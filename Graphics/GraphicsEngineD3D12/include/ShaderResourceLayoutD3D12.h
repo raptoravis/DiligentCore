@@ -95,7 +95,9 @@
 //      handles mutable and dynamic resources
 //    * Every shader object (ShaderD3D12Impl) constains shader variable manager that handles static resources
 
-#include <array>
+#include <memory>
+#include "stl/array.h"
+#include "stl/unique_ptr.h"
 
 #include "ShaderBase.h"
 #include "ShaderResourcesD3D12.h"
@@ -309,12 +311,12 @@ private:
     }
 
     void AllocateMemory(IMemoryAllocator&                                         Allocator,
-                        const std::array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES>& CbvSrvUavCount,
-                        const std::array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES>& SamplerCount);
+                        const array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES>& CbvSrvUavCount,
+                        const array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES>& SamplerCount);
 
-    std::unique_ptr<void, STDDeleterRawMem<void> > m_ResourceBuffer;
-    std::array<Uint16, SHADER_VARIABLE_TYPE_NUM_TYPES + 1> m_CbvSrvUavOffsets = {};
-    std::array<Uint16, SHADER_VARIABLE_TYPE_NUM_TYPES + 1> m_SamplersOffsets  = {};
+    unique_ptr<void, STDDeleterRawMem<void> > m_ResourceBuffer;
+    array<Uint16, SHADER_VARIABLE_TYPE_NUM_TYPES + 1> m_CbvSrvUavOffsets = {};
+    array<Uint16, SHADER_VARIABLE_TYPE_NUM_TYPES + 1> m_SamplersOffsets  = {};
 
     CComPtr<ID3D12Device>                       m_pd3d12Device;
     IObject&                                    m_Owner;

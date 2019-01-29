@@ -22,6 +22,7 @@
  */
 
 #include "pch.h"
+#include "stl/utility.h"
 #include "BufferD3D12Impl.h"
 #include "RenderDeviceD3D12Impl.h"
 #include "DeviceContextD3D12Impl.h"
@@ -198,12 +199,12 @@ BufferD3D12Impl :: BufferD3D12Impl(IReferenceCounters*          pRefCounters,
             //                  |     was added to the delete queue      |                                   |
             //                  |     with value N                       |                                   |
             Uint32 QueueIndex = 0;
-	        pRenderDeviceD3D12->CloseAndExecuteTransientCommandContext(QueueIndex, std::move(InitContext));
+	        pRenderDeviceD3D12->CloseAndExecuteTransientCommandContext(QueueIndex, move(InitContext));
 
             // Add reference to the object to the release queue to keep it alive
             // until copy operation is complete. This must be done after
             // submitting command list for execution!
-            pRenderDeviceD3D12->SafeReleaseDeviceObject(std::move(UploadBuffer), Uint64{1} << QueueIndex);
+            pRenderDeviceD3D12->SafeReleaseDeviceObject(move(UploadBuffer), Uint64{1} << QueueIndex);
         }
 
         if (m_Desc.BindFlags & BIND_UNIFORM_BUFFER)
@@ -288,7 +289,7 @@ BufferD3D12Impl :: ~BufferD3D12Impl()
 {
     // D3D12 object can only be destroyed when it is no longer used by the GPU
     auto *pDeviceD3D12Impl = ValidatedCast<RenderDeviceD3D12Impl>(GetDevice());
-    pDeviceD3D12Impl->SafeReleaseDeviceObject(std::move(m_pd3d12Resource), m_Desc.CommandQueueMask);
+    pDeviceD3D12Impl->SafeReleaseDeviceObject(move(m_pd3d12Resource), m_Desc.CommandQueueMask);
 }
 
 IMPLEMENT_QUERY_INTERFACE( BufferD3D12Impl, IID_BufferD3D12, TBufferBase )
@@ -314,14 +315,14 @@ void BufferD3D12Impl::CreateViewInternal( const BufferViewDesc& OrigViewDesc, IB
             auto UAVHandleAlloc = pDeviceD3D12Impl->AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
             CreateUAV( ViewDesc, UAVHandleAlloc.GetCpuHandle() );
             *ppView = NEW_RC_OBJ(BuffViewAllocator, "BufferViewD3D12Impl instance", BufferViewD3D12Impl, bIsDefaultView ? this : nullptr)
-                                (GetDevice(), ViewDesc, this, std::move(UAVHandleAlloc), bIsDefaultView );
+                                (GetDevice(), ViewDesc, this, move(UAVHandleAlloc), bIsDefaultView );
         }
         else if( ViewDesc.ViewType == BUFFER_VIEW_SHADER_RESOURCE )
         {
 			auto SRVHandleAlloc = pDeviceD3D12Impl->AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
             CreateSRV( ViewDesc, SRVHandleAlloc.GetCpuHandle() );
             *ppView = NEW_RC_OBJ(BuffViewAllocator, "BufferViewD3D12Impl instance", BufferViewD3D12Impl, bIsDefaultView ? this : nullptr)
-                                (GetDevice(), ViewDesc, this, std::move(SRVHandleAlloc), bIsDefaultView );
+                                (GetDevice(), ViewDesc, this, move(SRVHandleAlloc), bIsDefaultView );
         }
 
         if( !bIsDefaultView && *ppView )

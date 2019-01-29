@@ -23,9 +23,11 @@
 
 #pragma once
 
+#include "stl/vector.h"
+#include "stl/map.h"
+#include "stl/utility.h"
+
 #include <mutex>
-#include <map>
-#include <deque>
 #include <atomic>
 
 namespace Diligent
@@ -124,7 +126,7 @@ public:
     D3D12DynamicMemoryManager& operator= (const D3D12DynamicMemoryManager&)  = delete;
     D3D12DynamicMemoryManager& operator= (      D3D12DynamicMemoryManager&&) = delete;
 
-    void ReleasePages(std::vector<D3D12DynamicPage>& Pages, Uint64 QueueMask);
+    void ReleasePages(vector<D3D12DynamicPage>& Pages, Uint64 QueueMask);
 
     void Destroy();
 
@@ -138,8 +140,8 @@ private:
     RenderDeviceD3D12Impl& m_DeviceD3D12Impl;
     
     std::mutex m_AvailablePagesMtx;
-    using AvailablePagesMapElemType = std::pair<Uint64, D3D12DynamicPage>;
-    std::multimap<Uint64, D3D12DynamicPage, std::less<Uint64>, STDAllocatorRawMem<AvailablePagesMapElemType> > m_AvailablePages;
+    using AvailablePagesMapElemType = pair<Uint64, D3D12DynamicPage>;
+    multimap<Uint64, D3D12DynamicPage, less<Uint64>, STDAllocatorRawMem<AvailablePagesMapElemType> > m_AvailablePages;
 
 #ifdef DEVELOPMENT
     std::atomic_int32_t m_AllocatedPageCounter = 0;
@@ -152,7 +154,7 @@ class D3D12DynamicHeap
 public:
     D3D12DynamicHeap(D3D12DynamicMemoryManager& DynamicMemMgr, std::string HeapName, Uint64 PageSize) :
         m_GlobalDynamicMemMgr (DynamicMemMgr),
-        m_HeapName            (std::move(HeapName)),
+        m_HeapName            (move(HeapName)),
         m_PageSize            (PageSize)
     {}
 
@@ -174,7 +176,7 @@ private:
     D3D12DynamicMemoryManager& m_GlobalDynamicMemMgr;
     const std::string m_HeapName;
 
-    std::vector<D3D12DynamicPage> m_AllocatedPages;
+    vector<D3D12DynamicPage> m_AllocatedPages;
     
     const Uint64 m_PageSize;
 

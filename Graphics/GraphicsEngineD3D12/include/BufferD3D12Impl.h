@@ -26,6 +26,8 @@
 /// \file
 /// Declaration of Diligent::BufferD3D12Impl class
 
+#include "stl/vector.h"
+
 #include "BufferD3D12.h"
 #include "RenderDeviceD3D12.h"
 #include "BufferBase.h"
@@ -94,7 +96,7 @@ private:
     friend class DeviceContextD3D12Impl;
     // Array of dynamic allocations for every device context
     // sizeof(D3D12DynamicAllocation) == 40 (x64)
-    std::vector<D3D12DynamicAllocation,  STDAllocatorRawMem<D3D12DynamicAllocation> > m_DynamicData;
+    vector<D3D12DynamicAllocation,  STDAllocatorRawMem<D3D12DynamicAllocation> > m_DynamicData;
 };
 
 }

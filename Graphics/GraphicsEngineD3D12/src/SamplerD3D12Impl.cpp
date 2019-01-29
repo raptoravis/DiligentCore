@@ -22,6 +22,7 @@
  */
 
 #include "pch.h"
+#include "stl/utility.h"
 #include "SamplerD3D12Impl.h"
 #include "RenderDeviceD3D12Impl.h"
 #include "D3D12TypeConversions.h"
@@ -50,7 +51,7 @@ SamplerD3D12Impl::SamplerD3D12Impl(IReferenceCounters*    pRefCounters,
     };
 
     auto CPUDescriptorAlloc = pRenderDeviceD3D12->AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
-    m_Descriptor = std::move(CPUDescriptorAlloc);
+    m_Descriptor = move(CPUDescriptorAlloc);
 	pD3D12Device->CreateSampler(&D3D12SamplerDesc, m_Descriptor.GetCpuHandle());
 }
 

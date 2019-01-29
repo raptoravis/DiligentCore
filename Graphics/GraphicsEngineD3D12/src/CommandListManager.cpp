@@ -22,6 +22,7 @@
  */
 
 #include "pch.h"
+#include "stl/utility.h"
 #include "CommandListManager.h"
 #include "RenderDeviceD3D12Impl.h"
 
@@ -88,7 +89,7 @@ void CommandListManager::ReleaseAllocator( CComPtr<ID3D12CommandAllocator>&& All
         CommandListManager*             Mgr;
 
         StaleAllocator(CComPtr<ID3D12CommandAllocator>&& _Allocator, CommandListManager& _Mgr)noexcept :
-            Allocator (std::move(_Allocator)),
+            Allocator (move(_Allocator)),
             Mgr       (&_Mgr)
         {
         }
@@ -98,7 +99,7 @@ void CommandListManager::ReleaseAllocator( CComPtr<ID3D12CommandAllocator>&& All
         StaleAllocator& operator= (      StaleAllocator&&) = delete;
             
         StaleAllocator(StaleAllocator&& rhs)noexcept : 
-            Allocator (std::move(rhs.Allocator)),
+            Allocator (move(rhs.Allocator)),
             Mgr       (rhs.Mgr)
         {
             rhs.Mgr       = nullptr;
@@ -107,16 +108,16 @@ void CommandListManager::ReleaseAllocator( CComPtr<ID3D12CommandAllocator>&& All
         ~StaleAllocator()
         {
             if (Mgr != nullptr)
-                Mgr->FreeAllocator( std::move(Allocator) );
+                Mgr->FreeAllocator( move(Allocator) );
         }
     };
-    m_DeviceD3D12Impl.GetReleaseQueue(CmdQueue).DiscardResource(StaleAllocator{std::move(Allocator), *this}, FenceValue);
+    m_DeviceD3D12Impl.GetReleaseQueue(CmdQueue).DiscardResource(StaleAllocator{move(Allocator), *this}, FenceValue);
 }
 
 void CommandListManager::FreeAllocator( CComPtr<ID3D12CommandAllocator>&& Allocator )
 {
 	std::lock_guard<std::mutex> LockGuard(m_AllocatorMutex);
-	m_FreeAllocators.emplace_back( std::move(Allocator) );
+	m_FreeAllocators.emplace_back( move(Allocator) );
 #ifdef DEVELOPMENT
     Atomics::AtomicDecrement(m_AllocatorCounter);
 #endif

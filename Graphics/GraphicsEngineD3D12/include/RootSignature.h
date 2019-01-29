@@ -25,7 +25,10 @@
 
 /// \file
 /// Declaration of Diligent::RootSignature class
-#include <array>
+#include "stl/array.h"
+#include "stl/vector.h"
+#include "stl/algorithm.h"
+
 #include "ShaderD3DBase.h"
 #include "ShaderResourceLayoutD3D12.h"
 
@@ -125,7 +128,7 @@ public:
             for (Uint32 r = 0; r < SrcTbl.NumDescriptorRanges; ++r)
             {
                 const auto &Range = SrcTbl.pDescriptorRanges[r];
-                dbgTableSize = std::max(dbgTableSize, Range.OffsetInDescriptorsFromTableStart + Range.NumDescriptors);
+                dbgTableSize = max(dbgTableSize, Range.OffsetInDescriptorsFromTableStart + Range.NumDescriptors);
             }
             VERIFY(dbgTableSize == m_DescriptorTableSize, "Incorrect descriptor table size");
             
@@ -155,7 +158,7 @@ public:
 		range.BaseShaderRegister = Register;
 		range.RegisterSpace      = Space;
 		range.OffsetInDescriptorsFromTableStart = OffsetFromTableStart;
-        m_DescriptorTableSize = std::max(m_DescriptorTableSize, OffsetFromTableStart + Count);
+        m_DescriptorTableSize = max(m_DescriptorTableSize, OffsetFromTableStart + Count);
 	}
 
     SHADER_VARIABLE_TYPE GetShaderVariableType()const{ return m_ShaderVarType; }
@@ -357,11 +360,11 @@ private:
     void dbgVerifyRootParameters()const;
 #endif
     
-    std::vector<Uint32, STDAllocatorRawMem<Uint32> > GetCacheTableSizes()const;
+    vector<Uint32, STDAllocatorRawMem<Uint32> > GetCacheTableSizes()const;
 
-    std::array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES> m_TotalSrvCbvUavSlots = {};
-    std::array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES> m_TotalSamplerSlots   = {};
-    std::array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES> m_TotalRootViews      = {};
+    array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES> m_TotalSrvCbvUavSlots = {};
+    array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES> m_TotalSamplerSlots   = {};
+    array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES> m_TotalRootViews      = {};
     
     CComPtr<ID3D12RootSignature> m_pd3d12RootSignature;
 
@@ -432,7 +435,7 @@ private:
                                        Uint32 RootTableToAddRanges = static_cast<Uint32>(-1));
 
         IMemoryAllocator &m_MemAllocator;
-        std::unique_ptr<void, STDDeleter<void, IMemoryAllocator>> m_pMemory;
+        unique_ptr<void, STDDeleter<void, IMemoryAllocator>> m_pMemory;
         Uint32 m_NumRootTables         = 0;
         Uint32 m_NumRootViews          = 0;
         Uint32 m_TotalDescriptorRanges = 0;
@@ -446,9 +449,9 @@ private:
     // in m_RootParams (NOT the Root Index!), for every variable type 
     // (static, mutable, dynamic) and every shader type,
     // or -1, if the table is not yet assigned to the combination
-    std::array<Uint8, SHADER_VARIABLE_TYPE_NUM_TYPES * 6> m_SrvCbvUavRootTablesMap;
+    array<Uint8, SHADER_VARIABLE_TYPE_NUM_TYPES * 6> m_SrvCbvUavRootTablesMap;
     // This array contains the same data for Sampler root table
-    std::array<Uint8, SHADER_VARIABLE_TYPE_NUM_TYPES * 6> m_SamplerRootTablesMap;
+    array<Uint8, SHADER_VARIABLE_TYPE_NUM_TYPES * 6> m_SamplerRootTablesMap;
 
     RootParamsManager m_RootParams;
     
@@ -467,7 +470,7 @@ private:
         {}
     };
     // Note: sizeof(m_StaticSamplers) == 56 (MS compiler, release x64)
-    std::vector<StaticSamplerAttribs, STDAllocatorRawMem<StaticSamplerAttribs> > m_StaticSamplers;
+    vector<StaticSamplerAttribs, STDAllocatorRawMem<StaticSamplerAttribs> > m_StaticSamplers;
 
     IMemoryAllocator &m_MemAllocator;
 

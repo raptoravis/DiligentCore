@@ -27,11 +27,13 @@
 #pragma once
 
 #include <mutex>
-#include <vector>
-#include <queue>
 #include <string>
-#include <unordered_set>
 #include <atomic>
+
+#include "stl/vector.h"
+#include "stl/unordered_set.h"
+#include "stl/utility.h"
+
 #include "ObjectBase.h"
 #include "VariableSizeAllocationsManager.h"
 
@@ -95,13 +97,13 @@ public:
 
     // Move constructor (copy is not allowed)
     DescriptorHeapAllocation(DescriptorHeapAllocation&& Allocation)noexcept : 
-	    m_FirstCpuHandle      (std::move(Allocation.m_FirstCpuHandle)),
-	    m_FirstGpuHandle      (std::move(Allocation.m_FirstGpuHandle)),
-        m_NumHandles          (std::move(Allocation.m_NumHandles)),
-        m_pAllocator          (std::move(Allocation.m_pAllocator)),
-        m_AllocationManagerId (std::move(Allocation.m_AllocationManagerId)),
-        m_pDescriptorHeap     (std::move(Allocation.m_pDescriptorHeap) ),
-        m_DescriptorSize      (std::move(Allocation.m_DescriptorSize) )
+	    m_FirstCpuHandle      (move(Allocation.m_FirstCpuHandle)),
+	    m_FirstGpuHandle      (move(Allocation.m_FirstGpuHandle)),
+        m_NumHandles          (move(Allocation.m_NumHandles)),
+        m_pAllocator          (move(Allocation.m_pAllocator)),
+        m_AllocationManagerId (move(Allocation.m_AllocationManagerId)),
+        m_pDescriptorHeap     (move(Allocation.m_pDescriptorHeap) ),
+        m_DescriptorSize      (move(Allocation.m_DescriptorSize) )
     {
         Allocation.Reset();
     }
@@ -109,13 +111,13 @@ public:
     // Move assignment (assignment is not allowed)
     DescriptorHeapAllocation& operator = (DescriptorHeapAllocation&& Allocation)noexcept
     { 
-	    m_FirstCpuHandle      = std::move(Allocation.m_FirstCpuHandle);
-	    m_FirstGpuHandle      = std::move(Allocation.m_FirstGpuHandle);
-        m_NumHandles          = std::move(Allocation.m_NumHandles);
-        m_pAllocator          = std::move(Allocation.m_pAllocator);
-        m_AllocationManagerId = std::move(Allocation.m_AllocationManagerId);
-        m_pDescriptorHeap     = std::move(Allocation.m_pDescriptorHeap);
-        m_DescriptorSize      = std::move(Allocation.m_DescriptorSize);
+	    m_FirstCpuHandle      = move(Allocation.m_FirstCpuHandle);
+	    m_FirstGpuHandle      = move(Allocation.m_FirstGpuHandle);
+        m_NumHandles          = move(Allocation.m_NumHandles);
+        m_pAllocator          = move(Allocation.m_pAllocator);
+        m_AllocationManagerId = move(Allocation.m_AllocationManagerId);
+        m_pDescriptorHeap     = move(Allocation.m_pDescriptorHeap);
+        m_DescriptorSize      = move(Allocation.m_DescriptorSize);
 
         Allocation.Reset();
 
@@ -142,7 +144,7 @@ public:
     ~DescriptorHeapAllocation()
     {
         if(!IsNull() && m_pAllocator)
-            m_pAllocator->Free(std::move(*this), ~Uint64{0});
+            m_pAllocator->Free(move(*this), ~Uint64{0});
         // Allocation must have been disposed by the allocator
         VERIFY(IsNull(), "Non-null descriptor is being destroyed");
     }
@@ -250,9 +252,9 @@ public:
         m_FirstGPUHandle            (rhs.m_FirstGPUHandle),
         m_MaxAllocatedSize          (rhs.m_MaxAllocatedSize),
         // Mutex is not movable
-        //m_FreeBlockManagerMutex     (std::move(rhs.m_FreeBlockManagerMutex))
-        m_FreeBlockManager          (std::move(rhs.m_FreeBlockManager)),
-        m_pd3d12DescriptorHeap      (std::move(rhs.m_pd3d12DescriptorHeap))
+        //m_FreeBlockManagerMutex     (move(rhs.m_FreeBlockManagerMutex))
+        m_FreeBlockManager          (move(rhs.m_FreeBlockManager)),
+        m_pd3d12DescriptorHeap      (move(rhs.m_pd3d12DescriptorHeap))
     {
         rhs.m_NumDescriptorsInAllocation = 0; // Must be set to zero so that debug check in dtor passes
         rhs.m_ThisManagerId              = static_cast<size_t>(-1);
@@ -373,9 +375,9 @@ private:
 
     // Pool of descriptor heap managers
     std::mutex                                                                                        m_HeapPoolMutex;
-    std::vector<DescriptorHeapAllocationManager, STDAllocatorRawMem<DescriptorHeapAllocationManager>> m_HeapPool;
+    vector<DescriptorHeapAllocationManager, STDAllocatorRawMem<DescriptorHeapAllocationManager>> m_HeapPool;
     // Indices of available descriptor heap managers
-    std::unordered_set<size_t, std::hash<size_t>, std::equal_to<size_t>, STDAllocatorRawMem<size_t>>  m_AvailableHeaps;
+    unordered_set<size_t, hash<size_t>, equal_to<size_t>, STDAllocatorRawMem<size_t>>  m_AvailableHeaps;
     
     D3D12_DESCRIPTOR_HEAP_DESC m_HeapDesc;
 	const UINT m_DescriptorSize = 0;
@@ -528,7 +530,7 @@ private:
 
     // List of chunks allocated from the master GPU descriptor heap. All chunks are disposed at the end
     // of the frame
-    std::vector<DescriptorHeapAllocation, STDAllocatorRawMem<DescriptorHeapAllocation> > m_Suballocations;
+    vector<DescriptorHeapAllocation, STDAllocatorRawMem<DescriptorHeapAllocation> > m_Suballocations;
 
 	Uint32 m_CurrentSuballocationOffset  = 0;
     Uint32 m_DynamicChunkSize            = 0;

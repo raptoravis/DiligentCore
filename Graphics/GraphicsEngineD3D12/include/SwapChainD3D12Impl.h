@@ -26,6 +26,8 @@
 /// \file
 /// Declaration of Diligent::SwapChainD3D12Impl class
 
+#include "stl/vector.h"
+
 #include <dxgi1_4.h>
 #include "SwapChainD3D12.h"
 #include "SwapChainD3DBase.h"
@@ -69,7 +71,7 @@ private:
     virtual void UpdateSwapChain(bool CreateNew)override final;
     void InitBuffersAndViews();
 
-    std::vector< RefCntAutoPtr<ITextureViewD3D12>, STDAllocatorRawMem<RefCntAutoPtr<ITextureViewD3D12>> > m_pBackBufferRTV;
+    vector< RefCntAutoPtr<ITextureViewD3D12>, STDAllocatorRawMem<RefCntAutoPtr<ITextureViewD3D12>> > m_pBackBufferRTV;
     RefCntAutoPtr<ITextureViewD3D12> m_pDepthBufferDSV;
 };
 

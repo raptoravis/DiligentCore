@@ -26,7 +26,9 @@
 /// \file
 /// Declaration of Diligent::DeviceContextD3D12Impl class
 
-#include <unordered_map>
+#include "stl/unordered_map.h"
+#include "stl/unique_ptr.h"
+#include "stl/utility.h"
 
 #include "DeviceContextD3D12.h"
 #include "DeviceContextBase.h"
@@ -258,7 +260,7 @@ private:
         m_State.NumCommands = m_State.NumCommands != 0 ? m_State.NumCommands : 1;
         return *m_CurrCmdCtx;
     }
-    std::unique_ptr<CommandContext, STDDeleterRawMem<CommandContext> > m_CurrCmdCtx;
+    unique_ptr<CommandContext, STDDeleterRawMem<CommandContext> > m_CurrCmdCtx;
 
     struct State
     {
@@ -292,7 +294,7 @@ private:
 
     FixedBlockMemoryAllocator m_CmdListAllocator;
 
-    std::vector<std::pair<Uint64, RefCntAutoPtr<IFence> > > m_PendingFences;
+    vector<pair<Uint64, RefCntAutoPtr<IFence> > > m_PendingFences;
 
     struct MappedTextureKey
     {
@@ -312,7 +314,7 @@ private:
             }
         };
     };
-    std::unordered_map<MappedTextureKey, TextureUploadSpace, MappedTextureKey::Hasher> m_MappedTextures;
+    unordered_map<MappedTextureKey, TextureUploadSpace, MappedTextureKey::Hasher> m_MappedTextures;
 };
 
 }

@@ -22,6 +22,7 @@
  */
 
 #include "pch.h"
+#include "stl/utility.h"
 #include "RenderDeviceD3D12Impl.h"
 #include "PipelineStateD3D12Impl.h"
 #include "ShaderD3D12Impl.h"
@@ -117,14 +118,14 @@ void RenderDeviceD3D12Impl::DisposeCommandContext(PooledCommandContext&& Ctx)
 	CComPtr<ID3D12CommandAllocator> pAllocator; 
     Ctx->Close(pAllocator);
     // Since allocator has not been used, we cmd list manager can put it directly into the free allocator list
-    m_CmdListManager.FreeAllocator(std::move(pAllocator));
-    FreeCommandContext(std::move(Ctx));
+    m_CmdListManager.FreeAllocator(move(pAllocator));
+    FreeCommandContext(move(Ctx));
 }
 
 void RenderDeviceD3D12Impl::FreeCommandContext(PooledCommandContext&& Ctx)
 {
 	std::lock_guard<std::mutex> LockGuard(m_ContextPoolMutex);
-    m_ContextPool.emplace_back(std::move(Ctx));
+    m_ContextPool.emplace_back(move(Ctx));
 #ifdef DEVELOPMENT
     Atomics::AtomicDecrement(m_AllocatedCtxCounter);
 #endif
@@ -142,11 +143,11 @@ void RenderDeviceD3D12Impl::CloseAndExecuteTransientCommandContext(Uint32 Comman
             FenceValue = pCmdQueue->Submit(pCmdList);
         }
     );
-	m_CmdListManager.ReleaseAllocator(std::move(pAllocator), CommandQueueIndex, FenceValue);
-    FreeCommandContext(std::move(Ctx));
+	m_CmdListManager.ReleaseAllocator(move(pAllocator), CommandQueueIndex, FenceValue);
+    FreeCommandContext(move(Ctx));
 }
 
-Uint64 RenderDeviceD3D12Impl::CloseAndExecuteCommandContext(Uint32 QueueIndex, PooledCommandContext&& Ctx, bool DiscardStaleObjects, std::vector<std::pair<Uint64, RefCntAutoPtr<IFence> > >* pSignalFences)
+Uint64 RenderDeviceD3D12Impl::CloseAndExecuteCommandContext(Uint32 QueueIndex, PooledCommandContext&& Ctx, bool DiscardStaleObjects, vector<pair<Uint64, RefCntAutoPtr<IFence> > >* pSignalFences)
 {
     CComPtr<ID3D12CommandAllocator> pAllocator;
     ID3D12GraphicsCommandList* pCmdList = Ctx->Close(pAllocator);
@@ -184,8 +185,8 @@ Uint64 RenderDeviceD3D12Impl::CloseAndExecuteCommandContext(Uint32 QueueIndex, P
         }
     }
 
-	m_CmdListManager.ReleaseAllocator(std::move(pAllocator), QueueIndex, FenceValue);
-    FreeCommandContext(std::move(Ctx));
+	m_CmdListManager.ReleaseAllocator(move(pAllocator), QueueIndex, FenceValue);
+    FreeCommandContext(move(Ctx));
 
     PurgeReleaseQueue(QueueIndex);
 
@@ -219,7 +220,7 @@ RenderDeviceD3D12Impl::PooledCommandContext RenderDeviceD3D12Impl::AllocateComma
     	std::lock_guard<std::mutex> LockGuard(m_ContextPoolMutex);
         if (!m_ContextPool.empty())
         {
-            PooledCommandContext Ctx = std::move(m_ContextPool.back());
+            PooledCommandContext Ctx = move(m_ContextPool.back());
             m_ContextPool.pop_back();
             Ctx->Reset(m_CmdListManager);
             Ctx->SetID(ID);

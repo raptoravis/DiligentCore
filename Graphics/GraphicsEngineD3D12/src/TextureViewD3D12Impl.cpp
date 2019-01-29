@@ -22,6 +22,7 @@
  */
 
 #include "pch.h"
+#include "stl/utility.h"
 #include "TextureViewD3D12Impl.h"
 #include "DeviceContextD3D12Impl.h"
 
@@ -35,7 +36,7 @@ TextureViewD3D12Impl::TextureViewD3D12Impl( IReferenceCounters*        pRefCount
                                             DescriptorHeapAllocation&& HandleAlloc,
                                             bool                       bIsDefaultView ) :
     TTextureViewBase( pRefCounters, pDevice, ViewDesc, pTexture, bIsDefaultView ),
-    m_Descriptor(std::move(HandleAlloc))
+    m_Descriptor(move(HandleAlloc))
 {
 }
 //

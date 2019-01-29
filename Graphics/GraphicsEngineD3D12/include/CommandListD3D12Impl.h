@@ -26,6 +26,8 @@
 /// \file
 /// Declaration of Diligent::CommandListD3D12Impl class
 
+#include "stl/utility.h"
+
 #include "CommandListBase.h"
 #include "RenderDeviceD3D12Impl.h"
 
@@ -47,7 +49,7 @@ public:
                          RenderDeviceD3D12Impl::PooledCommandContext&&  pCmdContext) :
         TCommandListBase(pRefCounters, pDevice),
         m_pDeferredCtx  (pDeferredCtx),
-        m_pCmdContext   (std::move(pCmdContext))
+        m_pCmdContext   (move(pCmdContext))
     {
     }
     
@@ -58,8 +60,8 @@ public:
 
     RenderDeviceD3D12Impl::PooledCommandContext Close(RefCntAutoPtr<DeviceContextD3D12Impl>& pDeferredCtx)
     {
-        pDeferredCtx  = std::move(m_pDeferredCtx);
-        return std::move(m_pCmdContext);
+        pDeferredCtx  = move(m_pDeferredCtx);
+        return move(m_pCmdContext);
     }
 
 private:

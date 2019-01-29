@@ -25,6 +25,7 @@
 
 /// \file
 /// Declaration of Diligent::ShaderD3D12Impl class
+#include <memory>
 
 #include "RenderDeviceD3D12.h"
 #include "ShaderD3D12.h"

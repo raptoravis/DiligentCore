@@ -22,6 +22,7 @@
  */
 
 #include "pch.h"
+#include "stl/utility.h"
 #include "d3dx12_win.h"
 #include "CommandContext.h"
 #include "TextureD3D12Impl.h"
@@ -87,7 +88,7 @@ ID3D12GraphicsCommandList* CommandContext::Close(CComPtr<ID3D12CommandAllocator>
 	auto hr = m_pCommandList->Close();
     DEV_CHECK_ERR(SUCCEEDED(hr), "Failed to close the command list");
     
-    pAllocator = std::move(m_pCurrentAllocator);
+    pAllocator = move(m_pCurrentAllocator);
     return m_pCommandList;
 }
 

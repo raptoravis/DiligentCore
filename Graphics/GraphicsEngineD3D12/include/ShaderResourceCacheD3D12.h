@@ -79,6 +79,9 @@
 //                 .....       |   DescrptHndl[0]  ...  DescrptHndl[n-1]   |    ....
 //
 
+#include "stl/algorithm.h"
+#include "stl/utility.h"
+
 #include "DescriptorHeap.h"
 
 namespace Diligent
@@ -214,12 +217,12 @@ public:
                 if(Tbl.DbgGetHeapType() == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
                 {
                     VERIFY(Tbl.m_TableStartOffset == NumSrvCbvUavDescriptors, "Descriptor space allocation is not continuous");
-                    NumSrvCbvUavDescriptors = std::max(NumSrvCbvUavDescriptors, Tbl.m_TableStartOffset + Tbl.GetSize());
+                    NumSrvCbvUavDescriptors = max(NumSrvCbvUavDescriptors, Tbl.m_TableStartOffset + Tbl.GetSize());
                 }
                 else
                 {
                     VERIFY(Tbl.m_TableStartOffset == NumSamplerDescriptors, "Descriptor space allocation is not continuous");
-                    NumSamplerDescriptors = std::max(NumSamplerDescriptors, Tbl.m_TableStartOffset + Tbl.GetSize());
+                    NumSamplerDescriptors = max(NumSamplerDescriptors, Tbl.m_TableStartOffset + Tbl.GetSize());
                 }
             }
         }
@@ -227,8 +230,8 @@ public:
         VERIFY(NumSamplerDescriptors == SamplerHeapSpace.GetNumHandles() || NumSamplerDescriptors == 0 && SamplerHeapSpace.GetCpuHandle(0).ptr == 0, "Unexpected descriptor heap allocation size" );
 #endif
 
-        m_CbvSrvUavHeapSpace = std::move(CbcSrvUavHeapSpace);
-        m_SamplerHeapSpace = std::move(SamplerHeapSpace);
+        m_CbvSrvUavHeapSpace = move(CbcSrvUavHeapSpace);
+        m_SamplerHeapSpace = move(SamplerHeapSpace);
     }
 
     ID3D12DescriptorHeap* GetSrvCbvUavDescriptorHeap() { return m_CbvSrvUavHeapSpace.GetDescriptorHeap(); }

@@ -25,6 +25,11 @@
 
 /// \file
 /// Declaration of Diligent::RenderDeviceD3D12Impl class
+
+#include "stl/unique_ptr.h"
+#include "stl/vector.h"
+#include "stl/utility.h"
+
 #include "RenderDeviceD3D12.h"
 #include "RenderDeviceD3DBase.h"
 #include "RenderDeviceNextGenBase.h"
@@ -80,10 +85,10 @@ public:
 
 	void IdleGPU();
 
-    using PooledCommandContext = std::unique_ptr<CommandContext, STDDeleterRawMem<CommandContext> >;
+    using PooledCommandContext = unique_ptr<CommandContext, STDDeleterRawMem<CommandContext> >;
     PooledCommandContext AllocateCommandContext(const Char *ID = "");
     void CloseAndExecuteTransientCommandContext(Uint32 CommandQueueIndex, PooledCommandContext&& Ctx);
-    Uint64 CloseAndExecuteCommandContext(Uint32 QueueIndex, PooledCommandContext&& Ctx, bool DiscardStaleObjects, std::vector<std::pair<Uint64, RefCntAutoPtr<IFence> > >* pSignalFences);
+    Uint64 CloseAndExecuteCommandContext(Uint32 QueueIndex, PooledCommandContext&& Ctx, bool DiscardStaleObjects, vector<pair<Uint64, RefCntAutoPtr<IFence> > >* pSignalFences);
 
     // Disposes an unused command context
     void DisposeCommandContext(PooledCommandContext&& Ctx);
@@ -114,7 +119,7 @@ private:
     CommandListManager m_CmdListManager;
 
     std::mutex m_ContextPoolMutex;
-	std::vector< PooledCommandContext, STDAllocatorRawMem<PooledCommandContext> > m_ContextPool;
+	vector< PooledCommandContext, STDAllocatorRawMem<PooledCommandContext> > m_ContextPool;
 #ifdef DEVELOPMENT
     Atomics::AtomicLong m_AllocatedCtxCounter = 0;
 #endif

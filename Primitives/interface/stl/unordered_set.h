@@ -59,14 +59,14 @@ template <typename  Key,
           typename  Predicate          = std::equal_to<Key>, 
 	      typename  Allocator          = std::allocator<Key>,
           bool      /*bCacheHashCode*/ = false>
-using unordered_set = std::unordered_set<Key, T, Hash, Predicate, Allocator>;
+using unordered_set = std::unordered_set<Key, Hash, Predicate, Allocator>;
 
 template <typename  Key,
           typename  Hash               = std::hash<Key>,
           typename  Predicate          = std::equal_to<Key>, 
 	      typename  Allocator          = std::allocator<Key>,
           bool      /*bCacheHashCode*/ = false>
-using unordered_multiset = std::unordered_multiset<Key, T, Hash, Predicate, Allocator>;
+using unordered_multiset = std::unordered_multiset<Key, Hash, Predicate, Allocator>;
 
 }
 

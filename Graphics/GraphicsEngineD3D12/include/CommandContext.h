@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <vector>
+#include "stl/vector.h"
 
 #include "D3D12ResourceBase.h"
 #include "TextureViewD3D12.h"
@@ -168,7 +168,7 @@ protected:
 	ID3D12RootSignature* m_pCurComputeRootSignature  = nullptr;
 
     static constexpr int MaxPendingBarriers = 16;
-	std::vector<D3D12_RESOURCE_BARRIER, STDAllocatorRawMem<D3D12_RESOURCE_BARRIER> > m_PendingResourceBarriers;
+	vector<D3D12_RESOURCE_BARRIER, STDAllocatorRawMem<D3D12_RESOURCE_BARRIER> > m_PendingResourceBarriers;
 
     ShaderDescriptorHeaps m_BoundDescriptorHeaps;
     

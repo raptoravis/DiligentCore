@@ -25,7 +25,7 @@
 /// Routines that initialize D3D12-based engine implementation
 
 #include "pch.h"
-#include <array>
+#include "stl/array.h"
 #include "RenderDeviceFactoryD3D12.h"
 #include "RenderDeviceD3D12Impl.h"
 #include "DeviceContextD3D12Impl.h"
@@ -262,7 +262,7 @@ void EngineFactoryD3D12Impl::CreateDeviceAndContextsD3D12( const EngineD3D12Attr
         return;
     }
         
-    std::array<ICommandQueueD3D12*, 1> CmdQueues = {pCmdQueueD3D12};
+    array<ICommandQueueD3D12*, 1> CmdQueues = {pCmdQueueD3D12};
     AttachToD3D12Device(d3d12Device, CmdQueues.size(), CmdQueues.data(), CreationAttribs, ppDevice, ppContexts, NumDeferredContexts);
 }
 

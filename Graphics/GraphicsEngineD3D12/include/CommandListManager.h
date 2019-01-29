@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <vector>
+#include "stl/vector.h"
 #include <mutex>
 #include <stdint.h>
 
@@ -58,7 +58,7 @@ public:
 
 private:
     std::mutex m_AllocatorMutex;
-	std::vector< CComPtr<ID3D12CommandAllocator>, STDAllocatorRawMem<CComPtr<ID3D12CommandAllocator>> > m_FreeAllocators;
+	vector< CComPtr<ID3D12CommandAllocator>, STDAllocatorRawMem<CComPtr<ID3D12CommandAllocator>> > m_FreeAllocators;
 	
     RenderDeviceD3D12Impl& m_DeviceD3D12Impl;
 

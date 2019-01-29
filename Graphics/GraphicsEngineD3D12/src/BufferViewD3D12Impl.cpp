@@ -22,6 +22,7 @@
  */
 
 #include "pch.h"
+#include "stl/utility.h"
 #include "BufferViewD3D12Impl.h"
 
 namespace Diligent
@@ -34,7 +35,7 @@ BufferViewD3D12Impl::BufferViewD3D12Impl( IReferenceCounters*        pRefCounter
                                           DescriptorHeapAllocation&& HandleAlloc,
                                           bool                       bIsDefaultView ) :
     TBufferViewBase( pRefCounters, pDevice, ViewDesc, pBuffer, bIsDefaultView ),
-    m_DescriptorHandle( std::move(HandleAlloc) )
+    m_DescriptorHandle( move(HandleAlloc) )
 {
 }
 

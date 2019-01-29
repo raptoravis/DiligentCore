@@ -23,6 +23,8 @@
 
 #include "pch.h"
 #include <sstream>
+#include "stl/utility.h"
+#include "stl/algorithm.h"
 #include "RenderDeviceD3D12Impl.h"
 #include "DeviceContextD3D12Impl.h"
 #include "SwapChainD3D12.h"
@@ -137,7 +139,7 @@ namespace Diligent
             if (m_CurrCmdCtx)
             {
                 // The command context has never been executed, so it can be disposed without going through release queue
-                m_pDevice.RawPtr<RenderDeviceD3D12Impl>()->DisposeCommandContext(std::move(m_CurrCmdCtx));
+                m_pDevice.RawPtr<RenderDeviceD3D12Impl>()->DisposeCommandContext(move(m_CurrCmdCtx));
             }
         }
         else
@@ -583,11 +585,11 @@ namespace Diligent
             if (m_State.NumCommands != 0)
             {
                 m_CurrCmdCtx->FlushResourceBarriers();
-                pDeviceD3D12Impl->CloseAndExecuteCommandContext(m_CommandQueueId, std::move(m_CurrCmdCtx), true, &m_PendingFences);
+                pDeviceD3D12Impl->CloseAndExecuteCommandContext(m_CommandQueueId, move(m_CurrCmdCtx), true, &m_PendingFences);
                 m_PendingFences.clear();
             }
             else
-                pDeviceD3D12Impl->DisposeCommandContext(std::move(m_CurrCmdCtx));
+                pDeviceD3D12Impl->DisposeCommandContext(move(m_CurrCmdCtx));
         }
 
         if(RequestNewCmdCtx)
@@ -762,7 +764,7 @@ namespace Diligent
     {
         const Uint32 MaxScissorRects = D3D12_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE;
         VERIFY( NumRects < MaxScissorRects, "Too many scissor rects are being set" );
-        NumRects = std::min( NumRects, MaxScissorRects );
+        NumRects = min( NumRects, MaxScissorRects );
 
         TDeviceContextBase::SetScissorRects(NumRects, pRects, RTWidth, RTHeight);
 
@@ -786,7 +788,7 @@ namespace Diligent
         const Uint32 MaxD3D12RTs = D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT;
         Uint32 NumRenderTargets = m_NumBoundRenderTargets;
         VERIFY( NumRenderTargets <= MaxD3D12RTs, "D3D12 only allows 8 simultaneous render targets" );
-        NumRenderTargets = std::min( MaxD3D12RTs, NumRenderTargets );
+        NumRenderTargets = min( MaxD3D12RTs, NumRenderTargets );
 
         ITextureViewD3D12* ppRTVs[MaxD3D12RTs]; // Do not initialize with zeroes!
         ITextureViewD3D12* pDSV = nullptr;
@@ -1192,7 +1194,7 @@ namespace Diligent
 #ifdef _DEBUG
         {
             const auto& FmtAttribs = GetTextureFormatAttribs(TexDesc.Format);
-            const Uint32 RowCount = std::max((Footpring.Footprint.Height/FmtAttribs.BlockHeight), 1u);
+            const Uint32 RowCount = max((Footpring.Footprint.Height/FmtAttribs.BlockHeight), 1u);
             VERIFY(BufferSize >= Footpring.Footprint.RowPitch * RowCount * Footpring.Footprint.Depth, "Buffer is not large enough");
             VERIFY(Footpring.Footprint.Depth == 1 || static_cast<UINT>(SrcDepthStride) == Footpring.Footprint.RowPitch * RowCount, "Depth stride must be equal to the size of 2D plane");
         }
@@ -1215,7 +1217,7 @@ namespace Diligent
 
         if (StateTransitionRequired)
         {
-            std::swap(BarrierDesc.Transition.StateBefore, BarrierDesc.Transition.StateAfter);
+            swap(BarrierDesc.Transition.StateBefore, BarrierDesc.Transition.StateAfter);
             pCmdList->ResourceBarrier(1, &BarrierDesc);
         }
     }
@@ -1361,10 +1363,10 @@ namespace Diligent
         Box FullExtentBox;
         if (pMapRegion == nullptr)
         {
-            FullExtentBox.MaxX = std::max(TexDesc.Width  >> MipLevel, 1u);
-            FullExtentBox.MaxY = std::max(TexDesc.Height >> MipLevel, 1u);
+            FullExtentBox.MaxX = max(TexDesc.Width  >> MipLevel, 1u);
+            FullExtentBox.MaxY = max(TexDesc.Height >> MipLevel, 1u);
             if (TexDesc.Type == RESOURCE_DIM_TEX_3D)
-                FullExtentBox.MaxZ = std::max(TexDesc.Depth >> MipLevel, 1u);
+                FullExtentBox.MaxZ = max(TexDesc.Depth >> MipLevel, 1u);
             pMapRegion = &FullExtentBox;
         }
 
@@ -1374,7 +1376,7 @@ namespace Diligent
         MappedData.DepthStride = UploadSpace.DepthStride;
 
         auto Subres = D3D12CalcSubresource(MipLevel, ArraySlice, 0, TexDesc.MipLevels, TexDesc.ArraySize);
-        auto it = m_MappedTextures.emplace(MappedTextureKey{&TextureD3D12, Subres}, std::move(UploadSpace));
+        auto it = m_MappedTextures.emplace(MappedTextureKey{&TextureD3D12, Subres}, move(UploadSpace));
         if(!it.second)
             LOG_ERROR_MESSAGE("Mip level ", MipLevel, ", slice ", ArraySlice, " of texture '", TexDesc.Name, "' has already been mapped");
     }
@@ -1420,7 +1422,7 @@ namespace Diligent
     {
         auto* pDeviceD3D12Impl = m_pDevice.RawPtr<RenderDeviceD3D12Impl>();
         CommandListD3D12Impl* pCmdListD3D12( NEW_RC_OBJ(m_CmdListAllocator, "CommandListD3D12Impl instance", CommandListD3D12Impl)
-                                                       (pDeviceD3D12Impl, this, std::move(m_CurrCmdCtx)) );
+                                                       (pDeviceD3D12Impl, this, move(m_CurrCmdCtx)) );
         pCmdListD3D12->QueryInterface( IID_CommandList, reinterpret_cast<IObject**>(ppCommandList) );
         Flush(true);
 
@@ -1443,7 +1445,7 @@ namespace Diligent
         VERIFY_EXPR(m_PendingFences.empty());
         RefCntAutoPtr<DeviceContextD3D12Impl> pDeferredCtx;
         auto CmdContext = pCmdListD3D12->Close(pDeferredCtx);
-        m_pDevice.RawPtr<RenderDeviceD3D12Impl>()->CloseAndExecuteCommandContext(m_CommandQueueId, std::move(CmdContext), true, nullptr);
+        m_pDevice.RawPtr<RenderDeviceD3D12Impl>()->CloseAndExecuteCommandContext(m_CommandQueueId, move(CmdContext), true, nullptr);
         // Set the bit in the deferred context cmd queue mask corresponding to cmd queue of this context
         pDeferredCtx->m_SubmittedBuffersCmdQueueMask |= Uint64{1} << m_CommandQueueId;
     }

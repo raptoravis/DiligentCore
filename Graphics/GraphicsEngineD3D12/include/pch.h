@@ -32,9 +32,7 @@
 #define NOMINMAX
 
 
-#include <vector>
 #include <exception>
-#include <algorithm>
 #include <d3d12.h>
 
 #include "PlatformDefinitions.h"

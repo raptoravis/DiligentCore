@@ -23,6 +23,10 @@
 
 #include "pch.h"
 
+#include "stl/array.h"
+#include "stl/utility.h"
+#include "stl/algorithm.h"
+
 #include "ShaderResourceLayoutD3D12.h"
 #include "ShaderResourceCacheD3D12.h"
 #include "BufferD3D12Impl.h"
@@ -71,7 +75,7 @@ D3D12_DESCRIPTOR_RANGE_TYPE GetDescriptorRangeType(CachedResourceType ResType)
         }
 
     private:
-        std::array<D3D12_DESCRIPTOR_RANGE_TYPE, static_cast<size_t>(CachedResourceType::NumTypes)> m_Map;
+        array<D3D12_DESCRIPTOR_RANGE_TYPE, static_cast<size_t>(CachedResourceType::NumTypes)> m_Map;
     };
 
     static const ResTypeToD3D12DescrRangeType ResTypeToDescrRangeTypeMap;
@@ -79,8 +83,8 @@ D3D12_DESCRIPTOR_RANGE_TYPE GetDescriptorRangeType(CachedResourceType ResType)
 }
 
 void ShaderResourceLayoutD3D12::AllocateMemory(IMemoryAllocator&                                         Allocator,
-                                               const std::array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES>& CbvSrvUavCount,
-                                               const std::array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES>& SamplerCount)
+                                               const array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES>& CbvSrvUavCount,
+                                               const array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES>& SamplerCount)
 {
     m_CbvSrvUavOffsets[0] = 0;
     for(SHADER_VARIABLE_TYPE VarType = SHADER_VARIABLE_TYPE_STATIC; VarType < SHADER_VARIABLE_TYPE_NUM_TYPES; VarType = static_cast<SHADER_VARIABLE_TYPE>(VarType+1))
@@ -103,7 +107,7 @@ void ShaderResourceLayoutD3D12::AllocateMemory(IMemoryAllocator&                
         return;
 
     auto *pRawMem = ALLOCATE(Allocator, "Raw memory buffer for shader resource layout resources", MemSize);
-    m_ResourceBuffer = std::unique_ptr<void, STDDeleterRawMem<void> >(pRawMem, Allocator);
+    m_ResourceBuffer = unique_ptr<void, STDDeleterRawMem<void> >(pRawMem, Allocator);
 }
 
 
@@ -117,15 +121,15 @@ void ShaderResourceLayoutD3D12::Initialize(ID3D12Device*                        
                                            ShaderResourceCacheD3D12*                   pResourceCache,
                                            RootSignature*                              pRootSig)
 {
-    m_pResources = std::move(pSrcResources);
+    m_pResources = move(pSrcResources);
     m_pd3d12Device = pd3d12Device;
 
     VERIFY_EXPR( (pResourceCache != nullptr) ^ (pRootSig != nullptr) );
 
     Uint32 AllowedTypeBits = GetAllowedTypeBits(AllowedVarTypes, NumAllowedTypes);
 
-    std::array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES> CbvSrvUavCount = {};
-    std::array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES> SamplerCount   = {};
+    array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES> CbvSrvUavCount = {};
+    array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES> SamplerCount   = {};
 
     // Count number of resources to allocate all needed memory
     m_pResources->ProcessResources(
@@ -178,8 +182,8 @@ void ShaderResourceLayoutD3D12::Initialize(ID3D12Device*                        
     
     AllocateMemory(LayoutDataAllocator, CbvSrvUavCount, SamplerCount);
 
-    std::array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES> CurrCbvSrvUav = {};
-    std::array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES> CurrSampler   = {};
+    array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES> CurrCbvSrvUav = {};
+    array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES> CurrSampler   = {};
     Uint32 StaticResCacheTblSizes[4] = {0, 0, 0, 0};
 
     auto AddResource = [&](const D3DShaderResourceAttribs& Attribs, CachedResourceType ResType, Uint32 SamplerId = D3D12Resource::InvalidSamplerId)
@@ -208,7 +212,7 @@ void ShaderResourceLayoutD3D12::Initialize(ID3D12Device*                        
             RootIndex = DescriptorRangeType;
             Offset    = Attribs.BindPoint;
             // Resources in the static resource cache are indexed by the bind point
-            StaticResCacheTblSizes[RootIndex] = std::max(StaticResCacheTblSizes[RootIndex], Offset + Attribs.BindCount);
+            StaticResCacheTblSizes[RootIndex] = max(StaticResCacheTblSizes[RootIndex], Offset + Attribs.BindCount);
         }
         VERIFY(RootIndex != D3D12Resource::InvalidRootIndex, "Root index must be valid");
         VERIFY(Offset != D3D12Resource::InvalidOffset, "Offset must be valid");
@@ -374,7 +378,7 @@ void ShaderResourceLayoutD3D12::D3D12Resource::CacheCB(IDeviceObject*           
                 pd3d12Device->CopyDescriptorsSimple(1, ShdrVisibleHeapCPUDescriptorHandle, DstRes.CPUDescriptorHandle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
             }
 
-            DstRes.pObject = std::move(pBuffD3D12);
+            DstRes.pObject = move(pBuffD3D12);
         }
         else
         {
@@ -465,7 +469,7 @@ void ShaderResourceLayoutD3D12::D3D12Resource::CacheResourceView(IDeviceObject* 
         
         BindSamplerProc(pViewD3D12);
 
-        DstRes.pObject = std::move(pViewD3D12);
+        DstRes.pObject = move(pViewD3D12);
     }
     else
     {
@@ -512,7 +516,7 @@ void ShaderResourceLayoutD3D12::D3D12Resource::CacheSampler(IDeviceObject*      
             pd3d12Device->CopyDescriptorsSimple(1, ShdrVisibleHeapCPUDescriptorHandle, DstSam.CPUDescriptorHandle, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
         }
 
-        DstSam.pObject = std::move(pSamplerD3D12);
+        DstSam.pObject = move(pSamplerD3D12);
     }
     else
     {

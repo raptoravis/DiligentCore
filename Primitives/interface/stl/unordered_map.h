@@ -47,7 +47,7 @@ template <typename  Key,
           typename  Predicate      = eastl::equal_to<Key>, 
 	      typename  Allocator      = EASTLAllocatorType,
           bool      bCacheHashCode = false>
-using unordered_multimap = eastl::unordered_multimap<Key, T, Hash, Predicate, Allocator, bCacheHashCode>;
+using unordered_multimap = eastl::hash_multimap<Key, T, Hash, Predicate, Allocator, bCacheHashCode>;
 
 }
 

@@ -35,6 +35,7 @@ using eastl::pair;
 using eastl::make_pair;
 using eastl::move;
 using eastl::forward;
+using eastl::swap;
 
 }
 
@@ -50,6 +51,7 @@ using std::pair;
 using std::make_pair;
 using std::move;
 using std::forward;
+using std::swap;
 
 }
 

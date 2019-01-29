@@ -23,7 +23,8 @@
 
 #pragma once
 
-#include <array>
+#include "stl/array.h"
+#include "stl/vector.h"
 
 /// \file
 /// Implementation of D3D type conversions
@@ -72,7 +73,7 @@ namespace Diligent
     D3D_PRIM_TOPOLOGY TopologyToD3DTopology(PRIMITIVE_TOPOLOGY Topology)
     {
         static bool bIsInit = false;
-        static std::array<D3D_PRIM_TOPOLOGY, PRIMITIVE_TOPOLOGY_NUM_TOPOLOGIES> d3dPrimTopology = {};
+        static array<D3D_PRIM_TOPOLOGY, PRIMITIVE_TOPOLOGY_NUM_TOPOLOGIES> d3dPrimTopology = {};
         if( !bIsInit )
         {
             d3dPrimTopology[PRIMITIVE_TOPOLOGY_UNDEFINED]      =  D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
@@ -128,7 +129,7 @@ namespace Diligent
     {
         // D3D12_FILL_MODE is identical tp D3D11_FILL_MODE
         static bool bIsInit = false;
-        static std::array<D3D_FILL_MODE, FILL_MODE_NUM_MODES> d3dFillModes = {};
+        static array<D3D_FILL_MODE, FILL_MODE_NUM_MODES> d3dFillModes = {};
         if( !bIsInit )
         {
             d3dFillModes[ FILL_MODE_WIREFRAME ] = D3D_FILL_MODE_WIREFRAME;
@@ -154,7 +155,7 @@ namespace Diligent
     {
         // D3D_CULL_MODE is identical to D3D11_CULL_MODE
         static bool bIsInit = false;
-        static std::array<D3D_CULL_MODE, CULL_MODE_NUM_MODES> d3dCullModes = {};
+        static array<D3D_CULL_MODE, CULL_MODE_NUM_MODES> d3dCullModes = {};
         if( !bIsInit )
         {
             d3dCullModes[ CULL_MODE_NONE  ] = D3D_CULL_MODE_NONE;
@@ -206,7 +207,7 @@ namespace Diligent
         // Note that this code is safe for multithreaded environments since
         // bIsInit is set to true only AFTER the entire map is initialized.
         static bool bIsInit = false;
-        static std::array<D3D_BLEND, BLEND_FACTOR_NUM_FACTORS> D3DBlend = {};
+        static array<D3D_BLEND, BLEND_FACTOR_NUM_FACTORS> D3DBlend = {};
         if( !bIsInit )
         {
             // In a multithreaded environment, several threads can potentially enter
@@ -251,7 +252,7 @@ namespace Diligent
         // D3D12_BLEND_OP and D3D11_BLEND_OP are identical
 
         static bool bIsInit = false;
-        static std::array<D3D_BLEND_OP, BLEND_OPERATION_NUM_OPERATIONS> D3DBlendOp = {};
+        static array<D3D_BLEND_OP, BLEND_OPERATION_NUM_OPERATIONS> D3DBlendOp = {};
         if( !bIsInit )
         {
             D3DBlendOp[ BLEND_OPERATION_ADD          ] = D3D_BLEND_OP_ADD;
@@ -313,7 +314,7 @@ namespace Diligent
     D3D_STENCIL_OP StencilOpToD3DStencilOp( STENCIL_OP StencilOp )
     {
         static bool bIsInit = false;
-        static std::array<D3D_STENCIL_OP, STENCIL_OP_NUM_OPS> StOpToD3DStOpMap = {};
+        static array<D3D_STENCIL_OP, STENCIL_OP_NUM_OPS> StOpToD3DStOpMap = {};
         if( !bIsInit )
         {
             StOpToD3DStOpMap[ STENCIL_OP_KEEP     ] = D3D_STENCIL_OP_KEEP;
@@ -370,7 +371,7 @@ namespace Diligent
 
 
     template<typename D3D_INPUT_ELEMENT_DESC>
-    void LayoutElements_To_D3D_INPUT_ELEMENT_DESCs(const std::vector<LayoutElement, STDAllocatorRawMem<LayoutElement> > &LayoutElements, std::vector<D3D_INPUT_ELEMENT_DESC, STDAllocatorRawMem<D3D_INPUT_ELEMENT_DESC>> &D3DInputElements)
+    void LayoutElements_To_D3D_INPUT_ELEMENT_DESCs(const vector<LayoutElement, STDAllocatorRawMem<LayoutElement> > &LayoutElements, vector<D3D_INPUT_ELEMENT_DESC, STDAllocatorRawMem<D3D_INPUT_ELEMENT_DESC>> &D3DInputElements)
     {
         // D3D12_INPUT_ELEMENT_DESC and D3D11_INPUT_ELEMENT_DESC are identical
         auto NumElements = LayoutElements.size();
