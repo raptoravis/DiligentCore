@@ -23,9 +23,11 @@
 
 #include "pch.h"
 #include <mutex>
-#include <deque>
-#include <unordered_map>
-#include <vector>
+
+#include "stl/deque.h"
+#include "stl/unordered_map.h"
+#include "stl/vector.h"
+
 #include "TextureUploaderGL.h"
 #include "ThreadSignal.h"
 
@@ -131,11 +133,11 @@ namespace Diligent
         };
 
         std::mutex m_PendingOperationsMtx;
-        std::vector< PendingBufferOperation > m_PendingOperations;
-        std::vector< PendingBufferOperation > m_InWorkOperations;
+        vector< PendingBufferOperation > m_PendingOperations;
+        vector< PendingBufferOperation > m_InWorkOperations;
 
         std::mutex m_UploadBuffCacheMtx;
-        std::unordered_map< UploadBufferDesc, std::deque<RefCntAutoPtr<UploadBufferGL> > > m_UploadBufferCache;
+        unordered_map< UploadBufferDesc, deque<RefCntAutoPtr<UploadBufferGL> > > m_UploadBufferCache;
     };
 
     TextureUploaderGL::TextureUploaderGL(IReferenceCounters *pRefCounters, IRenderDevice *pDevice, const TextureUploaderDesc Desc) :

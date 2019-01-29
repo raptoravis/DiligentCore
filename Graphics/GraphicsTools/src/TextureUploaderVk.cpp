@@ -23,36 +23,32 @@
 
 #include "pch.h"
 
-#include <atlbase.h>
+#include "../../External/vulkan/vulkan.h"
 #include <mutex>
-#include <d3d12.h>
-
 #include "stl/unordered_map.h"
 #include "stl/deque.h"
 #include "stl/vector.h"
-#include "stl/utility.h"
 
-#include "TextureUploaderD3D12.h"
-#include "RenderDeviceD3D12.h"
-#include "BufferD3D12.h"
-#include "TextureD3D12.h"
+#include "TextureUploaderVk.h"
+#include "RenderDeviceVk.h"
+#include "BufferVk.h"
+#include "TextureVk.h"
 #include "ThreadSignal.h"
 
 namespace Diligent
 {
-
-    class UploadBufferD3D12 : public UploadBufferBase
+    class UploadBufferVk : public UploadBufferBase
     {
     public:
-        UploadBufferD3D12(IReferenceCounters *pRefCounters, 
-                          IRenderDeviceD3D12 *pRenderDeviceD3D12,
-                          const UploadBufferDesc &Desc, 
-                          IBuffer *pStagingBuffer,
-                          void *pData, 
-                          size_t RowStride, 
-                          size_t DepthStride) :
+        UploadBufferVk(IReferenceCounters *pRefCounters, 
+                       IRenderDeviceVk *pRenderDeviceVk,
+                       const UploadBufferDesc &Desc, 
+                       IBuffer *pStagingBuffer,
+                       void *pData, 
+                       size_t RowStride, 
+                       size_t DepthStride) :
             UploadBufferBase(pRefCounters, Desc),
-            m_pDeviceD3D12(pRenderDeviceD3D12),
+            m_pDeviceVk(pRenderDeviceVk),
             m_pStagingBuffer(pStagingBuffer)
         {
             m_pData = pData;
@@ -60,13 +56,15 @@ namespace Diligent
             m_DepthStride = DepthStride;
         }
 
-        ~UploadBufferD3D12()
+        ~UploadBufferVk()
         {
-            RefCntAutoPtr<IBufferD3D12> pBufferD3D12(m_pStagingBuffer, IID_BufferD3D12);
+#if 0
+            RefCntAutoPtr<IBufferVk> pBufferVk(m_pStagingBuffer, IID_BufferVk);
             size_t DataStartOffset;
-            auto* pd3d12Buff = pBufferD3D12->GetD3D12Buffer(DataStartOffset, nullptr);
-            pd3d12Buff->Unmap(0, nullptr);
+            auto* pVkBuff = pBufferVk->GetVkBuffer(DataStartOffset, nullptr);
+            pVkBuff->Unmap(0, nullptr);
             LOG_INFO_MESSAGE("Releasing staging buffer of size ", m_pStagingBuffer->GetDesc().uiSizeInBytes);
+#endif
         }
           
         void SignalCopyScheduled()
@@ -92,19 +90,19 @@ namespace Diligent
         ThreadingTools::Signal m_CopyScheduledSignal;
 
         RefCntAutoPtr<IBuffer> m_pStagingBuffer;
-        RefCntAutoPtr<IRenderDeviceD3D12> m_pDeviceD3D12;
+        RefCntAutoPtr<IRenderDeviceVk> m_pDeviceVk;
     };
 
-    struct TextureUploaderD3D12::InternalData
+    struct TextureUploaderVk::InternalData
     {
         InternalData(IRenderDevice *pDevice) :
-            m_pDeviceD3D12(pDevice, IID_RenderDeviceD3D12)
+            m_pDeviceVk(pDevice, IID_RenderDeviceVk)
         {
-            m_pd3d12NativeDevice = m_pDeviceD3D12->GetD3D12Device();
+            //m_pVkNativeDevice = m_pDeviceVk->GetVkDevice();
         }
 
-        CComPtr<ID3D12Device> m_pd3d12NativeDevice;
-        RefCntAutoPtr<IRenderDeviceD3D12> m_pDeviceD3D12;
+        //CComPtr<IVkDevice> m_pVkNativeDevice;
+        RefCntAutoPtr<IRenderDeviceVk> m_pDeviceVk;
 
         void SwapMapQueues()
         {
@@ -112,7 +110,7 @@ namespace Diligent
             m_PendingOperations.swap(m_InWorkOperations);
         }
 
-        void EnqueCopy(UploadBufferD3D12 *pUploadBuffer, ITextureD3D12 *pDstTex, Uint32 dstSlice, Uint32 dstMip)
+        void EnqueCopy(UploadBufferVk *pUploadBuffer, ITextureVk *pDstTex, Uint32 dstSlice, Uint32 dstMip)
         {
             std::lock_guard<std::mutex> QueueLock(m_PendingOperationsMtx);
             m_PendingOperations.emplace_back(PendingBufferOperation::Operation::Copy, pUploadBuffer, pDstTex, dstSlice, dstMip);
@@ -125,16 +123,16 @@ namespace Diligent
             {
                 Copy
             }operation;
-            RefCntAutoPtr<UploadBufferD3D12> pUploadBuffer;
-            RefCntAutoPtr<ITextureD3D12> pDstTexture;
+            RefCntAutoPtr<UploadBufferVk> pUploadBuffer;
+            RefCntAutoPtr<ITextureVk> pDstTexture;
             Uint32 DstSlice = 0;
             Uint32 DstMip = 0;
 
-            PendingBufferOperation(Operation op, UploadBufferD3D12* pBuff) :
+            PendingBufferOperation(Operation op, UploadBufferVk* pBuff) :
                 operation(op),
                 pUploadBuffer(pBuff)
             {}
-            PendingBufferOperation(Operation op, UploadBufferD3D12* pBuff, ITextureD3D12 *pDstTex, Uint32 dstSlice, Uint32 dstMip) :
+            PendingBufferOperation(Operation op, UploadBufferVk* pBuff, ITextureVk *pDstTex, Uint32 dstSlice, Uint32 dstMip) :
                 operation(op),
                 pUploadBuffer(pBuff),
                 pDstTexture(pDstTex),
@@ -146,16 +144,16 @@ namespace Diligent
         vector< PendingBufferOperation > m_InWorkOperations;
 
         std::mutex m_UploadBuffCacheMtx;
-        unordered_map< UploadBufferDesc, deque< pair<Uint64, RefCntAutoPtr<UploadBufferD3D12> > > > m_UploadBufferCache;
+        unordered_map< UploadBufferDesc, deque< pair<Uint64, RefCntAutoPtr<UploadBufferVk> > > > m_UploadBufferCache;
     };
 
-    TextureUploaderD3D12::TextureUploaderD3D12(IReferenceCounters *pRefCounters, IRenderDevice *pDevice, const TextureUploaderDesc Desc) :
+    TextureUploaderVk::TextureUploaderVk(IReferenceCounters *pRefCounters, IRenderDevice *pDevice, const TextureUploaderDesc Desc) :
         TextureUploaderBase(pRefCounters, pDevice, Desc),
         m_pInternalData(new InternalData(pDevice))
     {
     }
 
-    TextureUploaderD3D12::~TextureUploaderD3D12()
+    TextureUploaderVk::~TextureUploaderVk()
     {
         for (auto BuffQueueIt : m_pInternalData->m_UploadBufferCache)
         {
@@ -163,12 +161,12 @@ namespace Diligent
             {
                 const auto &desc = BuffQueueIt.first;
                 auto &FmtInfo = m_pDevice->GetTextureFormatInfo(desc.Format);
-                LOG_INFO_MESSAGE("TextureUploaderD3D12: releasing ", BuffQueueIt.second.size(), ' ', desc.Width, 'x', desc.Height, 'x', desc.Depth, ' ', FmtInfo.Name, " upload buffer(s) ");
+                LOG_INFO_MESSAGE("TextureUploaderVk: releasing ", BuffQueueIt.second.size(), ' ', desc.Width, 'x', desc.Height, 'x', desc.Depth, ' ', FmtInfo.Name, " upload buffer(s) ");
             }
         }
     }
 
-    void TextureUploaderD3D12::RenderThreadUpdate(IDeviceContext *pContext)
+    void TextureUploaderVk::RenderThreadUpdate(IDeviceContext *pContext)
     {
         m_pInternalData->SwapMapQueues();
         if (!m_pInternalData->m_InWorkOperations.empty())
@@ -187,8 +185,10 @@ namespace Diligent
                         DstBox.MaxX = TexDesc.Width;
                         DstBox.MaxY = TexDesc.Height;
                         // UpdateTexture() transitions dst subresource to COPY_DEST state and then transitions back to original state
+#if 0
                         pContext->UpdateTexture(OperationInfo.pDstTexture, OperationInfo.DstMip, OperationInfo.DstSlice, DstBox,
                                                 SubResData, RESOURCE_STATE_TRANSITION_MODE_TRANSITION, RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+#endif
                         pBuffer->SignalCopyScheduled();
                     }
                     break;
@@ -199,7 +199,7 @@ namespace Diligent
         }
     }
 
-    void TextureUploaderD3D12::AllocateUploadBuffer(const UploadBufferDesc& Desc, bool IsRenderThread, IUploadBuffer **ppBuffer)
+    void TextureUploaderVk::AllocateUploadBuffer(const UploadBufferDesc& Desc, bool IsRenderThread, IUploadBuffer **ppBuffer)
     {
         *ppBuffer = nullptr;
 
@@ -215,7 +215,7 @@ namespace Diligent
                     if (!Deque.empty())
                     {
                         auto &FrontBuff = Deque.front();
-                        if (m_pInternalData->m_pDeviceD3D12->IsFenceSignaled(0, FrontBuff.first))
+                        if (m_pInternalData->m_pDeviceVk->IsFenceSignaled(0, FrontBuff.first))
                         {
                             *ppBuffer = FrontBuff.second.Detach();
                             Deque.pop_front();
@@ -229,14 +229,14 @@ namespace Diligent
         if(*ppBuffer == nullptr)
         {
             BufferDesc BuffDesc;
-            BuffDesc.Name = "Staging buffer for UploadBufferD3D12";
+            BuffDesc.Name = "Staging buffer for UploadBufferVk";
             BuffDesc.CPUAccessFlags = CPU_ACCESS_WRITE;
             BuffDesc.Usage = USAGE_CPU_ACCESSIBLE;
 
             const auto &TexFmtInfo = m_pDevice->GetTextureFormatInfo(Desc.Format);
             Uint32 RowStride = Desc.Width * Uint32{TexFmtInfo.ComponentSize} * Uint32{TexFmtInfo.NumComponents};
-            static_assert((D3D12_TEXTURE_DATA_PITCH_ALIGNMENT & (D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1)) == 0, "Alginment is expected to be power of 2");
-            Uint32 AlignmentMask = D3D12_TEXTURE_DATA_PITCH_ALIGNMENT-1;
+            //static_assert((Vk_TEXTURE_DATA_PITCH_ALIGNMENT & (Vk_TEXTURE_DATA_PITCH_ALIGNMENT - 1)) == 0, "Alginment is expected to be power of 2");
+            Uint32 AlignmentMask = 512;//Vk_TEXTURE_DATA_PITCH_ALIGNMENT-1;
             RowStride = (RowStride + AlignmentMask) & (~AlignmentMask);
 
             BuffDesc.uiSizeInBytes = Desc.Height * RowStride;
@@ -244,10 +244,15 @@ namespace Diligent
             m_pDevice->CreateBuffer(BuffDesc, BufferData(), &pStagingBuffer);
 
             PVoid CpuVirtualAddress = nullptr;
-            RefCntAutoPtr<IBufferD3D12> pStagingBufferD3D12(pStagingBuffer, IID_BufferD3D12);
+            RefCntAutoPtr<IBufferVk> pStagingBufferVk(pStagingBuffer, IID_BufferVk);
             size_t DataStartOffset;
-            auto* pd3d12Buff = pStagingBufferD3D12->GetD3D12Buffer(DataStartOffset, nullptr);
-            pd3d12Buff->Map(0, nullptr, &CpuVirtualAddress);
+#if 0
+            auto* pVkBuff = pStagingBufferVk->GetVkBuffer(DataStartOffset, nullptr);
+            pVkBuff->Map(0, nullptr, &CpuVirtualAddress);
+#else
+            static Uint8 DummyData[1<<20];
+            CpuVirtualAddress = DummyData;
+#endif
             if (CpuVirtualAddress == nullptr)
             {
                 LOG_ERROR_MESSAGE("Failed to map upload buffer");
@@ -256,31 +261,31 @@ namespace Diligent
 
             LOG_INFO_MESSAGE("Created staging buffer of size ", BuffDesc.uiSizeInBytes);
 
-            RefCntAutoPtr<UploadBufferD3D12> pUploadBuffer(MakeNewRCObj<UploadBufferD3D12>()(m_pInternalData->m_pDeviceD3D12, Desc, pStagingBuffer, CpuVirtualAddress, RowStride, 0));
+            RefCntAutoPtr<UploadBufferVk> pUploadBuffer(MakeNewRCObj<UploadBufferVk>()(m_pInternalData->m_pDeviceVk, Desc, pStagingBuffer, CpuVirtualAddress, RowStride, 0));
             *ppBuffer = pUploadBuffer.Detach();
         }
     }
 
-    void TextureUploaderD3D12::ScheduleGPUCopy(ITexture *pDstTexture,
+    void TextureUploaderVk::ScheduleGPUCopy(ITexture *pDstTexture,
         Uint32 ArraySlice,
         Uint32 MipLevel,
         IUploadBuffer *pUploadBuffer)
     {
-        auto *pUploadBufferD3D12 = ValidatedCast<UploadBufferD3D12>(pUploadBuffer);
-        RefCntAutoPtr<ITextureD3D12> pDstTexD3D12(pDstTexture, IID_TextureD3D12);
-        m_pInternalData->EnqueCopy(pUploadBufferD3D12, pDstTexD3D12, ArraySlice, MipLevel);
+        auto *pUploadBufferVk = ValidatedCast<UploadBufferVk>(pUploadBuffer);
+        RefCntAutoPtr<ITextureVk> pDstTexVk(pDstTexture, IID_TextureVk);
+        m_pInternalData->EnqueCopy(pUploadBufferVk, pDstTexVk, ArraySlice, MipLevel);
     }
 
-    void TextureUploaderD3D12::RecycleBuffer(IUploadBuffer *pUploadBuffer)
+    void TextureUploaderVk::RecycleBuffer(IUploadBuffer *pUploadBuffer)
     {
-        auto *pUploadBufferD3D12 = ValidatedCast<UploadBufferD3D12>(pUploadBuffer);
-        VERIFY(pUploadBufferD3D12->DbgIsCopyScheduled(), "Upload buffer must be recycled only after copy operation has been scheduled on the GPU");
-        pUploadBufferD3D12->Reset();
+        auto *pUploadBufferVk = ValidatedCast<UploadBufferVk>(pUploadBuffer);
+        VERIFY(pUploadBufferVk->DbgIsCopyScheduled(), "Upload buffer must be recycled only after copy operation has been scheduled on the GPU");
+        pUploadBufferVk->Reset();
 
         std::lock_guard<std::mutex> CacheLock(m_pInternalData->m_UploadBuffCacheMtx);
         auto &Cache = m_pInternalData->m_UploadBufferCache;
-        auto &Deque = Cache[pUploadBufferD3D12->GetDesc()];
-        Uint64 FenceValue = m_pInternalData->m_pDeviceD3D12->GetNextFenceValue(0);
-        Deque.emplace_back( FenceValue, pUploadBufferD3D12 );
+        auto &Deque = Cache[pUploadBufferVk->GetDesc()];
+        Uint64 FenceValue = m_pInternalData->m_pDeviceVk->GetNextFenceValue(0);
+        Deque.emplace_back( FenceValue, pUploadBufferVk );
     }
 }

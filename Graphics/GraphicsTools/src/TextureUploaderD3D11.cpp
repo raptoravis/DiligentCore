@@ -23,11 +23,14 @@
 
 #include "pch.h"
 
-#include <unordered_map>
-#include <deque>
 #include <mutex>
 #include <atlbase.h>
-#include <vector>
+
+#include "stl/unordered_map.h"
+#include "stl/deque.h"
+#include "stl/vector.h"
+#include "stl/utility.h"
+
 #include <d3d11.h>
 
 #include "TextureUploaderD3D11.h"
@@ -160,11 +163,11 @@ namespace Diligent
         }
 
         std::mutex m_PendingOperationsMtx;
-        std::vector< PendingBufferOperation > m_PendingOperations;
-        std::vector< PendingBufferOperation > m_InWorkOperations;
+        vector< PendingBufferOperation > m_PendingOperations;
+        vector< PendingBufferOperation > m_InWorkOperations;
 
         std::mutex m_UploadBuffCacheMtx;
-        std::unordered_map< UploadBufferDesc, std::deque< RefCntAutoPtr<UploadBufferD3D11> > > m_UploadBufferCache;
+        unordered_map< UploadBufferDesc, deque< RefCntAutoPtr<UploadBufferD3D11> > > m_UploadBufferCache;
     };
 
     TextureUploaderD3D11::TextureUploaderD3D11(IReferenceCounters *pRefCounters, IRenderDevice *pDevice, const TextureUploaderDesc Desc) :
@@ -213,7 +216,7 @@ namespace Diligent
                             {
                                 std::lock_guard<std::mutex> CacheLock(m_pInternalData->m_UploadBuffCacheMtx);
                                 auto &Cache = m_pInternalData->m_UploadBufferCache;
-                                Cache[pBuffer->GetDesc()].emplace_back( std::move(pBuffer) );
+                                Cache[pBuffer->GetDesc()].emplace_back( move(pBuffer) );
                             }
                         }
                         else

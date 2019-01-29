@@ -23,16 +23,16 @@
 
 #pragma once
 
-#include "../../../Primitives/interface/stl/unique_ptr.h"
 #include "TextureUploaderBase.h"
+#include "stl/unique_ptr.h"
 
 namespace Diligent
 {
-    class TextureUploaderD3D12 : public TextureUploaderBase
+    class TextureUploaderVk : public TextureUploaderBase
     {
     public:
-        TextureUploaderD3D12(IReferenceCounters *pRefCounters, IRenderDevice *pDevice, const TextureUploaderDesc Desc);
-        ~TextureUploaderD3D12();
+        TextureUploaderVk(IReferenceCounters* pRefCounters, IRenderDevice *pDevice, const TextureUploaderDesc Desc);
+        ~TextureUploaderVk();
         virtual void RenderThreadUpdate(IDeviceContext *pContext)override final;
 
         virtual void AllocateUploadBuffer(const UploadBufferDesc& Desc, bool IsRenderThread, IUploadBuffer **ppBuffer)override final;

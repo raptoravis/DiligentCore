@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include "../../../Primitives/interface/stl/unique_ptr.h"
+
 #include "TextureUploaderBase.h"
 
 namespace Diligent
@@ -40,6 +42,6 @@ namespace Diligent
 
     private:
         struct InternalData;
-        std::unique_ptr<InternalData> m_pInternalData;
+        unique_ptr<InternalData> m_pInternalData;
     };
 }

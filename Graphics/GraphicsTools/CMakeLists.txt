@@ -39,6 +39,12 @@ if(GL_SUPPORTED OR GLES_SUPPORTED)
     list(APPEND DEPENDENCIES GraphicsEngineOpenGLInterface)
 endif()
 
+if(VULKAN_SUPPORTED)
+    list(APPEND SOURCE src/TextureUploaderVk.cpp)
+    list(APPEND INCLUDE include/TextureUploaderVk.h)
+    list(APPEND DEPENDENCIES GraphicsEngineVkInterface)
+endif()
+
 add_library(GraphicsTools STATIC ${SOURCE} ${INCLUDE})
 
 target_include_directories(GraphicsTools 
@@ -56,6 +62,7 @@ PRIVATE
     GraphicsAccessories
     ${DEPENDENCIES}
 PUBLIC
+    Primitives
     GraphicsEngineInterface
 )
 

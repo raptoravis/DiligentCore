@@ -38,10 +38,12 @@
 //--------------------------------------------------------------------------------------
 #pragma once
 
-#include <set>
-#include <vector>
 #include <sstream>
 #include <iomanip>
+
+#include "../../../Primitives/interface/stl/set.h"
+#include "../../../Primitives/interface/stl/vector.h"
+
 #include "../../GraphicsEngine/interface/Shader.h"
 #include "../../../Platforms/Basic/interface/DebugUtilities.h"
 
@@ -96,8 +98,8 @@ public:
     
 private:
 
-	std::vector< ShaderMacro > m_Macros;
-	std::set< std::string > m_DefinitionsPool;
+	vector< ShaderMacro > m_Macros;
+	set< std::string > m_DefinitionsPool;
     bool m_bIsFinalized = false;
 };
 

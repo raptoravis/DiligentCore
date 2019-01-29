@@ -22,9 +22,21 @@
  */
 
 #include "pch.h"
+#if D3D11_SUPPORTED
 #include "TextureUploaderD3D11.h"
+#endif
+
+#if D3D12_SUPPORTED
 #include "TextureUploaderD3D12.h"
+#endif
+
+#if GL_SUPPORTED || GLES_SUPPORTED
 #include "TextureUploaderGL.h"
+#endif
+
+#if VULKAN_SUPPORTED
+#include "TextureUploaderVk.h"
+#endif
 
 namespace Diligent
 {
@@ -33,19 +45,31 @@ namespace Diligent
         *ppUploader = nullptr;
         switch (pDevice->GetDeviceCaps().DevType)
         {
+#if D3D11_SUPPORTED
             case DeviceType::D3D11:
                 *ppUploader = MakeNewRCObj<TextureUploaderD3D11>()( pDevice, Desc );
                 break;
+#endif
 
+#if D3D12_SUPPORTED
             case DeviceType::D3D12:
                 *ppUploader = MakeNewRCObj<TextureUploaderD3D12>()( pDevice, Desc );
                 break;
+#endif
 
+#if GL_SUPPORTED || GLES_SUPPORTED
             case DeviceType::OpenGLES:
             case DeviceType::OpenGL:
                 *ppUploader = MakeNewRCObj<TextureUploaderGL>()( pDevice, Desc );
                 break;
+#endif
             
+#if VULKAN_SUPPORTED
+            case DeviceType::Vulkan:
+                *ppUploader = MakeNewRCObj<TextureUploaderVk>()( pDevice, Desc );
+                break;
+#endif
+
             default:
                 UNEXPECTED("Unexpected device type");
         }
