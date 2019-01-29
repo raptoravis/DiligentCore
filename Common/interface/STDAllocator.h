@@ -126,6 +126,11 @@ struct STDAllocator
         m_Allocator.Free(p);
     }
 
+    void deallocate(void* p, std::size_t count)
+    {
+        deallocate(reinterpret_cast<T*>(p), count);
+    }
+
     inline size_type max_size() const 
     { 
         return std::numeric_limits<size_type>::max() / sizeof(T); 

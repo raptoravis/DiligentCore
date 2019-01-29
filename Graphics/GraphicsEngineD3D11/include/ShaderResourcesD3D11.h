@@ -73,7 +73,9 @@
 //
 //
 
-#include <vector>
+#include <limits>
+#include "stl/vector.h"
+#include "stl/utility.h"
 
 #include "ShaderResources.h"
 
@@ -133,8 +135,8 @@ private:
     // reference shader name without the need to copy it
     const Char* const m_ShaderName;
 
-    using StaticSamplerAttribs = std::pair<const D3DShaderResourceAttribs&, RefCntAutoPtr<ISampler>>;
-    using StaticSamplerVector = std::vector<StaticSamplerAttribs, STDAllocatorRawMem<StaticSamplerAttribs>>;
+    using StaticSamplerAttribs = pair<const D3DShaderResourceAttribs&, RefCntAutoPtr<ISampler>>;
+    using StaticSamplerVector = vector<StaticSamplerAttribs, STDAllocatorRawMem<StaticSamplerAttribs>>;
     void InitStaticSamplers(StaticSamplerVector&& StaticSamplers);
 
     StaticSamplerVector m_StaticSamplers;

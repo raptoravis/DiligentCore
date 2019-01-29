@@ -35,9 +35,7 @@
 
 #include "PlatformDefinitions.h"
 
-#include <vector>
 #include <exception>
-#include <algorithm>
 
 #if PLATFORM_WIN32
 #   ifndef D3D11_VERSION

@@ -27,7 +27,9 @@
 /// Implementation of Diligent::RingBuffer class
 
 
-#include <deque>
+#include "../../../Primitives/interface/stl/deque.h"
+#include "../../../Primitives/interface/stl/utility.h"
+
 #include "../../../Primitives/interface/MemoryAllocator.h"
 #include "../../../Platforms/Basic/interface/DebugUtilities.h"
 #include "../../../Common/interface/Align.h"
@@ -62,7 +64,7 @@ namespace Diligent
         {}
 
         RingBuffer(RingBuffer&& rhs)noexcept : 
-            m_CompletedFrameHeads(std::move(rhs.m_CompletedFrameHeads)),
+            m_CompletedFrameHeads(move(rhs.m_CompletedFrameHeads)),
             m_Tail          (rhs.m_Tail),
             m_Head          (rhs.m_Head),
             m_MaxSize       (rhs.m_MaxSize),
@@ -78,7 +80,7 @@ namespace Diligent
 
         RingBuffer& operator = (RingBuffer&& rhs)noexcept
         {
-            m_CompletedFrameHeads = std::move(rhs.m_CompletedFrameHeads);
+            m_CompletedFrameHeads = move(rhs.m_CompletedFrameHeads);
             m_Tail          = rhs.m_Tail;
             m_Head          = rhs.m_Head;
             m_MaxSize       = rhs.m_MaxSize;
@@ -217,7 +219,7 @@ namespace Diligent
         OffsetType GetUsedSize()const { return m_UsedSize; }
 
     private:
-        std::deque< FrameHeadAttribs, STDAllocatorRawMem<FrameHeadAttribs> > m_CompletedFrameHeads;
+        deque< FrameHeadAttribs, STDAllocatorRawMem<FrameHeadAttribs> > m_CompletedFrameHeads;
         OffsetType m_Tail          = 0;
         OffsetType m_Head          = 0;
         OffsetType m_MaxSize       = 0;

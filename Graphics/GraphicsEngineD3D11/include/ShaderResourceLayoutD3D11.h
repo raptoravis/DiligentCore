@@ -26,6 +26,9 @@
 /// \file
 /// Declaration of Diligent::ShaderResourceLayoutD3D11 class
 
+#include <memory>
+#include "stl/unique_ptr.h"
+
 #include "ShaderResources.h"
 #include "ShaderBase.h"
 #include "ShaderResourceCacheD3D11.h"
@@ -244,7 +247,7 @@ private:
     // ShaderD3D11Impl object, or ShaderResourceBindingD3D11Impl object
     ShaderResourceCacheD3D11* m_pResourceCache = nullptr;
 
-    std::unique_ptr<void, STDDeleterRawMem<void> > m_ResourceBuffer;
+    unique_ptr<void, STDDeleterRawMem<void> > m_ResourceBuffer;
 
     // Offsets in bytes
     using OffsetType = Uint16;

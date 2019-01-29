@@ -26,6 +26,8 @@
 /// \file
 /// Definition of the Diligent::MapHelper helper template class
 
+#include "../../../Primitives/interface/stl/utility.h"
+
 #include "../../../Platforms/Basic/interface/DebugUtilities.h"
 #include "../../../Common/interface/RefCntAutoPtr.h"
 #include "DeviceContext.h"
@@ -53,17 +55,17 @@ public:
 
     /// Initializes the class member with null values
     MapHelper() :
-        m_pBuffer(nullptr),
-        m_pContext(nullptr),
-        m_pMappedData(nullptr),
-        m_MapType(static_cast<MAP_TYPE>(-1)),
-        m_MapFlags(static_cast<Uint32>(-1))
+        m_pBuffer       (nullptr),
+        m_pContext      (nullptr),
+        m_pMappedData   (nullptr),
+        m_MapType       (static_cast<MAP_TYPE>(-1)),
+        m_MapFlags      (static_cast<Uint32>(-1))
     {
     }
 
     /// Initializes the object and maps the provided resource.
     /// See Map() for details.
-    MapHelper( IDeviceContext *pContext, IBuffer *pBuffer, MAP_TYPE MapType, MAP_FLAGS MapFlags ) :
+    MapHelper( IDeviceContext* pContext, IBuffer* pBuffer, MAP_TYPE MapType, MAP_FLAGS MapFlags ) :
         MapHelper()
     {
         Map(pContext, pBuffer, MapType, MapFlags);
@@ -71,32 +73,32 @@ public:
 
     /// Move constructor: takes over resource ownership from Helper
     MapHelper(MapHelper&& Helper) :
-        m_pBuffer( std::move(Helper.m_pBuffer) ),
-        m_pMappedData( std::move(Helper.m_pMappedData) ),
-        m_pContext( std::move(Helper.m_pContext) ),
-        m_MapType( std::move(Helper.m_MapType) ),
-        m_MapFlags( std::move(Helper.m_MapFlags) )
+        m_pBuffer       ( move(Helper.m_pBuffer) ),
+        m_pMappedData   ( move(Helper.m_pMappedData) ),
+        m_pContext      ( move(Helper.m_pContext) ),
+        m_MapType       ( move(Helper.m_MapType) ),
+        m_MapFlags      ( move(Helper.m_MapFlags) )
     {
-        Helper.m_pBuffer = nullptr;
-        Helper.m_pContext = nullptr;
+        Helper.m_pBuffer     = nullptr;
+        Helper.m_pContext    = nullptr;
         Helper.m_pMappedData = nullptr;
-        Helper.m_MapType = static_cast<MAP_TYPE>(-1);
-        Helper.m_MapFlags = static_cast<Uint32>(-1);
+        Helper.m_MapType     = static_cast<MAP_TYPE>(-1);
+        Helper.m_MapFlags    = static_cast<Uint32>(-1);
     }
 
     /// Move-assignement operator: takes over resource ownership from Helper
     MapHelper& operator = (MapHelper&& Helper)
     {
-        m_pBuffer = std::move(Helper.m_pBuffer);
-        m_pMappedData = std::move(Helper.m_pMappedData);
-        m_pContext = std::move( Helper.m_pContext );
-        m_MapType = std::move(Helper.m_MapType);
-        m_MapFlags = std::move(Helper.m_MapFlags);
-        Helper.m_pBuffer = nullptr;
-        Helper.m_pContext = nullptr;
+        m_pBuffer       = move(Helper.m_pBuffer);
+        m_pMappedData   = move(Helper.m_pMappedData);
+        m_pContext      = move( Helper.m_pContext );
+        m_MapType       = move(Helper.m_MapType);
+        m_MapFlags      = move(Helper.m_MapFlags);
+        Helper.m_pBuffer     = nullptr;
+        Helper.m_pContext    = nullptr;
         Helper.m_pMappedData = nullptr;
-        Helper.m_MapType = static_cast<MAP_TYPE>(-1);
-        Helper.m_MapFlags = static_cast<Uint32>(-1);
+        Helper.m_MapType     = static_cast<MAP_TYPE>(-1);
+        Helper.m_MapFlags    = static_cast<Uint32>(-1);
         return *this;
     }
 

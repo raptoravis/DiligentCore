@@ -26,6 +26,8 @@
 /// \file
 /// Declaration of Diligent::TextureBaseD3D11 class
 
+#include "stl/vector.h"
+
 #include "TextureD3D11.h"
 #include "RenderDeviceD3D11.h"
 #include "TextureBase.h"
@@ -74,7 +76,7 @@ public:
 protected:
     void CreateViewInternal( const struct TextureViewDesc &ViewDesc, ITextureView **ppView, bool bIsDefaultView )override final;
     void PrepareD3D11InitData(const TextureData &InitData, Uint32 NumSubresources, 
-                              std::vector<D3D11_SUBRESOURCE_DATA, STDAllocatorRawMem<D3D11_SUBRESOURCE_DATA> > &D3D11InitData);
+                              vector<D3D11_SUBRESOURCE_DATA, STDAllocatorRawMem<D3D11_SUBRESOURCE_DATA> >& D3D11InitData);
 
     virtual void CreateSRV( TextureViewDesc& SRVDesc, ID3D11ShaderResourceView**  ppD3D11SRV ) = 0;
     virtual void CreateRTV( TextureViewDesc& RTVDesc, ID3D11RenderTargetView**    ppD3D11RTV ) = 0;

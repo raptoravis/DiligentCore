@@ -26,7 +26,9 @@
 /// \file
 /// Declaration of Diligent::FenceD3D11Impl class
 
-#include <deque>
+#include "stl/utility.h"
+#include "stl/deque.h"
+
 #include "FenceD3D11.h"
 #include "RenderDeviceD3D11.h"
 #include "FenceBase.h"
@@ -55,7 +57,7 @@ public:
 
     void AddPendingQuery(CComPtr<ID3D11DeviceContext> pCtx, CComPtr<ID3D11Query> pQuery, Uint64 Value)
     {
-        m_PendingQueries.emplace_back(std::move(pCtx), std::move(pQuery), Value);
+        m_PendingQueries.emplace_back(move(pCtx), move(pQuery), Value);
     }
 
 private:
@@ -66,12 +68,12 @@ private:
         Uint64                       Value;
 
         PendingFenceData(CComPtr<ID3D11DeviceContext> pCtx, CComPtr<ID3D11Query> pQuery, Uint64 _Value) : 
-            pd3d11Ctx  (std::move(pCtx)),
-            pd3d11Query(std::move(pQuery)),
+            pd3d11Ctx  (move(pCtx)),
+            pd3d11Query(move(pQuery)),
             Value      (_Value)
         {}
     };
-    std::deque< PendingFenceData > m_PendingQueries;
+    deque< PendingFenceData > m_PendingQueries;
     volatile Uint64 m_LastCompletedFenceValue = 0;
 };
 

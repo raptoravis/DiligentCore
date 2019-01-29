@@ -21,7 +21,8 @@
  *  of the possibility of such damages.
  */
 
-#include "pch.h"
+#include "stl/algorithm.h"
+#include "DeviceContext.h"
 #include "Texture.h"
 #include "GraphicsAccessories.h"
 
@@ -83,9 +84,9 @@ void ValidateTextureDesc( const TextureDesc& Desc )
     if( Desc.Type == RESOURCE_DIM_TEX_1D || Desc.Type == RESOURCE_DIM_TEX_1D_ARRAY )
         MaxDim = Desc.Width;
     else if( Desc.Type == RESOURCE_DIM_TEX_2D || Desc.Type == RESOURCE_DIM_TEX_2D_ARRAY  || Desc.Type == RESOURCE_DIM_TEX_CUBE || Desc.Type == RESOURCE_DIM_TEX_CUBE_ARRAY )
-        MaxDim = std::max(Desc.Width, Desc.Height);
+        MaxDim = max(Desc.Width, Desc.Height);
     else if( Desc.Type == RESOURCE_DIM_TEX_3D )
-        MaxDim = std::max( std::max(Desc.Width, Desc.Height), Desc.Depth );
+        MaxDim = max( max(Desc.Width, Desc.Height), Desc.Depth );
     VERIFY( MaxDim >= (1U << (Desc.MipLevels-1)), "Texture \"", Desc.Name ? Desc.Name : "", "\": Incorrect number of Mip levels (", Desc.MipLevels, ")" );
 
     if( Desc.SampleCount > 1 )
@@ -135,7 +136,7 @@ void ValidateTextureRegion(const TextureDesc& TexDesc, Uint32 MipLevel, Uint32 S
 
     const auto& FmtAttribs = GetTextureFormatAttribs(TexDesc.Format);
 
-    Uint32 MipWidth = std::max(TexDesc.Width >> MipLevel, 1U);
+    Uint32 MipWidth = max(TexDesc.Width >> MipLevel, 1U);
     if(FmtAttribs.ComponentType == COMPONENT_TYPE_COMPRESSED)
     {
         VERIFY_EXPR( (FmtAttribs.BlockWidth & (FmtAttribs.BlockWidth-1)) == 0);
@@ -150,7 +151,7 @@ void ValidateTextureRegion(const TextureDesc& TexDesc, Uint32 MipLevel, Uint32 S
     if (TexDesc.Type != RESOURCE_DIM_TEX_1D && 
         TexDesc.Type != RESOURCE_DIM_TEX_1D_ARRAY)
     {
-        Uint32 MipHeight = std::max(TexDesc.Height >> MipLevel, 1U);
+        Uint32 MipHeight = max(TexDesc.Height >> MipLevel, 1U);
         if(FmtAttribs.ComponentType == COMPONENT_TYPE_COMPRESSED)
         {
             VERIFY_EXPR( (FmtAttribs.BlockHeight & (FmtAttribs.BlockHeight-1)) == 0);
@@ -165,7 +166,7 @@ void ValidateTextureRegion(const TextureDesc& TexDesc, Uint32 MipLevel, Uint32 S
 
     if (TexDesc.Type == RESOURCE_DIM_TEX_3D)
     {
-        Uint32 MipDepth = std::max(TexDesc.Depth >> MipLevel, 1U);
+        Uint32 MipDepth = max(TexDesc.Depth >> MipLevel, 1U);
         VERIFY_TEX_PARAMS( Box.MaxZ <= MipDepth, "Region max Z coordinate (", Box.MaxZ, ") is out of allowed range  [0, ", MipDepth, "]" );
     }
     else
@@ -223,15 +224,15 @@ void ValidateCopyTextureParams(const CopyTextureAttribs& CopyAttribs )
     auto pSrcBox = CopyAttribs.pSrcBox;
     if( pSrcBox == nullptr )
     {
-        SrcBox.MaxX = std::max( SrcTexDesc.Width >> CopyAttribs.SrcMipLevel, 1u );
+        SrcBox.MaxX = max( SrcTexDesc.Width >> CopyAttribs.SrcMipLevel, 1u );
         if( SrcTexDesc.Type == RESOURCE_DIM_TEX_1D || 
             SrcTexDesc.Type == RESOURCE_DIM_TEX_1D_ARRAY )
             SrcBox.MaxY = 1;
         else
-            SrcBox.MaxY = std::max( SrcTexDesc.Height >> CopyAttribs.SrcMipLevel, 1u );
+            SrcBox.MaxY = max( SrcTexDesc.Height >> CopyAttribs.SrcMipLevel, 1u );
 
         if( SrcTexDesc.Type == RESOURCE_DIM_TEX_3D )
-            SrcBox.MaxZ = std::max( SrcTexDesc.Depth >> CopyAttribs.SrcMipLevel, 1u );
+            SrcBox.MaxZ = max( SrcTexDesc.Depth >> CopyAttribs.SrcMipLevel, 1u );
         else
             SrcBox.MaxZ = 1;
 

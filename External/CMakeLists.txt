@@ -1,5 +1,8 @@
 cmake_minimum_required (VERSION 3.6)
 
+add_subdirectory(EASTL)
+set_directory_root_folder("EASTL" "Core/External/EASTL")
+
 if(PLATFORM_WIN32 OR PLATFORM_LINUX OR PLATFORM_MACOS)
 	add_subdirectory(glew)
     if(INSTALL_DILIGENT_CORE)

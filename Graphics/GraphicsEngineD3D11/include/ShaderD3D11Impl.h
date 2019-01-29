@@ -26,6 +26,8 @@
 /// \file
 /// Declaration of Diligent::ShaderD3D11Impl class
 
+#include <memory>
+
 #include "ShaderD3D11.h"
 #include "RenderDeviceD3D11.h"
 #include "ShaderBase.h"

@@ -22,7 +22,8 @@
  */
 
 #include "pch.h"
-#include <array>
+#include "stl/vector.h"
+#include "stl/array.h"
 #include "PipelineStateD3D11Impl.h"
 #include "RenderDeviceD3D11Impl.h"
 #include "ShaderResourceBindingD3D11Impl.h"
@@ -98,7 +99,7 @@ PipelineStateD3D11Impl::PipelineStateD3D11Impl(IReferenceCounters*      pRefCoun
         // Create input layout
         if( m_LayoutElements.size() > 0 ) 
         {
-            std::vector<D3D11_INPUT_ELEMENT_DESC, STDAllocatorRawMem<D3D11_INPUT_ELEMENT_DESC> > d311InputElements(STD_ALLOCATOR_RAW_MEM(D3D11_INPUT_ELEMENT_DESC, GetRawAllocator(), "Allocator for vector<D3D11_INPUT_ELEMENT_DESC>") );
+            vector<D3D11_INPUT_ELEMENT_DESC, STDAllocatorRawMem<D3D11_INPUT_ELEMENT_DESC> > d311InputElements(STD_ALLOCATOR_RAW_MEM(D3D11_INPUT_ELEMENT_DESC, GetRawAllocator(), "Allocator for vector<D3D11_INPUT_ELEMENT_DESC>") );
             LayoutElements_To_D3D11_INPUT_ELEMENT_DESCs(m_LayoutElements, d311InputElements);
 
             ID3DBlob* pVSByteCode = m_pVS.RawPtr<ShaderD3D11Impl>()->GetBytecode();
@@ -112,13 +113,13 @@ PipelineStateD3D11Impl::PipelineStateD3D11Impl(IReferenceCounters*      pRefCoun
 
     if(PipelineDesc.SRBAllocationGranularity > 1)
     {
-        std::array<size_t, MaxShadersInPipeline> ShaderResLayoutDataSizes = {};
-        std::array<size_t, MaxShadersInPipeline> ShaderResCacheDataSizes  = {};
+        array<size_t, MaxShadersInPipeline> ShaderResLayoutDataSizes = {};
+        array<size_t, MaxShadersInPipeline> ShaderResCacheDataSizes  = {};
         for (Uint32 s = 0; s < m_NumShaders; ++s)
         {
             auto* pShader = GetShader<const ShaderD3D11Impl>(s);
             const auto& ShaderResources = *pShader->GetResources();
-            std::array<SHADER_VARIABLE_TYPE, 2> AllowedVarTypes = { SHADER_VARIABLE_TYPE_MUTABLE, SHADER_VARIABLE_TYPE_DYNAMIC };
+            array<SHADER_VARIABLE_TYPE, 2> AllowedVarTypes = { SHADER_VARIABLE_TYPE_MUTABLE, SHADER_VARIABLE_TYPE_DYNAMIC };
             ShaderResLayoutDataSizes[s] = ShaderResourceLayoutD3D11::GetRequiredMemorySize(ShaderResources, AllowedVarTypes.data(), static_cast<Uint32>(AllowedVarTypes.size()));
             ShaderResCacheDataSizes[s] = ShaderResourceCacheD3D11::GetRequriedMemorySize(ShaderResources);
         }

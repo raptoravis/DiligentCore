@@ -26,7 +26,7 @@
 /// \file
 /// Implementation of the Diligent::ShaderBase template class
 
-#include <vector>
+#include "stl/vector.h"
 
 #include "Shader.h"
 #include "DeviceObjectBase.h"
@@ -230,11 +230,11 @@ public:
     
 protected:
     /// Shader variable descriptions
-    std::vector<ShaderVariableDesc, STDAllocatorRawMem<ShaderVariableDesc> > m_VariablesDesc;
+    vector<ShaderVariableDesc, STDAllocatorRawMem<ShaderVariableDesc> > m_VariablesDesc;
     /// String pool that is used to hold copies of variable names and static sampler names
-    std::vector<String, STDAllocatorRawMem<String> > m_StringPool;
+    vector<String, STDAllocatorRawMem<String> > m_StringPool;
     /// Static sampler descriptions
-    std::vector<StaticSamplerDesc, STDAllocatorRawMem<StaticSamplerDesc> > m_StaticSamplers;
+    vector<StaticSamplerDesc, STDAllocatorRawMem<StaticSamplerDesc> > m_StaticSamplers;
 };
 
 }

@@ -26,6 +26,7 @@ PUBLIC
 target_link_libraries(GraphicsAccessories 
 PUBLIC
     BuildSettings
+    Primitives
     Common 
     GraphicsEngineInterface
 )

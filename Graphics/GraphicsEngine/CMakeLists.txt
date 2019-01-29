@@ -11,7 +11,6 @@ set(INCLUDE
     include/DeviceObjectBase.h
     include/EngineMemory.h
     include/FenceBase.h
-    include/pch.h
     include/PipelineStateBase.h
     include/RenderDeviceBase.h
     include/ResourceMappingImpl.h
@@ -68,6 +67,7 @@ PUBLIC
 target_link_libraries(GraphicsEngine 
 PUBLIC
     BuildSettings 
+    Primitives
     PlatformInterface 
     Common
     GraphicsAccessories

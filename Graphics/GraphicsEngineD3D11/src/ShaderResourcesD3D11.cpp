@@ -23,6 +23,9 @@
 
 #include "pch.h"
 
+#include "stl/algorithm.h"
+#include "stl/utility.h"
+
 #include <d3dcompiler.h>
 #include "ShaderResourcesD3D11.h"
 #include "ShaderBase.h"
@@ -58,31 +61,31 @@ ShaderResourcesD3D11::ShaderResourcesD3D11(RenderDeviceD3D11Impl* pDeviceD3D11Im
         void OnNewCB(const D3DShaderResourceAttribs& CBAttribs)
         {
             VERIFY( CBAttribs.BindPoint + CBAttribs.BindCount-1 <= MaxAllowedBindPoint, "CB bind point exceeds supported range" );
-            Resources.m_MaxCBBindPoint = std::max(Resources.m_MaxCBBindPoint, static_cast<MaxBindPointType>(CBAttribs.BindPoint + CBAttribs.BindCount-1));
+            Resources.m_MaxCBBindPoint = max(Resources.m_MaxCBBindPoint, static_cast<MaxBindPointType>(CBAttribs.BindPoint + CBAttribs.BindCount-1));
         }
 
         void OnNewTexUAV (const D3DShaderResourceAttribs& TexUAV)
         {
             VERIFY( TexUAV.BindPoint + TexUAV.BindCount-1 <= MaxAllowedBindPoint, "Tex UAV bind point exceeds supported range" );
-            Resources.m_MaxUAVBindPoint = std::max(Resources.m_MaxUAVBindPoint, static_cast<MaxBindPointType>(TexUAV.BindPoint + TexUAV.BindCount-1));
+            Resources.m_MaxUAVBindPoint = max(Resources.m_MaxUAVBindPoint, static_cast<MaxBindPointType>(TexUAV.BindPoint + TexUAV.BindCount-1));
         }
 
         void OnNewBuffUAV(const D3DShaderResourceAttribs& BuffUAV)
         {
             VERIFY( BuffUAV.BindPoint + BuffUAV.BindCount-1 <= MaxAllowedBindPoint, "Buff UAV bind point exceeds supported range" );
-            Resources.m_MaxUAVBindPoint = std::max(Resources.m_MaxUAVBindPoint, static_cast<MaxBindPointType>(BuffUAV.BindPoint + BuffUAV.BindCount-1));
+            Resources.m_MaxUAVBindPoint = max(Resources.m_MaxUAVBindPoint, static_cast<MaxBindPointType>(BuffUAV.BindPoint + BuffUAV.BindCount-1));
         }
 
         void OnNewBuffSRV(const D3DShaderResourceAttribs& BuffSRV)
         {
             VERIFY( BuffSRV.BindPoint + BuffSRV.BindCount-1 <= MaxAllowedBindPoint, "Buff SRV bind point exceeds supported range" );
-            Resources.m_MaxSRVBindPoint = std::max(Resources.m_MaxSRVBindPoint, static_cast<MaxBindPointType>(BuffSRV.BindPoint + BuffSRV.BindCount-1));
+            Resources.m_MaxSRVBindPoint = max(Resources.m_MaxSRVBindPoint, static_cast<MaxBindPointType>(BuffSRV.BindPoint + BuffSRV.BindCount-1));
         }
 
         void OnNewSampler(const D3DShaderResourceAttribs& SamplerAttribs)
         {
             VERIFY( SamplerAttribs.BindPoint + SamplerAttribs.BindCount-1 <= MaxAllowedBindPoint, "Sampler bind point exceeds supported range" );
-            Resources.m_MaxSamplerBindPoint = std::max(Resources.m_MaxSamplerBindPoint, static_cast<MaxBindPointType>(SamplerAttribs.BindPoint + SamplerAttribs.BindCount-1));
+            Resources.m_MaxSamplerBindPoint = max(Resources.m_MaxSamplerBindPoint, static_cast<MaxBindPointType>(SamplerAttribs.BindPoint + SamplerAttribs.BindCount-1));
             
             if (SamplerAttribs.IsStaticSampler())
             {
@@ -95,7 +98,7 @@ ShaderResourcesD3D11::ShaderResourcesD3D11(RenderDeviceD3D11Impl* pDeviceD3D11Im
                     {
                         RefCntAutoPtr<ISampler> pSampler;
                         pDeviceD3D11Impl->CreateSampler(StaticSamplerDesc.Desc, &pSampler);
-                        m_StaticSamplers.emplace_back(SamplerAttribs, std::move(pSampler));
+                        m_StaticSamplers.emplace_back(SamplerAttribs, move(pSampler));
                         break;
                     }
                 }
@@ -106,12 +109,12 @@ ShaderResourcesD3D11::ShaderResourcesD3D11(RenderDeviceD3D11Impl* pDeviceD3D11Im
         void OnNewTexSRV(const D3DShaderResourceAttribs& TexAttribs)
         {
             VERIFY( TexAttribs.BindPoint + TexAttribs.BindCount-1 <= MaxAllowedBindPoint, "Tex SRV bind point exceeds supported range" );
-            Resources.m_MaxSRVBindPoint = std::max(Resources.m_MaxSRVBindPoint, static_cast<MaxBindPointType>(TexAttribs.BindPoint + TexAttribs.BindCount-1));
+            Resources.m_MaxSRVBindPoint = max(Resources.m_MaxSRVBindPoint, static_cast<MaxBindPointType>(TexAttribs.BindPoint + TexAttribs.BindCount-1));
         }
 
         ~NewResourceHandler()
         {
-            Resources.InitStaticSamplers(std::move(m_StaticSamplers));
+            Resources.InitStaticSamplers(move(m_StaticSamplers));
         }
 
     private:
@@ -134,7 +137,7 @@ void ShaderResourcesD3D11::InitStaticSamplers(StaticSamplerVector&& StaticSample
 {
     m_StaticSamplers.reserve(StaticSamplers.size());
     for(auto& Sam : StaticSamplers)
-        m_StaticSamplers.emplace_back(std::move(Sam));
+        m_StaticSamplers.emplace_back(move(Sam));
 }
 
 ShaderResourcesD3D11::~ShaderResourcesD3D11()
@@ -150,7 +153,7 @@ void ShaderResourcesD3D11::SetStaticSamplers(ShaderResourceCacheD3D11& ResourceC
         VERIFY_EXPR(SamAttribs.IsStaticSampler());
         auto* pSamplerD3D11Impl = const_cast<SamplerD3D11Impl*>(SS.second.RawPtr<SamplerD3D11Impl>());
         // Limiting EndBindPoint is required when initializing static samplers in a Shader's static cache
-        auto EndBindPoint = std::min( static_cast<Uint32>(SamAttribs.BindPoint) + SamAttribs.BindCount, NumCachedSamplers);
+        auto EndBindPoint = min( static_cast<Uint32>(SamAttribs.BindPoint) + SamAttribs.BindCount, NumCachedSamplers);
         for(Uint32 BindPoint = SamAttribs.BindPoint; BindPoint < EndBindPoint; ++BindPoint )
             ResourceCache.SetSampler(BindPoint, pSamplerD3D11Impl);
     }

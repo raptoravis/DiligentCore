@@ -26,8 +26,9 @@
 /// \file
 /// Implementation of the Diligent::PipelineStateBase template class
 
-#include <array>
-#include <vector>
+#include "stl/algorithm.h"
+#include "stl/array.h"
+#include "stl/vector.h"
 
 #include "PipelineState.h"
 #include "DeviceObjectBase.h"
@@ -126,7 +127,7 @@ public:
                 UNEXPECTED("Buffer slot (", BuffSlot, ") exceeds the limit (", m_Strides.size(), ")");
                 continue;
             }
-            m_BufferSlotsUsed = std::max(m_BufferSlotsUsed, BuffSlot + 1);
+            m_BufferSlotsUsed = max(m_BufferSlotsUsed, BuffSlot + 1);
 
             auto &CurrStride = TightStrides[BuffSlot];
             if( It->RelativeOffset < CurrStride )
@@ -243,13 +244,13 @@ public:
     }
 
 protected:
-    std::vector<LayoutElement, STDAllocatorRawMem<LayoutElement> > m_LayoutElements;
+    vector<LayoutElement, STDAllocatorRawMem<LayoutElement> > m_LayoutElements;
 
     Uint32 m_BufferSlotsUsed = 0;
     // The size of this array must be equal to the
     // maximum number of buffer slots, because a layout 
     // element can refer to any input slot
-    std::array<Uint32, MaxBufferSlots> m_Strides = {};
+    array<Uint32, MaxBufferSlots> m_Strides = {};
 
     RefCntAutoPtr<IShader> m_pVS; ///< Strong reference to the vertex shader
     RefCntAutoPtr<IShader> m_pPS; ///< Strong reference to the pixel shader

@@ -26,12 +26,12 @@
 /// \file
 /// Implementation of the Diligent::TextureBase template class
 
+#include "stl/unique_ptr.h"
 #include "Texture.h"
 #include "GraphicsTypes.h"
 #include "DeviceObjectBase.h"
 #include "GraphicsAccessories.h"
 #include "STDAllocator.h"
-#include <memory>
 
 namespace Diligent
 {
@@ -184,13 +184,13 @@ protected:
 #endif
     // WARNING! We cannot use ITextureView here, because ITextureView has no virtual dtor!
     /// Default SRV addressing the entire texture
-    std::unique_ptr<TTextureViewImpl, STDDeleter<TTextureViewImpl, TTexViewObjAllocator>> m_pDefaultSRV;
+    unique_ptr<TTextureViewImpl, STDDeleter<TTextureViewImpl, TTexViewObjAllocator>> m_pDefaultSRV;
     /// Default RTV addressing the most detailed mip level
-    std::unique_ptr<TTextureViewImpl, STDDeleter<TTextureViewImpl, TTexViewObjAllocator>> m_pDefaultRTV;
+    unique_ptr<TTextureViewImpl, STDDeleter<TTextureViewImpl, TTexViewObjAllocator>> m_pDefaultRTV;
     /// Default DSV addressing the most detailed mip level
-    std::unique_ptr<TTextureViewImpl, STDDeleter<TTextureViewImpl, TTexViewObjAllocator>> m_pDefaultDSV;
+    unique_ptr<TTextureViewImpl, STDDeleter<TTextureViewImpl, TTexViewObjAllocator>> m_pDefaultDSV;
     /// Default UAV addressing the entire texture
-    std::unique_ptr<TTextureViewImpl, STDDeleter<TTextureViewImpl, TTexViewObjAllocator>> m_pDefaultUAV;
+    unique_ptr<TTextureViewImpl, STDDeleter<TTextureViewImpl, TTexViewObjAllocator>> m_pDefaultUAV;
 
     /// Implementation of ITexture::GetDefaultView().
     ITextureView* GetDefaultView( TEXTURE_VIEW_TYPE ViewType )override

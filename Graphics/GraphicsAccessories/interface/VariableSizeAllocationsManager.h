@@ -26,8 +26,9 @@
 
 #pragma once
 
-#include <map>
-#include <algorithm>
+#include "../../../Primitives/interface/stl/algorithm.h"
+#include "../../../Primitives/interface/stl/map.h"
+#include "../../../Primitives/interface/stl/utility.h"
 
 #include "../../../Primitives/interface/MemoryAllocator.h"
 #include "../../../Platforms/Basic/interface/DebugUtilities.h"
@@ -67,19 +68,19 @@ namespace Diligent
 
         // Type of the map that keeps memory blocks sorted by their offsets
         using TFreeBlocksByOffsetMap = 
-            std::map<OffsetType,    
-                     FreeBlockInfo, 
-                     std::less<OffsetType>, // Standard ordering
-                     STDAllocatorRawMem<std::pair<const OffsetType,  FreeBlockInfo>> // Raw memory allocator
-                     >;
+            map<OffsetType,    
+                FreeBlockInfo, 
+                less<OffsetType>, // Standard ordering
+                STDAllocatorRawMem<pair<const OffsetType,  FreeBlockInfo>> // Raw memory allocator
+                >;
 
         // Type of the map that keeps memory blocks sorted by their sizes
         using TFreeBlocksBySizeMap = 
-            std::multimap<OffsetType, 
-                          TFreeBlocksByOffsetMap::iterator, 
-                          std::less<OffsetType>, // Standard ordering
-                          STDAllocatorRawMem<std::pair<const OffsetType, TFreeBlocksByOffsetMap::iterator>> // Raw memory allocator
-                          >;
+            multimap<OffsetType, 
+                     TFreeBlocksByOffsetMap::iterator, 
+                     less<OffsetType>, // Standard ordering
+                     STDAllocatorRawMem<pair<const OffsetType, TFreeBlocksByOffsetMap::iterator>> // Raw memory allocator
+                     >;
 
         struct FreeBlockInfo
         {
@@ -127,8 +128,8 @@ namespace Diligent
         }
 
         VariableSizeAllocationsManager(VariableSizeAllocationsManager&& rhs)noexcept : 
-            m_FreeBlocksByOffset (std::move(rhs.m_FreeBlocksByOffset)),
-            m_FreeBlocksBySize   (std::move(rhs.m_FreeBlocksBySize)),
+            m_FreeBlocksByOffset (move(rhs.m_FreeBlocksByOffset)),
+            m_FreeBlocksBySize   (move(rhs.m_FreeBlocksBySize)),
             m_MaxSize            (rhs.m_MaxSize),
             m_FreeSize           (rhs.m_FreeSize),
             m_CurrAlignment      (rhs.m_CurrAlignment)
@@ -221,7 +222,7 @@ namespace Diligent
                 }
                 else
                 {
-                    m_CurrAlignment = std::min(m_CurrAlignment, Alignment);
+                    m_CurrAlignment = min(m_CurrAlignment, Alignment);
                 }
             }
 

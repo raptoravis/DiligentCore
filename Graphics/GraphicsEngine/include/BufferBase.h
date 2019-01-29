@@ -26,12 +26,12 @@
 /// \file
 /// Implementation of the Diligent::BufferBase template class
 
+#include "stl/unique_ptr.h"
 #include "Buffer.h"
 #include "GraphicsTypes.h"
 #include "DeviceObjectBase.h"
 #include "GraphicsAccessories.h"
 #include "STDAllocator.h"
-#include <memory>
 
 namespace Diligent
 {
@@ -166,10 +166,10 @@ protected:
     RESOURCE_STATE m_State = RESOURCE_STATE_UNKNOWN;
 
     /// Default UAV addressing the entire buffer
-    std::unique_ptr<BufferViewImplType, STDDeleter<BufferViewImplType, TBuffViewObjAllocator> > m_pDefaultUAV;
+    unique_ptr<BufferViewImplType, STDDeleter<BufferViewImplType, TBuffViewObjAllocator> > m_pDefaultUAV;
 
     /// Default SRV addressing the entire buffer
-    std::unique_ptr<BufferViewImplType, STDDeleter<BufferViewImplType, TBuffViewObjAllocator> > m_pDefaultSRV;
+    unique_ptr<BufferViewImplType, STDDeleter<BufferViewImplType, TBuffViewObjAllocator> > m_pDefaultSRV;
 };
 
 

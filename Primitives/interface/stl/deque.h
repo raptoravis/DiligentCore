@@ -21,49 +21,34 @@
  *  of the possibility of such damages.
  */
 
-#include "DebugUtilities.h"
-#include "EngineMemory.h"
-#include "DefaultRawMemoryAllocator.h"
+#pragma once
+
+#if DILIGENT_USE_EASTL
+
+#include "../../External/EASTL/include/EASTL/deque.h"
 
 namespace Diligent
 {
 
-static IMemoryAllocator* g_pRawAllocator;
-void SetRawAllocator(IMemoryAllocator *pRawAllocator)
+template <typename  T,
+          typename  Allocator          = EASTLAllocatorType,
+          unsigned  kDequeSubarraySize = DEQUE_DEFAULT_SUBARRAY_SIZE(T)>
+using deque = eastl::deque<T, Allocator, kDequeSubarraySize>;
+
+}
+
+#else
+
+#include <deque>
+
+namespace Diligent
 {
-    if (pRawAllocator == nullptr)
-    {
-        LOG_INFO_MESSAGE("User-defined allocator is not provided. Using default allocator.");
-        pRawAllocator = &DefaultRawMemoryAllocator::GetAllocator();
-    }
-    g_pRawAllocator = pRawAllocator;
-}
 
-IMemoryAllocator& GetRawAllocator()
-{
-    return g_pRawAllocator != nullptr ? *g_pRawAllocator : DefaultRawMemoryAllocator::GetAllocator();
-}
+template <typename   T,
+          typename   Allocator              = std::allocator<T>,
+          unsigned   /*kDequeSubarraySize*/ = 0>
+using deque = std::deque<T, Allocator>;
 
 }
-#if 0
 
-void* operator new(size_t Size)
-{ 
-    return Diligent::GetRawAllocator().Allocate(Size, "<Unknown>", "<Unknown>", -1); 
-}
-
-void* operator new[](size_t Size) 
-{ 
-    return Diligent::GetRawAllocator().Allocate(Size, "<Unknown>", "<Unknown>", -1); 
-}
-
-void operator delete(void* Ptr)
-{ 
-    Diligent::GetRawAllocator().Free(Ptr); 
-}
-
-void operator delete[](void* Ptr)
-{ 
-    Diligent::GetRawAllocator().Free(Ptr); 
-}
 #endif

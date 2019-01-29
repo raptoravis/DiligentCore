@@ -155,6 +155,16 @@ INTERFACE
     METAL_SUPPORTED=$<BOOL:${METAL_SUPPORTED}>
 )
 
+option(DILIGENT_USE_EASTL "Use EASTL" ON)
+target_compile_definitions(BuildSettings 
+INTERFACE 
+    DILIGENT_USE_EASTL=$<BOOL:${DILIGENT_USE_EASTL}>
+)
+if(${DILIGENT_USE_EASTL})
+    message("Using EASTL")
+else()
+    message("Using compiler-provided STL")
+endif()
 
 if(MSVC)
     # For msvc, enable level 4 warnings except for

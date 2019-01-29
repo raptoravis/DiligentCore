@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <vector>
+#include "stl/utility.h"
 #include <mutex>
 
 #include "Atomics.h"
@@ -117,7 +117,7 @@ public:
             return;
 
         Atomics::Long NumReferences = PlatformMisc::CountOneBits(QueueMask);
-        auto Wrapper = DynamicStaleResourceWrapper::Create(std::move(Object), NumReferences);
+        auto Wrapper = DynamicStaleResourceWrapper::Create(move(Object), NumReferences);
 
         while (QueueMask != 0)
         {
@@ -290,7 +290,7 @@ protected:
     struct CommandQueue
     {
         CommandQueue(RefCntAutoPtr<CommandQueueType> _CmdQueue, IMemoryAllocator& Allocator)noexcept : 
-            CmdQueue    (std::move(_CmdQueue)),
+            CmdQueue    (move(_CmdQueue)),
             ReleaseQueue(Allocator)
         {
             NextCmdBufferNumber = 0;

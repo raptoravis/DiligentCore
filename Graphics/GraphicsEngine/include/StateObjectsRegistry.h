@@ -26,8 +26,9 @@
 /// \file
 /// Implementation of the Diligent::StateObjectsRegistry template class
 
+#include "stl/unordered_map.h"
+
 #include "DeviceObject.h"
-#include <unordered_map>
 #include "STDAllocator.h"
 
 namespace Diligent
@@ -102,7 +103,7 @@ namespace Diligent
             }
 
             // Try to construct the new element in place
-            auto Elems = m_DescToObjHashMap.emplace( std::make_pair( ObjectDesc, Diligent::RefCntWeakPtr<IDeviceObject>(pObject) ) );
+            auto Elems = m_DescToObjHashMap.emplace( make_pair( ObjectDesc, RefCntWeakPtr<IDeviceObject>(pObject) ) );
             // It is theorertically possible that the same object can be found
             // in the registry. This might happen if two threads try to create
             // the same object at the same time. They both will not find the
@@ -198,8 +199,8 @@ namespace Diligent
         Atomics::AtomicLong m_NumDeletedObjects;
 
         /// Hash map that stores weak pointers to the referenced objects
-        typedef std::pair< const ResourceDescType, RefCntWeakPtr<IDeviceObject> > HashMapElem;
-        std::unordered_map<ResourceDescType, RefCntWeakPtr<IDeviceObject>, std::hash<ResourceDescType>, std::equal_to<ResourceDescType>, STDAllocatorRawMem<HashMapElem> > m_DescToObjHashMap;
+        using HashMapElem = pair< const ResourceDescType, RefCntWeakPtr<IDeviceObject> > ;
+        unordered_map<ResourceDescType, RefCntWeakPtr<IDeviceObject>, hash<ResourceDescType>, equal_to<ResourceDescType>, STDAllocatorRawMem<HashMapElem> > m_DescToObjHashMap;
 
         /// Registry name used for debug output
         const String m_RegistryName;

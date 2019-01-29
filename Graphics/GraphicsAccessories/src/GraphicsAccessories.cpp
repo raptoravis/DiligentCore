@@ -21,9 +21,9 @@
  *  of the possibility of such damages.
  */
 
+#include "stl/algorithm.h"
 #include "GraphicsAccessories.h"
 #include "DebugUtilities.h"
-#include <algorithm>
 
 namespace Diligent
 {
@@ -834,12 +834,12 @@ Uint32 ComputeMipLevelsCount( Uint32 Width )
 
 Uint32 ComputeMipLevelsCount( Uint32 Width, Uint32 Height )
 {
-    return ComputeMipLevelsCount( std::max( Width, Height ) );
+    return ComputeMipLevelsCount( max( Width, Height ) );
 }
 
 Uint32 ComputeMipLevelsCount( Uint32 Width, Uint32 Height, Uint32 Depth )
 {
-    return ComputeMipLevelsCount( std::max(std::max( Width, Height ), Depth) );
+    return ComputeMipLevelsCount( max(max( Width, Height ), Depth) );
 }
 
 bool VerifyResourceStates(RESOURCE_STATE State, bool IsTexture)

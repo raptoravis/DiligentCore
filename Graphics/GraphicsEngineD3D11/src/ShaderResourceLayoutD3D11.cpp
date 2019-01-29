@@ -23,6 +23,9 @@
 
 #include "pch.h"
 
+#include "stl/utility.h"
+#include "stl/algorithm.h"
+
 #include <d3dcompiler.h>
 
 #include "ShaderResourceLayoutD3D11.h"
@@ -100,7 +103,7 @@ void ShaderResourceLayoutD3D11::Initialize(std::shared_ptr<const ShaderResources
 {
     // http://diligentgraphics.com/diligent-engine/architecture/d3d11/shader-resource-layout#Shader-Resource-Layout-Initialization
 
-    m_pResources = std::move(pSrcResources);
+    m_pResources = move(pSrcResources);
     m_pResourceCache = &ResourceCache;
 
     auto AllowedTypeBits = GetAllowedTypeBits(VarTypes, NumVarTypes);
@@ -132,7 +135,7 @@ void ShaderResourceLayoutD3D11::Initialize(std::shared_ptr<const ShaderResources
     if (m_MemorySize)
     {
         auto *pRawMem = ALLOCATE(ResLayoutDataAllocator, "Raw memory buffer for shader resource layout resources", m_MemorySize);
-        m_ResourceBuffer = std::unique_ptr<void, STDDeleterRawMem<void> >(pRawMem, ResLayoutDataAllocator);
+        m_ResourceBuffer = unique_ptr<void, STDDeleterRawMem<void> >(pRawMem, ResLayoutDataAllocator);
     }
 
     VERIFY_EXPR(ResCounters.NumCBs     == GetNumCBs()     );
@@ -163,7 +166,7 @@ void ShaderResourceLayoutD3D11::Initialize(std::shared_ptr<const ShaderResources
 
             // Initialize current CB in place, increment CB counter
             new (&GetResource<ConstBuffBindInfo>(cb++)) ConstBuffBindInfo( CB, *this );
-            NumCBSlots = std::max(NumCBSlots, Uint32{CB.BindPoint} + Uint32{CB.BindCount});
+            NumCBSlots = max(NumCBSlots, Uint32{CB.BindPoint} + Uint32{CB.BindCount});
         },
 
         [&](const D3DShaderResourceAttribs& Sampler, Uint32)
@@ -175,7 +178,7 @@ void ShaderResourceLayoutD3D11::Initialize(std::shared_ptr<const ShaderResources
             {
                 // Initialize current sampler in place, increment sampler counter
                 new (&GetResource<SamplerBindInfo>(sam++)) SamplerBindInfo( Sampler, *this );
-                NumSamplerSlots = std::max(NumSamplerSlots, Uint32{Sampler.BindPoint} + Uint32{Sampler.BindCount});
+                NumSamplerSlots = max(NumSamplerSlots, Uint32{Sampler.BindPoint} + Uint32{Sampler.BindCount});
             }
         },
 
@@ -208,7 +211,7 @@ void ShaderResourceLayoutD3D11::Initialize(std::shared_ptr<const ShaderResources
 
             // Initialize tex SRV in place, increment counter of tex SRVs
             new (&GetResource<TexSRVBindInfo>(texSrv++)) TexSRVBindInfo( TexSRV, AssignedSamplerIndex, *this );
-            NumSRVSlots = std::max(NumSRVSlots, Uint32{TexSRV.BindPoint} + Uint32{TexSRV.BindCount});
+            NumSRVSlots = max(NumSRVSlots, Uint32{TexSRV.BindPoint} + Uint32{TexSRV.BindCount});
         },
 
         [&](const D3DShaderResourceAttribs& TexUAV, Uint32)
@@ -217,7 +220,7 @@ void ShaderResourceLayoutD3D11::Initialize(std::shared_ptr<const ShaderResources
              
             // Initialize tex UAV in place, increment counter of tex UAVs
             new (&GetResource<TexUAVBindInfo>(texUav++)) TexUAVBindInfo( TexUAV, *this );
-            NumUAVSlots = std::max(NumUAVSlots, Uint32{TexUAV.BindPoint} + Uint32{TexUAV.BindCount});
+            NumUAVSlots = max(NumUAVSlots, Uint32{TexUAV.BindPoint} + Uint32{TexUAV.BindCount});
         },
 
         [&](const D3DShaderResourceAttribs& BuffSRV, Uint32)
@@ -226,7 +229,7 @@ void ShaderResourceLayoutD3D11::Initialize(std::shared_ptr<const ShaderResources
             
             // Initialize buff SRV in place, increment counter of buff SRVs
             new (&GetResource<BuffSRVBindInfo>(bufSrv++)) BuffSRVBindInfo( BuffSRV, *this );
-            NumSRVSlots = std::max(NumSRVSlots, Uint32{BuffSRV.BindPoint} + Uint32{BuffSRV.BindCount});
+            NumSRVSlots = max(NumSRVSlots, Uint32{BuffSRV.BindPoint} + Uint32{BuffSRV.BindCount});
         },
 
         [&](const D3DShaderResourceAttribs& BuffUAV, Uint32)
@@ -235,7 +238,7 @@ void ShaderResourceLayoutD3D11::Initialize(std::shared_ptr<const ShaderResources
             
             // Initialize buff UAV in place, increment counter of buff UAVs
             new (&GetResource<BuffUAVBindInfo>(bufUav++)) BuffUAVBindInfo( BuffUAV, *this );
-            NumUAVSlots = std::max(NumUAVSlots, Uint32{BuffUAV.BindPoint} + Uint32{BuffUAV.BindCount});
+            NumUAVSlots = max(NumUAVSlots, Uint32{BuffUAV.BindPoint} + Uint32{BuffUAV.BindCount});
         }
     );
 
@@ -399,7 +402,7 @@ void ShaderResourceLayoutD3D11::ConstBuffBindInfo::BindResource(IDeviceObject* p
     }
 #endif
 
-    ResourceCache.SetCB(Attribs.BindPoint + ArrayIndex, std::move(pBuffD3D11Impl) );
+    ResourceCache.SetCB(Attribs.BindPoint + ArrayIndex, move(pBuffD3D11Impl) );
 }
 
 
@@ -504,7 +507,7 @@ void ShaderResourceLayoutD3D11::TexSRVBindInfo::BindResource(IDeviceObject* pVie
         ResourceCache.SetSampler(SamplerBindPoint, pSamplerD3D11Impl);
     }          
 
-    ResourceCache.SetTexSRV(Attribs.BindPoint + ArrayIndex, std::move(pViewD3D11));
+    ResourceCache.SetTexSRV(Attribs.BindPoint + ArrayIndex, move(pViewD3D11));
 }
 
 void ShaderResourceLayoutD3D11::SamplerBindInfo::BindResource(IDeviceObject* pSampler,
@@ -540,7 +543,7 @@ void ShaderResourceLayoutD3D11::SamplerBindInfo::BindResource(IDeviceObject* pSa
     }
 #endif
 
-    ResourceCache.SetSampler(Attribs.BindPoint + ArrayIndex, std::move(pSamplerD3D11));
+    ResourceCache.SetSampler(Attribs.BindPoint + ArrayIndex, move(pSamplerD3D11));
 }
 
 void ShaderResourceLayoutD3D11::BuffSRVBindInfo::BindResource(IDeviceObject* pView,
@@ -570,7 +573,7 @@ void ShaderResourceLayoutD3D11::BuffSRVBindInfo::BindResource(IDeviceObject* pVi
     }
 #endif
 
-    ResourceCache.SetBufSRV(Attribs.BindPoint + ArrayIndex, std::move(pViewD3D11));
+    ResourceCache.SetBufSRV(Attribs.BindPoint + ArrayIndex, move(pViewD3D11));
 }
 
 
@@ -601,7 +604,7 @@ void ShaderResourceLayoutD3D11::TexUAVBindInfo::BindResource(IDeviceObject* pVie
     }
 #endif
 
-    ResourceCache.SetTexUAV(Attribs.BindPoint + ArrayIndex, std::move(pViewD3D11));
+    ResourceCache.SetTexUAV(Attribs.BindPoint + ArrayIndex, move(pViewD3D11));
 }
 
 
@@ -632,7 +635,7 @@ void ShaderResourceLayoutD3D11::BuffUAVBindInfo::BindResource(IDeviceObject* pVi
     }
 #endif
 
-    ResourceCache.SetBufUAV(Attribs.BindPoint + ArrayIndex, std::move(pViewD3D11));
+    ResourceCache.SetBufUAV(Attribs.BindPoint + ArrayIndex, move(pViewD3D11));
 }
 
 

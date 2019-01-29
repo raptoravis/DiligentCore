@@ -22,6 +22,8 @@
  */
 
 #include "pch.h"
+#include "stl/algorithm.h"
+#include "stl/utility.h"
 #include "DeviceContextD3D11Impl.h"
 #include "BufferD3D11Impl.h"
 #include "ShaderD3D11Impl.h"
@@ -283,7 +285,7 @@ namespace Diligent
                     if (CommitResources)
                     {
                         bool IsNewUAV = CommittedD3D11UAVs[uav] != d3d11UAVs[uav];
-                        MinSlot = IsNewUAV ? std::min(MinSlot, uav) : MinSlot;
+                        MinSlot = IsNewUAV ? min(MinSlot, uav) : MinSlot;
                         MaxSlot = IsNewUAV ? uav : MaxSlot;
 
                         CommittedD3D11UAVRes[uav] = UAVRes.pd3d11Resource;
@@ -319,7 +321,7 @@ namespace Diligent
                             // This can only be CS
                             auto SetUAVMethod = SetUAVMethods[ShaderTypeInd];
                             (m_pd3d11DeviceContext->*SetUAVMethod)(MinSlot, MaxSlot-MinSlot+1, CommittedD3D11UAVs+MinSlot, nullptr);
-                            m_NumCommittedUAVs[ShaderTypeInd] = std::max(m_NumCommittedUAVs[ShaderTypeInd], static_cast<Uint8>(NumUAVs));
+                            m_NumCommittedUAVs[ShaderTypeInd] = max(m_NumCommittedUAVs[ShaderTypeInd], static_cast<Uint8>(NumUAVs));
                         }
                     }
 
@@ -419,7 +421,7 @@ namespace Diligent
                     if(CommitResources)
                     {
                         bool IsNewCB = CommittedD3D11CBs[cb] != d3d11CBs[cb];
-                        MinSlot = IsNewCB ? std::min(MinSlot, cb) : MinSlot;
+                        MinSlot = IsNewCB ? min(MinSlot, cb) : MinSlot;
                         MaxSlot = IsNewCB ? cb : MaxSlot;
                         CommittedD3D11CBs[cb] = d3d11CBs[cb];
                     }
@@ -431,7 +433,7 @@ namespace Diligent
                     {
                         auto SetCBMethod = SetCBMethods[ShaderTypeInd];
                         (m_pd3d11DeviceContext->*SetCBMethod)(MinSlot, MaxSlot-MinSlot+1, CommittedD3D11CBs+MinSlot);
-                        m_NumCommittedCBs[ShaderTypeInd] = std::max(m_NumCommittedCBs[ShaderTypeInd], static_cast<Uint8>(NumCBs));
+                        m_NumCommittedCBs[ShaderTypeInd] = max(m_NumCommittedCBs[ShaderTypeInd], static_cast<Uint8>(NumCBs));
                     }
 #ifdef DEVELOPMENT
                     if (m_DebugFlags & (Uint32)EngineD3D11DebugFlags::VerifyCommittedResourceRelevance)
@@ -524,7 +526,7 @@ namespace Diligent
                     if (CommitResources)
                     {
                         bool IsNewSRV = CommittedD3D11SRVs[srv] != d3d11SRVs[srv];
-                        MinSlot = IsNewSRV ? std::min(MinSlot, srv) : MinSlot;
+                        MinSlot = IsNewSRV ? min(MinSlot, srv) : MinSlot;
                         MaxSlot = IsNewSRV ? srv : MaxSlot;
 
                         CommittedD3D11SRVRes[srv] = SRVRes.pd3d11Resource;
@@ -538,7 +540,7 @@ namespace Diligent
                     {
                         auto SetSRVMethod = SetSRVMethods[ShaderTypeInd];
                         (m_pd3d11DeviceContext->*SetSRVMethod)(MinSlot, MaxSlot-MinSlot+1, CommittedD3D11SRVs+MinSlot);
-                        m_NumCommittedSRVs[ShaderTypeInd] = std::max(m_NumCommittedSRVs[ShaderTypeInd], static_cast<Uint8>(NumSRVs));
+                        m_NumCommittedSRVs[ShaderTypeInd] = max(m_NumCommittedSRVs[ShaderTypeInd], static_cast<Uint8>(NumSRVs));
                     }
 #ifdef DEVELOPMENT
                     if (m_DebugFlags & (Uint32)EngineD3D11DebugFlags::VerifyCommittedResourceRelevance)
@@ -568,7 +570,7 @@ namespace Diligent
                         VERIFY_EXPR(sam < Cache.GetSamplerCount());
 
                         bool IsNewSam = CommittedD3D11Samplers[sam] != d3d11Samplers[sam];
-                        MinSlot = IsNewSam ? std::min(MinSlot, sam) : MinSlot;
+                        MinSlot = IsNewSam ? min(MinSlot, sam) : MinSlot;
                         MaxSlot = IsNewSam ? sam : MaxSlot;
 
                         CommittedD3D11Samplers[sam] = d3d11Samplers[sam];
@@ -578,7 +580,7 @@ namespace Diligent
                     {
                         auto SetSamplerMethod = SetSamplerMethods[ShaderTypeInd];
                         (m_pd3d11DeviceContext->*SetSamplerMethod)(MinSlot, MaxSlot-MinSlot+1, CommittedD3D11Samplers+MinSlot);
-                        m_NumCommittedSamplers[ShaderTypeInd] = std::max(m_NumCommittedSamplers[ShaderTypeInd], static_cast<Uint8>(NumSamplers));
+                        m_NumCommittedSamplers[ShaderTypeInd] = max(m_NumCommittedSamplers[ShaderTypeInd], static_cast<Uint8>(NumSamplers));
                     }
 #ifdef DEVELOPMENT
                     if (m_DebugFlags & (Uint32)EngineD3D11DebugFlags::VerifyCommittedResourceRelevance)
@@ -689,7 +691,7 @@ namespace Diligent
     void DeviceContextD3D11Impl::CommitD3D11VertexBuffers(PipelineStateD3D11Impl* pPipelineStateD3D11)
     {
         VERIFY( m_NumVertexStreams <= MaxBufferSlots, "Too many buffers are being set" );
-        UINT NumBuffersToSet = std::max(m_NumVertexStreams, m_NumCommittedD3D11VBs );
+        UINT NumBuffersToSet = max(m_NumVertexStreams, m_NumCommittedD3D11VBs );
 
         bool BindVBs = m_NumVertexStreams != m_NumCommittedD3D11VBs;
 
@@ -1233,7 +1235,7 @@ namespace Diligent
         const Uint32 MaxD3D11RTs = D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT;
         Uint32 NumRenderTargets = m_NumBoundRenderTargets;
         VERIFY( NumRenderTargets <= MaxD3D11RTs, "D3D11 only allows 8 simultaneous render targets" );
-        NumRenderTargets = std::min( MaxD3D11RTs, NumRenderTargets );
+        NumRenderTargets = min( MaxD3D11RTs, NumRenderTargets );
 
         // Do not waste time setting RTVs to null
         ID3D11RenderTargetView* pd3d11RTs[MaxD3D11RTs];
@@ -1764,7 +1766,7 @@ namespace Diligent
         VERIFY_EXPR(pd3d11Query);
         m_pd3d11DeviceContext->End(pd3d11Query);
         auto* pFenceD3D11Impl = ValidatedCast<FenceD3D11Impl>(pFence);
-        pFenceD3D11Impl->AddPendingQuery(m_pd3d11DeviceContext, std::move(pd3d11Query), Value);
+        pFenceD3D11Impl->AddPendingQuery(m_pd3d11DeviceContext, move(pd3d11Query), Value);
     };
 
     void DeviceContextD3D11Impl::ClearStateCache()

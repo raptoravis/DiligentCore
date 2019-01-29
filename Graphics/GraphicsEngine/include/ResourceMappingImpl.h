@@ -26,9 +26,12 @@
 /// \file
 /// Declaration of the Diligent::ResourceMappingImpl class
 
+#include "stl/unordered_map.h"
+#include "stl/utility.h"
+
+#include "RefCntAutoPtr.h"
 #include "ResourceMapping.h"
 #include "ObjectBase.h"
-#include <unordered_map>
 #include "HashUtils.h"
 #include "STDAllocator.h"
 
@@ -43,7 +46,7 @@ namespace Diligent
         }
 
         ResMappingHashKey(ResMappingHashKey&& rhs) : 
-            StrKey(std::move(rhs.StrKey)),
+            StrKey(move(rhs.StrKey)),
             ArrayIndex(rhs.ArrayIndex)
         {}
 
@@ -126,7 +129,7 @@ namespace Diligent
         ThreadingTools::LockHelper Lock();
 
         ThreadingTools::LockFlag m_LockFlag;
-        typedef std::pair<const ResMappingHashKey, RefCntAutoPtr<IDeviceObject> > HashTableElem;
-        std::unordered_map< ResMappingHashKey, RefCntAutoPtr<IDeviceObject>, std::hash<ResMappingHashKey>, std::equal_to<ResMappingHashKey>, STDAllocatorRawMem<HashTableElem>  > m_HashTable;
+        using HashTableElem = pair<const ResMappingHashKey, RefCntAutoPtr<IDeviceObject> > ;
+        unordered_map< ResMappingHashKey, RefCntAutoPtr<IDeviceObject>, hash<ResMappingHashKey>, equal_to<ResMappingHashKey>, STDAllocatorRawMem<HashTableElem>  > m_HashTable;
     };
 }

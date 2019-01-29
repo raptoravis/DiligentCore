@@ -21,21 +21,32 @@
  *  of the possibility of such damages.
  */
 
-/// \file
-/// Precomputed header
-
 #pragma once
 
-#include <vector>
-#include <list>
+#include "functional.h"
+
+#if DILIGENT_USE_EASTL
+
+#include "../../External/EASTL/include/EASTL/set.h"
+
+namespace Diligent
+{
+
+using eastl::set;
+using eastl::multiset;
+
+}
+
+#else
+
 #include <set>
-#include <map>
-#include <unordered_map>
-#include <memory>
-#include <algorithm>
-#include "GraphicsTypes.h"
-#include "RefCntAutoPtr.h"
-#include "Errors.h"
-#include "DebugUtilities.h"
-#include "RenderDeviceBase.h"
-#include "DeviceContextBase.h"
+
+namespace Diligent
+{
+
+using std::set;
+using std::multiset;
+
+}
+
+#endif

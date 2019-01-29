@@ -21,49 +21,40 @@
  *  of the possibility of such damages.
  */
 
-#include "DebugUtilities.h"
-#include "EngineMemory.h"
-#include "DefaultRawMemoryAllocator.h"
+#pragma once
+
+#if DILIGENT_USE_EASTL
+
+#include "../../External/EASTL/include/EASTL/functional.h"
 
 namespace Diligent
 {
 
-static IMemoryAllocator* g_pRawAllocator;
-void SetRawAllocator(IMemoryAllocator *pRawAllocator)
+using eastl::hash;
+using eastl::equal_to;
+using eastl::not_equal_to;
+using eastl::less;
+using eastl::greater;
+using eastl::greater_equal;
+using eastl::less_equal;
+
+}
+
+#else
+
+#include <functional>
+
+namespace Diligent
 {
-    if (pRawAllocator == nullptr)
-    {
-        LOG_INFO_MESSAGE("User-defined allocator is not provided. Using default allocator.");
-        pRawAllocator = &DefaultRawMemoryAllocator::GetAllocator();
-    }
-    g_pRawAllocator = pRawAllocator;
-}
 
-IMemoryAllocator& GetRawAllocator()
-{
-    return g_pRawAllocator != nullptr ? *g_pRawAllocator : DefaultRawMemoryAllocator::GetAllocator();
-}
+using std::hash;
+using std::equal_to;
+using std::not_equal_to;
+using std::less;
+using std::greater;
+using std::greater_equal;
+using std::less_equal;
 
 }
-#if 0
 
-void* operator new(size_t Size)
-{ 
-    return Diligent::GetRawAllocator().Allocate(Size, "<Unknown>", "<Unknown>", -1); 
-}
-
-void* operator new[](size_t Size) 
-{ 
-    return Diligent::GetRawAllocator().Allocate(Size, "<Unknown>", "<Unknown>", -1); 
-}
-
-void operator delete(void* Ptr)
-{ 
-    Diligent::GetRawAllocator().Free(Ptr); 
-}
-
-void operator delete[](void* Ptr)
-{ 
-    Diligent::GetRawAllocator().Free(Ptr); 
-}
 #endif

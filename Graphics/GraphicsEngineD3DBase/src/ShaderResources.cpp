@@ -21,11 +21,11 @@
  *  of the possibility of such damages.
  */
 
-#include "pch.h"
 #include "EngineMemory.h"
 #include "StringTools.h"
 #include "ShaderResources.h"
 #include "HashUtils.h"
+#include "GraphicsAccessories.h"
 
 namespace Diligent
 {

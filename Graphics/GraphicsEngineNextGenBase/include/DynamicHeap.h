@@ -27,9 +27,10 @@
 /// Defines dynamic heap utilities
 
 #include <mutex>
-#include <deque>
-#include <vector>
 #include <atomic>
+#include "stl/vector.h"
+#include "stl/deque.h"
+#include "stl/utility.h"
 #include "VariableSizeAllocationsManager.h"
 #include "RingBuffer.h"
 
@@ -61,7 +62,7 @@ public:
     MasterBlockRingBufferBasedManager& operator= (const MasterBlockRingBufferBasedManager&)  = delete;
     MasterBlockRingBufferBasedManager& operator= (      MasterBlockRingBufferBasedManager&&) = delete;
 
-    void DiscardMasterBlocks(std::vector<MasterBlock>& /*Blocks*/, Uint64 FenceValue)
+    void DiscardMasterBlocks(vector<MasterBlock>& /*Blocks*/, Uint64 FenceValue)
     {
         std::lock_guard<std::mutex> Lock(m_RingBufferMtx);
         m_RingBuffer.FinishCurrentFrame(FenceValue);
@@ -115,7 +116,7 @@ public:
     }
 
     template<typename RenderDeviceImplType>
-    void ReleaseMasterBlocks(std::vector<MasterBlock>& Blocks, RenderDeviceImplType& Device, Uint64 CmdQueueMask)
+    void ReleaseMasterBlocks(vector<MasterBlock>& Blocks, RenderDeviceImplType& Device, Uint64 CmdQueueMask)
     {
         struct StaleMasterBlock
         {
@@ -123,7 +124,7 @@ public:
             MasterBlockListBasedManager* Mgr;
 
             StaleMasterBlock(MasterBlock&& _Block, MasterBlockListBasedManager* _Mgr)noexcept :
-                Block (std::move(_Block)),
+                Block (move(_Block)),
                 Mgr   (_Mgr)
             {
             }
@@ -133,7 +134,7 @@ public:
             StaleMasterBlock& operator= (      StaleMasterBlock&&) = delete;
             
             StaleMasterBlock(StaleMasterBlock&& rhs)noexcept : 
-                Block (std::move(rhs.Block)),
+                Block (move(rhs.Block)),
                 Mgr   (rhs.Mgr)
             {
                 rhs.Block = MasterBlock{};
@@ -148,13 +149,13 @@ public:
 #ifdef DEVELOPMENT
                     --Mgr->m_MasterBlockCounter;
 #endif
-                    Mgr->m_AllocationsMgr.Free(std::move(Block));
+                    Mgr->m_AllocationsMgr.Free(move(Block));
                 }
             }
         };
         for(auto& Block : Blocks)
         {
-            Device.SafeReleaseDeviceObject(StaleMasterBlock{std::move(Block), this}, CmdQueueMask);
+            Device.SafeReleaseDeviceObject(StaleMasterBlock{move(Block), this}, CmdQueueMask);
         }
     }
 

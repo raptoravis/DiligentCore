@@ -27,7 +27,9 @@
 
 #pragma once
 
-#include <deque>
+#include "../../../Primitives/interface/stl/deque.h"
+#include "../../../Primitives/interface/stl/utility.h"
+
 #include "VariableSizeAllocationsManager.h"
 
 namespace Diligent
@@ -61,9 +63,9 @@ namespace Diligent
 
         // = default causes compiler error when instantiating std::vector::emplace_back() in Visual Studio 2015 (Version 14.0.23107.0 D14REL)
         VariableSizeGPUAllocationsManager(VariableSizeGPUAllocationsManager&& rhs) noexcept : 
-            VariableSizeAllocationsManager(std::move(rhs)),
-            m_StaleAllocations(std::move(rhs.m_StaleAllocations)),
-			m_StaleAllocationsSize(rhs.m_StaleAllocationsSize)
+            VariableSizeAllocationsManager  (move(rhs)),
+            m_StaleAllocations              (move(rhs.m_StaleAllocations)),
+			m_StaleAllocationsSize          (rhs.m_StaleAllocationsSize)
         {
 			rhs.m_StaleAllocationsSize = 0;
         }
@@ -105,7 +107,7 @@ namespace Diligent
 		size_t GetStaleAllocationsSize()const { return m_StaleAllocationsSize; }
 
     private:
-        std::deque< StaleAllocationAttribs, STDAllocatorRawMem<StaleAllocationAttribs> > m_StaleAllocations;
+        deque< StaleAllocationAttribs, STDAllocatorRawMem<StaleAllocationAttribs> > m_StaleAllocations;
 		size_t m_StaleAllocationsSize = 0;
     };
 }

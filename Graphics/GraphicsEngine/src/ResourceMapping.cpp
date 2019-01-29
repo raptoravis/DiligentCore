@@ -21,11 +21,10 @@
  *  of the possibility of such damages.
  */
 
-#include "pch.h"
+#include "stl/utility.h"
+
 #include "ResourceMappingImpl.h"
 #include "DeviceObjectBase.h"
-
-using namespace std;
 
 namespace Diligent
 {
@@ -53,9 +52,9 @@ namespace Diligent
             // Try to construct new element in place
             auto Elems = 
                 m_HashTable.emplace( 
-                                    make_pair( Diligent::ResMappingHashKey(Name, true, StartIndex+Elem), // Make a copy of the source string
-                                               Diligent::RefCntAutoPtr<IDeviceObject>(pObject) 
-                                              ) 
+                                    make_pair( ResMappingHashKey(Name, true, StartIndex+Elem), // Make a copy of the source string
+                                               RefCntAutoPtr<IDeviceObject>(pObject) 
+                                             ) 
                                     );
             // If there is already element with the same name, replace it
             if( !Elems.second && Elems.first->second != pObject )
