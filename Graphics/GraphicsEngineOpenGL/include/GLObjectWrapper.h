@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include "stl/utility.h"
 #include "UniqueIdentifier.h"
 
 namespace GLObjectWrappers
@@ -53,8 +54,8 @@ public:
     
     GLObjWrapper(GLObjWrapper&& Wrapper) : 
         m_uiHandle(Wrapper.m_uiHandle),
-        m_CreateReleaseHelper( std::move( Wrapper.m_CreateReleaseHelper ) ),
-        m_UniqueId( std::move(Wrapper.m_UniqueId) )
+        m_CreateReleaseHelper( Diligent::move( Wrapper.m_CreateReleaseHelper ) ),
+        m_UniqueId( Diligent::move(Wrapper.m_UniqueId) )
     {
         Wrapper.m_uiHandle = 0;
     }
@@ -64,8 +65,8 @@ public:
         Release();
         m_uiHandle = Wrapper.m_uiHandle;
         Wrapper.m_uiHandle = 0;
-        m_CreateReleaseHelper = std::move( Wrapper.m_CreateReleaseHelper );
-        m_UniqueId = std::move(Wrapper.m_UniqueId);
+        m_CreateReleaseHelper = Diligent::move( Wrapper.m_CreateReleaseHelper );
+        m_UniqueId = Diligent::move(Wrapper.m_UniqueId);
         return *this;
     }
 

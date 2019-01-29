@@ -23,6 +23,8 @@
 
 #include "pch.h"
 
+#include "stl/algorithm.h"
+
 #include "Texture2D_OGL.h"
 #include "RenderDeviceGLImpl.h"
 #include "DeviceContextGLImpl.h"
@@ -88,8 +90,8 @@ Texture2D_OGL::Texture2D_OGL( IReferenceCounters *pRefCounters,
             {
                 for(Uint32 Mip = 0; Mip < m_Desc.MipLevels; ++Mip)
                 {
-                    Box DstBox{0, std::max(m_Desc.Width >>Mip, 1U),
-                               0, std::max(m_Desc.Height>>Mip, 1U)};
+                    Box DstBox{0, max(m_Desc.Width >>Mip, 1U),
+                               0, max(m_Desc.Height>>Mip, 1U)};
                     // UpdateData() is a virtual function. If we try to call it through vtbl from here,
                     // we will get into TextureBaseGL::UpdateData(), because instance of Texture2D_OGL
                     // is not fully constructed yet.
@@ -148,8 +150,8 @@ void Texture2D_OGL::UpdateData( GLContextState &ContextState, Uint32 MipLevel, U
 
     if( TransferAttribs.IsCompressed )
     {
-        auto MipWidth  = std::max(m_Desc.Width  >> MipLevel, 1U);
-        auto MipHeight = std::max(m_Desc.Height >> MipLevel, 1U);
+        auto MipWidth  = max(m_Desc.Width  >> MipLevel, 1U);
+        auto MipHeight = max(m_Desc.Height >> MipLevel, 1U);
         VERIFY( (DstBox.MinX % 4) == 0 && (DstBox.MinY % 4) == 0 &&
                 ((DstBox.MaxX % 4) == 0 || DstBox.MaxX == MipWidth) && 
                 ((DstBox.MaxY % 4) == 0 || DstBox.MaxY == MipHeight), 
@@ -167,8 +169,8 @@ void Texture2D_OGL::UpdateData( GLContextState &ContextState, Uint32 MipLevel, U
         //glPixelStorei(GL_UNPACK_COMPRESSED_BLOCK_WIDTH, 0);
         auto UpdateRegionWidth  = DstBox.MaxX - DstBox.MinX;
         auto UpdateRegionHeight = DstBox.MaxY - DstBox.MinY;
-        UpdateRegionWidth  = std::min(UpdateRegionWidth,  MipWidth  - DstBox.MinX);
-        UpdateRegionHeight = std::min(UpdateRegionHeight, MipHeight - DstBox.MinY);
+        UpdateRegionWidth  = min(UpdateRegionWidth,  MipWidth  - DstBox.MinX);
+        UpdateRegionHeight = min(UpdateRegionHeight, MipHeight - DstBox.MinY);
         glCompressedTexSubImage2D(m_BindTarget, MipLevel, 
                         DstBox.MinX, 
                         DstBox.MinY, 

@@ -22,6 +22,7 @@
  */
 
 #include "pch.h"
+#include "stl/vector.h"
 #include "PipelineStateGLImpl.h"
 #include "RenderDeviceGLImpl.h"
 #include "ShaderGLImpl.h"
@@ -79,7 +80,7 @@ void PipelineStateGLImpl::LinkGLProgram(bool bIsProgramPipelineSupported)
             glGetProgramiv( m_GLProgram, GL_INFO_LOG_LENGTH, &LengthWithNull );
 
             // The maxLength includes the NULL character
-            std::vector<char> shaderProgramInfoLog( LengthWithNull );
+            vector<char> shaderProgramInfoLog( LengthWithNull );
 
             // Notice that glGetProgramInfoLog  is used, not glGetShaderInfoLog.
             glGetProgramInfoLog( m_GLProgram, LengthWithNull, &Length, &shaderProgramInfoLog[0] );
@@ -96,8 +97,8 @@ void PipelineStateGLImpl::LinkGLProgram(bool bIsProgramPipelineSupported)
             CHECK_GL_ERROR( "glDetachShader() failed" );
         }
 
-        std::vector<ShaderVariableDesc> MergedVarTypesArray;
-        std::vector<StaticSamplerDesc> MergedStSamArray;
+        vector<ShaderVariableDesc> MergedVarTypesArray;
+        vector<StaticSamplerDesc> MergedStSamArray;
         SHADER_VARIABLE_TYPE DefaultVarType = SHADER_VARIABLE_TYPE_STATIC;
         for( Uint32 Shader = 0; Shader < m_NumShaders; ++Shader )
         {

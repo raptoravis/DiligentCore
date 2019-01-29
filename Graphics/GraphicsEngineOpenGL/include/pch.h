@@ -28,13 +28,6 @@
 
 #pragma once
 
-#include <vector>
-
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <algorithm>
-
 #if PLATFORM_WIN32
 
 #   ifndef GLEW_STATIC

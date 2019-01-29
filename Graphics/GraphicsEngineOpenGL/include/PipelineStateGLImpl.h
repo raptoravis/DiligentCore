@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include "stl/unordered_map.h"
+
 #include "PipelineStateGL.h"
 #include "PipelineStateBase.h"
 #include "RenderDevice.h"
@@ -62,7 +64,7 @@ private:
 
     GLProgram m_GLProgram;
     ThreadingTools::LockFlag m_ProgPipelineLockFlag;
-    std::unordered_map<GLContext::NativeGLContextType, GLObjectWrappers::GLPipelineObj> m_GLProgPipelines;
+    unordered_map<GLContext::NativeGLContextType, GLObjectWrappers::GLPipelineObj> m_GLProgPipelines;
 };
 
 }

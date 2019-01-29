@@ -24,6 +24,8 @@
 #pragma once
 
 #include <cstring>
+#include "stl/unordered_map.h"
+
 #include "GraphicsTypes.h"
 #include "Buffer.h"
 #include "InputLayout.h"
@@ -125,9 +127,9 @@ private:
 
     friend class RenderDeviceGLImpl;
     ThreadingTools::LockFlag m_CacheLockFlag;
-    std::unordered_map<VAOCacheKey, GLObjectWrappers::GLVertexArrayObj, VAOCacheKeyHashFunc> m_Cache;
-    std::unordered_multimap<const IPipelineState*, VAOCacheKey> m_PSOToKey;
-    std::unordered_multimap<const IBuffer*, VAOCacheKey> m_BuffToKey;
+    unordered_map<VAOCacheKey, GLObjectWrappers::GLVertexArrayObj, VAOCacheKeyHashFunc> m_Cache;
+    unordered_multimap<const IPipelineState*, VAOCacheKey> m_PSOToKey;
+    unordered_multimap<const IBuffer*, VAOCacheKey> m_BuffToKey;
 
     // Any draw command fails if no VAO is bound. We will use this empty
     // VAO for draw commands with null input layout, such as these that

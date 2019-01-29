@@ -26,7 +26,9 @@
 /// \file
 /// Declaration of Diligent::FenceGLImpl class
 
-#include <deque>
+#include "stl/deque.h"
+#include "stl/utility.h"
+
 #include "FenceGL.h"
 #include "RenderDeviceGL.h"
 #include "FenceBase.h"
@@ -56,11 +58,11 @@ public:
 
     void AddPendingFence(GLObjectWrappers::GLSyncObj&& Fence, Uint64 Value)
     {
-        m_PendingFences.emplace_back(Value, std::move(Fence));
+        m_PendingFences.emplace_back(Value, move(Fence));
     }
 
 private:
-    std::deque<std::pair<Uint64, GLObjectWrappers::GLSyncObj> > m_PendingFences;
+    deque<pair<Uint64, GLObjectWrappers::GLSyncObj> > m_PendingFences;
     volatile Uint64 m_LastCompletedFenceValue = 0;
 };
 

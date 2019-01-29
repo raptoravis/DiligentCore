@@ -26,6 +26,9 @@
 #include <fstream>
 #include <string>
 
+#include "stl/algorithm.h"
+#include "stl/utility.h"
+
 #include "SwapChainGL.h"
 #include "DeviceContextGLImpl.h"
 #include "RenderDeviceGLImpl.h"
@@ -311,11 +314,11 @@ namespace Diligent
 
             Uint32 NumRenderTargets = m_NumBoundRenderTargets;
             VERIFY(NumRenderTargets < MaxRenderTargets, "Too many render targets (", NumRenderTargets, ") are being set");
-            NumRenderTargets = std::min(NumRenderTargets, MaxRenderTargets);
+            NumRenderTargets = min(NumRenderTargets, MaxRenderTargets);
 
             const auto& CtxCaps = m_ContextState.GetContextCaps();
             VERIFY(NumRenderTargets < static_cast<Uint32>(CtxCaps.m_iMaxDrawBuffers), "This device only supports ", CtxCaps.m_iMaxDrawBuffers, " draw buffers, but ", NumRenderTargets, " are being set");
-            NumRenderTargets = std::min(NumRenderTargets, static_cast<Uint32>(CtxCaps.m_iMaxDrawBuffers));
+            NumRenderTargets = min(NumRenderTargets, static_cast<Uint32>(CtxCaps.m_iMaxDrawBuffers));
 
             ITextureView* pBoundRTVs[MaxRenderTargets] = {};
             for (Uint32 rt = 0; rt < NumRenderTargets; ++rt)
@@ -1009,7 +1012,7 @@ namespace Diligent
         );
         CHECK_GL_ERROR( "Failed to create gl fence" );
         auto* pFenceGLImpl = ValidatedCast<FenceGLImpl>(pFence);
-        pFenceGLImpl->AddPendingFence(std::move(GLFence), Value);
+        pFenceGLImpl->AddPendingFence(move(GLFence), Value);
     };
 
     bool DeviceContextGLImpl::UpdateCurrentGLContext()

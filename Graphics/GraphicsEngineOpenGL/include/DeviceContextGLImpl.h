@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include "stl/vector.h"
+
 #include "DeviceContextGL.h"
 #include "DeviceContextBase.h"
 #include "BaseInterfacesGL.h"
@@ -168,8 +170,8 @@ protected:
 private:
     Uint32 m_CommitedResourcesTentativeBarriers;
 
-    std::vector<class TextureBaseGL*> m_BoundWritableTextures;
-    std::vector<class BufferGLImpl*> m_BoundWritableBuffers;
+    vector<class TextureBaseGL*> m_BoundWritableTextures;
+    vector<class BufferGLImpl*> m_BoundWritableBuffers;
 
     bool m_bVAOIsUpToDate = false;
     GLObjectWrappers::GLFrameBufferObj m_DefaultFBO;

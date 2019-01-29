@@ -23,6 +23,8 @@
 
 #include "pch.h"
 
+#include "stl/vector.h"
+
 #include "GLContextState.h"
 #include "TextureBaseGL.h"
 #include "SamplerGLImpl.h"
@@ -177,7 +179,7 @@ namespace Diligent
     }
 
     template<class ObjectType>
-    bool UpdateBoundObjectsArr( std::vector< UniqueIdentifier >& BoundObjectIDs, Uint32 Index, const ObjectType &NewObject, GLuint &NewGLHandle )
+    bool UpdateBoundObjectsArr( vector< UniqueIdentifier >& BoundObjectIDs, Uint32 Index, const ObjectType &NewObject, GLuint &NewGLHandle )
     {
         if( Index >= BoundObjectIDs.size() )
             BoundObjectIDs.resize( Index + 1, -1 );

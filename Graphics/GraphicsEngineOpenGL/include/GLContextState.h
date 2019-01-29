@@ -23,6 +23,9 @@
 
 #pragma once
 
+#include <limits>
+#include "stl/vector.h"
+
 #include "GraphicsTypes.h"
 #include "GLObjectWrapper.h"
 #include "UniqueIdentifier.h"
@@ -93,15 +96,15 @@ private:
     // the system can reuse the same address
     // The safest way is to keep global unique ID for all objects
 
-    Diligent::UniqueIdentifier m_GLProgId = -1;
-    Diligent::UniqueIdentifier m_GLPipelineId = -1;
-    Diligent::UniqueIdentifier m_VAOId = -1;
-    Diligent::UniqueIdentifier m_FBOId = -1;
-    std::vector< Diligent::UniqueIdentifier > m_BoundTextures;
-    std::vector< Diligent::UniqueIdentifier > m_BoundSamplers;
+    UniqueIdentifier m_GLProgId = -1;
+    UniqueIdentifier m_GLPipelineId = -1;
+    UniqueIdentifier m_VAOId = -1;
+    UniqueIdentifier m_FBOId = -1;
+    vector< UniqueIdentifier > m_BoundTextures;
+    vector< UniqueIdentifier > m_BoundSamplers;
     struct BoundImageInfo
     {
-        Diligent::UniqueIdentifier InterfaceID = -1;
+        UniqueIdentifier InterfaceID = -1;
         GLint MipLevel = 0;
         GLboolean IsLayered = 0;
         GLint Layer = 0;
@@ -110,7 +113,7 @@ private:
         
         BoundImageInfo() {};
 
-        BoundImageInfo( Diligent::UniqueIdentifier _UniqueID,
+        BoundImageInfo( UniqueIdentifier _UniqueID,
                         GLint _MipLevel,
                         GLboolean _IsLayered,
                         GLint _Layer,
@@ -134,7 +137,7 @@ private:
                     Format      == rhs.Format;
         }
     };
-    std::vector< BoundImageInfo > m_BoundImages;
+    vector< BoundImageInfo > m_BoundImages;
 
     Uint32 m_PendingMemoryBarriers = 0;
 

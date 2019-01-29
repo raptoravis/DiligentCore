@@ -22,6 +22,11 @@
  */
 
 #pragma once
+
+#include "stl/utility.h"
+#include "stl/vector.h"
+#include "stl/unordered_map.h"
+
 #include "GLObjectWrapper.h"
 #include "HashUtils.h"
 #include "ShaderBase.h"
@@ -62,7 +67,7 @@ namespace Diligent
             GLProgramVariableBase(String               _Name, 
                                   size_t               _ArraySize,
                                   SHADER_VARIABLE_TYPE _VarType) :
-                Name      ( std::move(_Name) ),
+                Name      ( move(_Name) ),
                 pResources(_ArraySize),
                 VarType   (_VarType)
             {
@@ -81,7 +86,7 @@ namespace Diligent
             }
 
             String                                      Name;
-            std::vector< RefCntAutoPtr<IDeviceObject> > pResources;
+            vector< RefCntAutoPtr<IDeviceObject> > pResources;
             const SHADER_VARIABLE_TYPE                  VarType;
         };
 
@@ -91,7 +96,7 @@ namespace Diligent
                               size_t               _ArraySize,
                               SHADER_VARIABLE_TYPE _VarType,
                               GLint                _Index) :
-                GLProgramVariableBase(std::move(_Name), _ArraySize, _VarType),
+                GLProgramVariableBase(move(_Name), _ArraySize, _VarType),
                 Index(_Index)
             {}
 
@@ -108,7 +113,7 @@ namespace Diligent
 
             const GLuint Index;
         };
-        std::vector<UniformBufferInfo>& GetUniformBlocks(){ return m_UniformBlocks; }
+        vector<UniformBufferInfo>& GetUniformBlocks(){ return m_UniformBlocks; }
 
         struct SamplerInfo : GLProgramVariableBase
         {
@@ -118,7 +123,7 @@ namespace Diligent
                         GLint                _Location,
                         GLenum               _Type,
                         class SamplerGLImpl* _pStaticSampler) :
-                GLProgramVariableBase(std::move(_Name), _ArraySize, _VarType),
+                GLProgramVariableBase(move(_Name), _ArraySize, _VarType),
                 Location      (_Location),
                 Type          (_Type),
                 pStaticSampler(_pStaticSampler)
@@ -140,7 +145,7 @@ namespace Diligent
             const GLenum                       Type;
             RefCntAutoPtr<class SamplerGLImpl> pStaticSampler;
         };
-        std::vector<SamplerInfo>& GetSamplers(){ return m_Samplers; }
+        vector<SamplerInfo>& GetSamplers(){ return m_Samplers; }
         
         struct ImageInfo : GLProgramVariableBase
         {
@@ -149,7 +154,7 @@ namespace Diligent
                       SHADER_VARIABLE_TYPE _VarType,
                       GLint                _BindingPoint,
                       GLenum               _Type) :
-                GLProgramVariableBase(std::move(_Name), _ArraySize, _VarType),
+                GLProgramVariableBase(move(_Name), _ArraySize, _VarType),
                 BindingPoint(_BindingPoint),
                 Type        (_Type)
             {}
@@ -169,7 +174,7 @@ namespace Diligent
             const GLint  BindingPoint;
             const GLenum Type;
         };
-        std::vector<ImageInfo>& GetImages(){ return m_Images; }
+        vector<ImageInfo>& GetImages(){ return m_Images; }
 
         struct StorageBlockInfo : GLProgramVariableBase
         {
@@ -177,7 +182,7 @@ namespace Diligent
                              size_t               _ArraySize,
                              SHADER_VARIABLE_TYPE _VarType,
                              GLint                _Binding) :
-                GLProgramVariableBase(std::move(_Name), _ArraySize, _VarType),
+                GLProgramVariableBase(move(_Name), _ArraySize, _VarType),
                 Binding(_Binding)
             {}
 
@@ -194,7 +199,7 @@ namespace Diligent
 
             const GLint Binding;
         };
-        std::vector<StorageBlockInfo>& GetStorageBlocks(){ return m_StorageBlocks; }
+        vector<StorageBlockInfo>& GetStorageBlocks(){ return m_StorageBlocks; }
 
 
         struct CGLShaderVariable : ShaderVariableBase
@@ -253,7 +258,7 @@ namespace Diligent
             return Index < m_VariablesByIndex.size() ? m_VariablesByIndex[Index] : nullptr;
         }
 
-        const std::unordered_map<HashMapStringKey, CGLShaderVariable>& GetVariables(){return m_VariableHash;}
+        const unordered_map<HashMapStringKey, CGLShaderVariable>& GetVariables(){return m_VariableHash;}
         
         Uint32 GetVariableCount()const
         {
@@ -266,14 +271,14 @@ namespace Diligent
     private:
         void InitVariables(IObject &Owner);
 
-        std::vector<UniformBufferInfo> m_UniformBlocks;
-        std::vector<SamplerInfo>       m_Samplers;
-        std::vector<ImageInfo>         m_Images;
-        std::vector<StorageBlockInfo>  m_StorageBlocks;
+        vector<UniformBufferInfo> m_UniformBlocks;
+        vector<SamplerInfo>       m_Samplers;
+        vector<ImageInfo>         m_Images;
+        vector<StorageBlockInfo>  m_StorageBlocks;
         
         /// Hash map to look up shader variables by name.
-        std::unordered_map<HashMapStringKey, CGLShaderVariable> m_VariableHash;
-        std::vector<CGLShaderVariable*>                         m_VariablesByIndex;
+        unordered_map<HashMapStringKey, CGLShaderVariable> m_VariableHash;
+        vector<CGLShaderVariable*>                         m_VariablesByIndex;
         // When adding new member DO NOT FORGET TO UPDATE GLProgramResources( GLProgramResources&& ProgramResources )!!!
     };
 }

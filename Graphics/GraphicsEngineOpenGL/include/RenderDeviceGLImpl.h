@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include "stl/unordered_set.h"
+
 #include "RenderDeviceBase.h"
 #include "GLContext.h"
 #include "VAOCache.h"
@@ -107,13 +109,13 @@ protected:
     // Must be the first member because its constructor initializes OpenGL
     GLContext m_GLContext; 
 
-    std::unordered_set<String> m_ExtensionStrings;
+    unordered_set<String> m_ExtensionStrings;
 
     ThreadingTools::LockFlag m_VAOCacheLockFlag;
-    std::unordered_map<GLContext::NativeGLContextType, VAOCache> m_VAOCache;
+    unordered_map<GLContext::NativeGLContextType, VAOCache> m_VAOCache;
 
     ThreadingTools::LockFlag m_FBOCacheLockFlag;
-    std::unordered_map<GLContext::NativeGLContextType, FBOCache> m_FBOCache;
+    unordered_map<GLContext::NativeGLContextType, FBOCache> m_FBOCache;
 
     GPUInfo m_GPUInfo;
 

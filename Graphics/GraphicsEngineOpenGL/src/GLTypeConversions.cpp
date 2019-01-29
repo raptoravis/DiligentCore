@@ -22,6 +22,7 @@
  */
 
 #include "pch.h"
+#include "stl/unordered_map.h"
 #include "GLTypeConversions.h"
 #include "GraphicsAccessories.h"
 
@@ -227,7 +228,7 @@ public:
     }
 
 private:
-    std::unordered_map<GLenum, TEXTURE_FORMAT> m_FormatMap;
+    unordered_map<GLenum, TEXTURE_FORMAT> m_FormatMap;
 };
 
 TEXTURE_FORMAT GLInternalTexFormatToTexFormat(GLenum GlFormat)

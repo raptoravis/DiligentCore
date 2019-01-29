@@ -23,6 +23,8 @@
 
 #include "pch.h"
 
+#include "stl/algorithm.h"
+
 #include "Texture1D_OGL.h"
 #include "RenderDeviceGLImpl.h"
 #include "DeviceContextGLImpl.h"
@@ -64,7 +66,7 @@ Texture1D_OGL::Texture1D_OGL( IReferenceCounters *pRefCounters,
         {
             for(Uint32 Mip = 0; Mip < m_Desc.MipLevels; ++Mip)
             {
-                Box DstBox{0, std::max(m_Desc.Width>>Mip, 1U),
+                Box DstBox{0, max(m_Desc.Width>>Mip, 1U),
                            0, 1};
                 // UpdateData() is a virtual function. If we try to call it through vtbl from here,
                 // we will get into TextureBaseGL::UpdateData(), because instance of Texture1D_OGL

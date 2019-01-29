@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include "stl/vector.h"
+
 namespace Diligent
 {
 
@@ -43,18 +45,18 @@ public:
                 Int32 SrcMipLevel);
 
 private:
-    Diligent::RefCntAutoPtr<IShader> m_pVertexShader;
-    Diligent::RefCntAutoPtr<IShader> m_pFragmentShaders[RESOURCE_DIM_NUM_DIMENSIONS * 3];
-    Diligent::RefCntAutoPtr<IBuffer> m_pConstantBuffer;
-    Diligent::RefCntAutoPtr<IPipelineState> m_pPSO[RESOURCE_DIM_NUM_DIMENSIONS * 3];
+    RefCntAutoPtr<IShader> m_pVertexShader;
+    RefCntAutoPtr<IShader> m_pFragmentShaders[RESOURCE_DIM_NUM_DIMENSIONS * 3];
+    RefCntAutoPtr<IBuffer> m_pConstantBuffer;
+    RefCntAutoPtr<IPipelineState> m_pPSO[RESOURCE_DIM_NUM_DIMENSIONS * 3];
 
-    Diligent::RefCntAutoPtr<IPipelineState> m_pOrigPSO;
+    RefCntAutoPtr<IPipelineState> m_pOrigPSO;
     Uint32 m_OrigStencilRef = 0;
     float m_OrigBlendFactors[4] = {};
     Uint32 m_NumRenderTargets = 0;
     ITextureView *m_pOrigRTVs[MaxRenderTargets] = {};
-    Diligent::RefCntAutoPtr<ITextureView> m_pOrigDSV;
-    std::vector<Viewport> m_OrigViewports;
+    RefCntAutoPtr<ITextureView> m_pOrigDSV;
+    vector<Viewport> m_OrigViewports;
 };
 
 }

@@ -23,6 +23,8 @@
 
 #include "pch.h"
 
+#include "stl/algorithm.h"
+
 #include "TextureBaseGL.h"
 #include "RenderDeviceGLImpl.h"
 #include "GLTypeConversions.h"
@@ -261,7 +263,7 @@ void TextureBaseGL::CreateViewInternal( const struct TextureViewDesc &OrigViewDe
                     {
                         GLViewTarget = GL_TEXTURE_3D;
                         // If target is GL_TEXTURE_3D, NumLayers must equal 1.
-                        Uint32 MipDepth = std::max(m_Desc.Depth >> ViewDesc.MostDetailedMip, 1U);
+                        Uint32 MipDepth = max(m_Desc.Depth >> ViewDesc.MostDetailedMip, 1U);
                         if(ViewDesc.FirstDepthSlice != 0 || ViewDesc.NumDepthSlices != MipDepth)
                         {
                             LOG_ERROR("3D texture view '", (ViewDesc.Name ? ViewDesc.Name : ""), "' (most detailed mip: ", ViewDesc.MostDetailedMip,
@@ -294,7 +296,7 @@ void TextureBaseGL::CreateViewInternal( const struct TextureViewDesc &OrigViewDe
         else if( ViewDesc.ViewType == TEXTURE_VIEW_UNORDERED_ACCESS )
         {
             VERIFY( ViewDesc.NumArraySlices == 1 || 
-                    m_Desc.Type == RESOURCE_DIM_TEX_3D && ViewDesc.NumDepthSlices == std::max(m_Desc.Depth >> ViewDesc.MostDetailedMip, 1U) ||
+                    m_Desc.Type == RESOURCE_DIM_TEX_3D && ViewDesc.NumDepthSlices == max(m_Desc.Depth >> ViewDesc.MostDetailedMip, 1U) ||
                     ViewDesc.NumArraySlices == m_Desc.ArraySize,
                     "Only single array/depth slice or the whole texture can be bound as UAV in OpenGL.");
             VERIFY( ViewDesc.AccessFlags != 0, "At least one access flag must be specified" );
@@ -378,15 +380,15 @@ void TextureBaseGL :: CopyData(DeviceContextGLImpl *pDeviceCtxGL,
     Box SrcBox;
     if( pSrcBox == nullptr )
     {
-        SrcBox.MaxX = std::max( SrcTexDesc.Width >> SrcMipLevel, 1u );
+        SrcBox.MaxX = max( SrcTexDesc.Width >> SrcMipLevel, 1u );
         if( SrcTexDesc.Type == RESOURCE_DIM_TEX_1D || 
             SrcTexDesc.Type == RESOURCE_DIM_TEX_1D_ARRAY )
             SrcBox.MaxY = 1;
         else
-            SrcBox.MaxY = std::max( SrcTexDesc.Height >> SrcMipLevel, 1u );
+            SrcBox.MaxY = max( SrcTexDesc.Height >> SrcMipLevel, 1u );
 
         if( SrcTexDesc.Type == RESOURCE_DIM_TEX_3D )
-            SrcBox.MaxZ = std::max( SrcTexDesc.Depth >> SrcMipLevel, 1u );
+            SrcBox.MaxZ = max( SrcTexDesc.Depth >> SrcMipLevel, 1u );
         else
             SrcBox.MaxZ = 1;
         pSrcBox = &SrcBox;

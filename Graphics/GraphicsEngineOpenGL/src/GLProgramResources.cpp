@@ -22,18 +22,21 @@
  */
 
 #include "pch.h"
+#include "stl/utility.h"
+#include "stl/algorithm.h"
+#include "stl/vector.h"
 #include "GLProgramResources.h"
 #include "RenderDeviceGLImpl.h"
 
 namespace Diligent
 {
     GLProgramResources::GLProgramResources( GLProgramResources&& Program )noexcept :
-        m_UniformBlocks   (std::move(Program.m_UniformBlocks)),
-        m_Samplers        (std::move(Program.m_Samplers)     ),
-        m_Images          (std::move(Program.m_Images)       ),
-        m_StorageBlocks   (std::move(Program.m_StorageBlocks)),
-        m_VariableHash    (std::move(Program.m_VariableHash) ),
-        m_VariablesByIndex(std::move(Program.m_VariablesByIndex) )
+        m_UniformBlocks   (move(Program.m_UniformBlocks)),
+        m_Samplers        (move(Program.m_Samplers)     ),
+        m_Images          (move(Program.m_Images)       ),
+        m_StorageBlocks   (move(Program.m_StorageBlocks)),
+        m_VariableHash    (move(Program.m_VariableHash) ),
+        m_VariablesByIndex(move(Program.m_VariablesByIndex) )
     {
     }
 
@@ -81,7 +84,7 @@ namespace Diligent
             activeUniformBlockMaxLength = 1024;
         }
 
-        auto MaxNameLength = std::max( activeUniformMaxLength, activeUniformBlockMaxLength );
+        auto MaxNameLength = max( activeUniformMaxLength, activeUniformBlockMaxLength );
 
 #if GL_ARB_program_interface_query
         GLint numActiveShaderStorageBlocks = 0;
@@ -94,12 +97,12 @@ namespace Diligent
             GLint MaxShaderStorageBlockNameLen = 0;
             glGetProgramInterfaceiv( GLProgram, GL_SHADER_STORAGE_BLOCK, GL_MAX_NAME_LENGTH, &MaxShaderStorageBlockNameLen );
             CHECK_GL_ERROR_AND_THROW( "Unable to get the maximum shader storage block name length\n" );
-            MaxNameLength = std::max( MaxNameLength, MaxShaderStorageBlockNameLen );
+            MaxNameLength = max( MaxNameLength, MaxShaderStorageBlockNameLen );
         }
 #endif
 
-        MaxNameLength = std::max( MaxNameLength, 512 );
-        std::vector<GLchar> Name( MaxNameLength + 1 );
+        MaxNameLength = max( MaxNameLength, 512 );
+        vector<GLchar> Name( MaxNameLength + 1 );
         for( int i = 0; i < numActiveUniforms; i++ ) 
         {
             GLenum  dataType = 0;
@@ -269,7 +272,7 @@ namespace Diligent
             if(OpenBacketPtr != nullptr)
             {
                 auto Ind = atoi(OpenBacketPtr+1);
-                ArraySize = std::max(ArraySize, Ind+1);
+                ArraySize = max(ArraySize, Ind+1);
                 *OpenBacketPtr = 0;
                 if (m_UniformBlocks.size() > 0)
                 {
@@ -277,7 +280,7 @@ namespace Diligent
                     auto &LastBlock = m_UniformBlocks.back();
                     if (LastBlock.Name.compare(Name.data()) == 0)
                     {
-                        ArraySize = std::max(ArraySize, static_cast<GLint>(LastBlock.pResources.size()));
+                        ArraySize = max(ArraySize, static_cast<GLint>(LastBlock.pResources.size()));
                         VERIFY(UniformBlockIndex == LastBlock.Index + Ind, "Uniform block indices are expected to be continuous");
                         LastBlock.pResources.resize(ArraySize);
                         continue;
@@ -318,7 +321,7 @@ namespace Diligent
             if(OpenBacketPtr != nullptr)
             {
                 auto Ind = atoi(OpenBacketPtr+1);
-                ArraySize = std::max(ArraySize, Ind+1);
+                ArraySize = max(ArraySize, Ind+1);
                 *OpenBacketPtr = 0;
                 if (m_StorageBlocks.size() > 0)
                 {
@@ -326,7 +329,7 @@ namespace Diligent
                     auto &LastBlock = m_StorageBlocks.back();
                     if (LastBlock.Name.compare(Name.data()) == 0)
                     {
-                        ArraySize = std::max(ArraySize, static_cast<GLint>(LastBlock.pResources.size()));
+                        ArraySize = max(ArraySize, static_cast<GLint>(LastBlock.pResources.size()));
                         VERIFY(Binding == LastBlock.Binding + Ind, "Storage block bindings are expected to be continuous");
                         LastBlock.pResources.resize(ArraySize);
                         continue;
@@ -401,7 +404,7 @@ namespace Diligent
             for( auto& ProgVar : ResArr)                                \
             {                                                           \
                 /* HashMapStringKey will make a copy of the string*/    \
-                auto it = m_VariableHash.insert( std::make_pair( Diligent::HashMapStringKey(ProgVar.Name), CGLShaderVariable(Owner, ProgVar, static_cast<Uint32>(m_VariablesByIndex.size())) ) ); \
+                auto it = m_VariableHash.insert( make_pair( Diligent::HashMapStringKey(ProgVar.Name), CGLShaderVariable(Owner, ProgVar, static_cast<Uint32>(m_VariablesByIndex.size())) ) ); \
                 VERIFY_EXPR(it.second);                                 \
                 m_VariablesByIndex.push_back(&it.first->second);        \
             }                                                           \
