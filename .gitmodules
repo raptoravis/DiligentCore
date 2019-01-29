@@ -10,3 +10,6 @@
 [submodule "External/SPIRV-Headers"]
 	path = External/SPIRV-Headers
 	url = https://github.com/DiligentGraphics/SPIRV-Headers.git
+[submodule "External/EASTL"]
+	path = External/EASTL
+	url = https://github.com/DiligentGraphics/EASTL.git
