@@ -49,6 +49,9 @@
 // Descriptor set for static and mutable resources is assigned during cache initialization
 // Descriptor set for dynamic resources is assigned at every draw call
 
+#include "stl/utility.h"
+#include "stl/vector.h"
+
 #include "DescriptorPoolManager.h"
 #include "SPIRVShaderResources.h"
 
@@ -143,7 +146,7 @@ public:
         void AssignDescriptorSetAllocation(DescriptorSetAllocation&& Allocation)
         {
             VERIFY(m_NumResources > 0, "Descriptor set is empty");
-            m_DescriptorSetAllocation = std::move(Allocation);
+            m_DescriptorSetAllocation = move(Allocation);
         }
 
         const Uint32 m_NumResources = 0;
@@ -174,7 +177,7 @@ public:
     template<bool VerifyOnly>
     void TransitionResources(DeviceContextVkImpl *pCtxVkImpl);
 
-    Uint32 GetDynamicBufferOffsets(DeviceContextVkImpl *pCtxVkImpl, std::vector<uint32_t>& Offsets)const;
+    Uint32 GetDynamicBufferOffsets(DeviceContextVkImpl *pCtxVkImpl, vector<uint32_t>& Offsets)const;
 
 private:
 

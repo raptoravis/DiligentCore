@@ -25,6 +25,7 @@
 
 /// \file
 /// Declaration of Diligent::CommandListVkImpl class
+#include "stl/utility.h"
 
 #include "vulkan.h"
 #include "CommandListBase.h"
@@ -59,7 +60,7 @@ public:
     {
         CmdBuff               = m_vkCmdBuff;
         m_vkCmdBuff           = VK_NULL_HANDLE;
-        pDeferredCtx          = std::move(m_pDeferredCtx);
+        pDeferredCtx          = move(m_pDeferredCtx);
     }
 
 private:

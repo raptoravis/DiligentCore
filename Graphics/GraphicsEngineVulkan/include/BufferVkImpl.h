@@ -26,6 +26,8 @@
 /// \file
 /// Declaration of Diligent::BufferVkImpl class
 
+#include "stl/vector.h"
+
 #include "BufferVk.h"
 #include "RenderDeviceVk.h"
 #include "BufferBase.h"
@@ -109,7 +111,7 @@ private:
     VulkanUtilities::BufferViewWrapper CreateView(struct BufferViewDesc &ViewDesc);
     Uint32        m_DynamicOffsetAlignment = 0;
 
-    std::vector<VulkanDynamicAllocation, STDAllocatorRawMem<VulkanDynamicAllocation> > m_DynamicAllocations;
+    vector<VulkanDynamicAllocation, STDAllocatorRawMem<VulkanDynamicAllocation> > m_DynamicAllocations;
 
     VulkanUtilities::BufferWrapper m_VulkanBuffer;
     VulkanUtilities::VulkanMemoryAllocation m_MemoryAllocation;

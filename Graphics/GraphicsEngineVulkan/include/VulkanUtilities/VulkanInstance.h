@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include <vector>
 #include <memory>
+#include "stl/vector.h"
 #include "vulkan.h"
 
 namespace VulkanUtilities
@@ -69,8 +69,8 @@ namespace VulkanUtilities
         VkAllocationCallbacks* const m_pVkAllocator;
         VkInstance m_VkInstance = VK_NULL_HANDLE;
 
-        std::vector<VkLayerProperties>     m_Layers;
-        std::vector<VkExtensionProperties> m_Extensions;
-        std::vector<VkPhysicalDevice>      m_PhysicalDevices;
+        Diligent::vector<VkLayerProperties>     m_Layers;
+        Diligent::vector<VkExtensionProperties> m_Extensions;
+        Diligent::vector<VkPhysicalDevice>      m_PhysicalDevices;
     };
 }

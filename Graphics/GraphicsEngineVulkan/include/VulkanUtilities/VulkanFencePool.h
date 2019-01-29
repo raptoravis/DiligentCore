@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include <vector>
 #include <memory>
+#include "stl/vector.h"
 #include "vulkan.h"
 #include "VulkanLogicalDevice.h"
 #include "VulkanUtilities/VulkanObjectWrappers.h"
@@ -49,6 +49,6 @@ namespace VulkanUtilities
     private:
         // Shared pointer to logical device must be declared before fences
         std::shared_ptr<const VulkanLogicalDevice> m_LogicalDevice;
-        std::vector<FenceWrapper>                  m_Fences;
+        Diligent::vector<FenceWrapper>                  m_Fences;
     };
 }

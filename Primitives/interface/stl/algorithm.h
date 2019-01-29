@@ -32,6 +32,8 @@ namespace Diligent
 
 using eastl::max;
 using eastl::min;
+using eastl::copy;
+using eastl::find;
 
 }
 
@@ -45,6 +47,8 @@ namespace Diligent
 
 using std::max;
 using std::min;
+using std::copy;
+using std::find;
 
 }
 

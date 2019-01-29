@@ -26,7 +26,7 @@
 /// \file
 /// Definition of the Diligent::IShaderVk interface
 
-#include <vector>
+#include "../../../Primitives/interface/stl/vector.h"
 #include "../../GraphicsEngine/interface/Shader.h"
 
 namespace Diligent
@@ -42,7 +42,7 @@ class IShaderVk : public IShader
 public:
 
     /// Returns SPIRV bytecode
-    virtual const std::vector<uint32_t>& GetSPIRV()const = 0;
+    virtual const vector<uint32_t>& GetSPIRV()const = 0;
 };
 
 }

@@ -23,6 +23,8 @@
 
 #include "pch.h"
 #include <sstream>
+#include "stl/utility.h"
+#include "stl/algorithm.h"
 #include "VulkanUtilities/VulkanMemoryManager.h"
 
 namespace VulkanUtilities
@@ -32,7 +34,7 @@ VulkanMemoryAllocation::~VulkanMemoryAllocation()
 {
     if (Page != nullptr)
     {
-        Page->Free(std::move(*this));
+        Page->Free(Diligent::move(*this));
     }
 }
 
@@ -152,7 +154,7 @@ VulkanMemoryAllocation VulkanMemoryManager::Allocate(VkDeviceSize Size, VkDevice
             PageSize *= 2;
 
         m_CurrAllocatedSize[stat_ind] += PageSize;
-        m_PeakAllocatedSize[stat_ind] = std::max(m_PeakAllocatedSize[stat_ind], m_CurrAllocatedSize[stat_ind]);
+        m_PeakAllocatedSize[stat_ind] = Diligent::max(m_PeakAllocatedSize[stat_ind], m_CurrAllocatedSize[stat_ind]);
 
         auto it = m_Pages.emplace(MemoryTypeIndex, VulkanMemoryPage{*this, PageSize, MemoryTypeIndex, HostVisible});
         LOG_INFO_MESSAGE("VulkanMemoryManager '", m_MgrName, "': created new ", (HostVisible ? "host-visible" : "device-local"), 
@@ -169,7 +171,7 @@ VulkanMemoryAllocation VulkanMemoryManager::Allocate(VkDeviceSize Size, VkDevice
     }
 
     m_CurrUsedSize[stat_ind].fetch_add(Allocation.Size);
-    m_PeakUsedSize[stat_ind] = std::max(m_PeakUsedSize[stat_ind], static_cast<VkDeviceSize>(m_CurrUsedSize[stat_ind].load()));
+    m_PeakUsedSize[stat_ind] = Diligent::max(m_PeakUsedSize[stat_ind], static_cast<VkDeviceSize>(m_CurrUsedSize[stat_ind].load()));
 
     return Allocation;
 }

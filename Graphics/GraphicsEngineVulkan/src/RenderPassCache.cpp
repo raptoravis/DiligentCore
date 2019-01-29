@@ -23,6 +23,8 @@
 
 #include "pch.h"
 #include <sstream>
+#include "stl/utility.h"
+#include "stl/array.h"
 #include "RenderPassCache.h"
 #include "RenderDeviceVkImpl.h"
 #include "PipelineStateVkImpl.h"
@@ -46,9 +48,9 @@ VkRenderPass RenderPassCache::GetRenderPass(const RenderPassCacheKey& Key)
     if(it == m_Cache.end())
     {
         // Do not zero-intitialize arrays
-        std::array<VkAttachmentDescription, MaxRenderTargets+1> Attachments;
-        std::array<VkAttachmentReference,   MaxRenderTargets+1> AttachmentReferences;
-        VkSubpassDescription                                    Subpass;
+        array<VkAttachmentDescription, MaxRenderTargets+1> Attachments;
+        array<VkAttachmentReference,   MaxRenderTargets+1> AttachmentReferences;
+        VkSubpassDescription                               Subpass;
         auto RenderPassCI = PipelineStateVkImpl::GetRenderPassCreateInfo(Key.NumRenderTargets, Key.RTVFormats, Key.DSVFormat,
                                                                          Key.SampleCount, Attachments, AttachmentReferences, Subpass);
         std::stringstream PassNameSS;
@@ -58,7 +60,7 @@ VkRenderPass RenderPassCache::GetRenderPass(const RenderPassCacheKey& Key)
             PassNameSS << (rt > 0 ? ", " : "") << GetTextureFormatAttribs(Key.RTVFormats[rt]).Name;
         auto RenderPass = m_DeviceVkImpl.GetLogicalDevice().CreateRenderPass(RenderPassCI, PassNameSS.str().c_str());
         VERIFY_EXPR(RenderPass != VK_NULL_HANDLE);
-        it = m_Cache.emplace(Key, std::move(RenderPass)).first;
+        it = m_Cache.emplace(Key, move(RenderPass)).first;
     }
 
     return it->second;

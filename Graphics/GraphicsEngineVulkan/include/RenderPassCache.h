@@ -26,8 +26,8 @@
 /// \file
 /// Declaration of Diligent::RenderPassCache class
 
-#include <unordered_map>
 #include <mutex>
+#include "stl/unordered_map.h"
 #include "GraphicsTypes.h"
 #include "Constants.h"
 #include "HashUtils.h"
@@ -125,7 +125,7 @@ private:
     
     RenderDeviceVkImpl& m_DeviceVkImpl;
     std::mutex m_Mutex;
-    std::unordered_map<RenderPassCacheKey, VulkanUtilities::RenderPassWrapper, RenderPassCacheKeyHash> m_Cache;
+    unordered_map<RenderPassCacheKey, VulkanUtilities::RenderPassWrapper, RenderPassCacheKeyHash> m_Cache;
 };
 
 }

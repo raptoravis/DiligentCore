@@ -26,7 +26,9 @@
 /// \file
 /// Declaration of Diligent::FenceVkImpl class
 
-#include <deque>
+#include "stl/deque.h"
+#include "stl/utility.h"
+
 #include "FenceVk.h"
 #include "FenceBase.h"
 #include "VulkanUtilities/VulkanFencePool.h"
@@ -57,14 +59,14 @@ public:
     VulkanUtilities::FenceWrapper GetVkFence() { return m_FencePool.GetFence(); }
     void AddPendingFence(VulkanUtilities::FenceWrapper&& vkFence, Uint64 FenceValue)
     {
-        m_PendingFences.emplace_back(FenceValue, std::move(vkFence));
+        m_PendingFences.emplace_back(FenceValue, move(vkFence));
     }
 
     void Wait();
 
 private:
     VulkanUtilities::VulkanFencePool m_FencePool;
-    std::deque<std::pair<Uint64, VulkanUtilities::FenceWrapper>> m_PendingFences;
+    deque<pair<Uint64, VulkanUtilities::FenceWrapper>> m_PendingFences;
     volatile Uint64 m_LastCompletedFenceValue = 0;
 };
 

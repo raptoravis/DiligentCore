@@ -24,7 +24,8 @@
 #pragma once
 
 #include <memory>
-#include <vector>
+#include "stl/vector.h"
+#include "stl/unique_ptr.h"
 #include "vulkan.h"
 
 namespace VulkanUtilities
@@ -37,7 +38,7 @@ namespace VulkanUtilities
         VulkanPhysicalDevice& operator = (const VulkanPhysicalDevice&) = delete;
         VulkanPhysicalDevice& operator = (VulkanPhysicalDevice&&)      = delete;
 
-        static std::unique_ptr<VulkanPhysicalDevice> Create(VkPhysicalDevice vkDevice);
+        static Diligent::unique_ptr<VulkanPhysicalDevice> Create(VkPhysicalDevice vkDevice);
 
         uint32_t         FindQueueFamily     (VkQueueFlags QueueFlags)                           const;
         VkPhysicalDevice GetVkDeviceHandle   ()                                                  const { return m_VkDevice; }
@@ -55,7 +56,7 @@ namespace VulkanUtilities
         VkPhysicalDeviceProperties           m_Properties           = {};
         VkPhysicalDeviceFeatures             m_Features             = {};
         VkPhysicalDeviceMemoryProperties     m_MemoryProperties     = {};
-        std::vector<VkQueueFamilyProperties> m_QueueFamilyProperties;
-        std::vector<VkExtensionProperties>   m_SupportedExtensions;
+        Diligent::vector<VkQueueFamilyProperties> m_QueueFamilyProperties;
+        Diligent::vector<VkExtensionProperties>   m_SupportedExtensions;
     };
 }

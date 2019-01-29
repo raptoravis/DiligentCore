@@ -25,7 +25,9 @@
 
 /// \file
 /// Declaration of Diligent::DeviceContextVkImpl class
-#include <unordered_map>
+#include "stl/vector.h"
+#include "stl/unordered_map.h"
+#include "stl/utility.h"
 
 #include "DeviceContextVk.h"
 #include "DeviceContextBase.h"
@@ -334,14 +336,14 @@ private:
     FixedBlockMemoryAllocator m_CmdListAllocator;
 
     // Semaphores are not owned by the command context
-    std::vector<VkSemaphore>           m_WaitSemaphores;
-    std::vector<VkPipelineStageFlags>  m_WaitDstStageMasks;
-    std::vector<VkSemaphore>           m_SignalSemaphores;
+    vector<VkSemaphore>           m_WaitSemaphores;
+    vector<VkPipelineStageFlags>  m_WaitDstStageMasks;
+    vector<VkSemaphore>           m_SignalSemaphores;
 
     // List of fences to signal next time the command context is flushed
-    std::vector<std::pair<Uint64, RefCntAutoPtr<IFence> > > m_PendingFences;
+    vector<pair<Uint64, RefCntAutoPtr<IFence> > > m_PendingFences;
 
-    std::unordered_map<BufferVkImpl*, VulkanUploadAllocation> m_UploadAllocations;
+    unordered_map<BufferVkImpl*, VulkanUploadAllocation> m_UploadAllocations;
 
     struct MappedTextureKey
     {
@@ -368,7 +370,7 @@ private:
         BufferToTextureCopyInfo CopyInfo;
         VulkanDynamicAllocation Allocation;
     };
-    std::unordered_map<MappedTextureKey, MappedTexture, MappedTextureKey::Hasher> m_MappedTextures;
+    unordered_map<MappedTextureKey, MappedTexture, MappedTextureKey::Hasher> m_MappedTextures;
 
     VulkanUtilities::VulkanCommandBufferPool m_CmdPool;
     VulkanUploadHeap                         m_UploadHeap;

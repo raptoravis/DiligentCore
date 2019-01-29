@@ -22,6 +22,7 @@
  */
 
 #include "pch.h"
+#include "stl/utility.h"
 #include "CommandPoolManager.h"
 #include "RenderDeviceVkImpl.h"
 
@@ -33,7 +34,7 @@ CommandPoolManager::CommandPoolManager(RenderDeviceVkImpl&      DeviceVkImpl,
                                        uint32_t                 queueFamilyIndex, 
                                        VkCommandPoolCreateFlags flags)noexcept:
     m_DeviceVkImpl    (DeviceVkImpl),
-    m_Name            (std::move(Name)),
+    m_Name            (move(Name)),
     m_QueueFamilyIndex(queueFamilyIndex),
     m_CmdPoolFlags    (flags),
     m_CmdPools        (STD_ALLOCATOR_RAW_MEM(VulkanUtilities::CommandPoolWrapper, GetRawAllocator(), "Allocator for deque<VulkanUtilities::CommandPoolWrapper>"))
@@ -50,7 +51,7 @@ VulkanUtilities::CommandPoolWrapper CommandPoolManager::AllocateCommandPool(cons
     VulkanUtilities::CommandPoolWrapper CmdPool;
     if(!m_CmdPools.empty())
     {
-        CmdPool = std::move(m_CmdPools.front());
+        CmdPool = move(m_CmdPools.front());
         m_CmdPools.pop_front();
     }
 
@@ -71,7 +72,7 @@ VulkanUtilities::CommandPoolWrapper CommandPoolManager::AllocateCommandPool(cons
 #ifdef DEVELOPMENT
     ++m_AllocatedPoolCounter;
 #endif
-    return std::move(CmdPool);
+    return move(CmdPool);
 }
 
 void CommandPoolManager::SafeReleaseCommandPool(VulkanUtilities::CommandPoolWrapper&& CmdPool, Uint32 CmdQueueIndex, Uint64 FenceValue)
@@ -81,7 +82,7 @@ void CommandPoolManager::SafeReleaseCommandPool(VulkanUtilities::CommandPoolWrap
     public:
         CommandPoolDeleter(CommandPoolManager& _CmdPoolMgr, VulkanUtilities::CommandPoolWrapper&& _Pool) :
             CmdPoolMgr(&_CmdPoolMgr),
-            Pool      (std::move(_Pool))
+            Pool      (move(_Pool))
         {
             VERIFY_EXPR(Pool != VK_NULL_HANDLE);
         }
@@ -92,7 +93,7 @@ void CommandPoolManager::SafeReleaseCommandPool(VulkanUtilities::CommandPoolWrap
 
         CommandPoolDeleter(CommandPoolDeleter&& rhs) : 
             CmdPoolMgr(rhs.CmdPoolMgr),
-            Pool      (std::move(rhs.Pool))
+            Pool      (move(rhs.Pool))
         {
             rhs.CmdPoolMgr = nullptr;
         }
@@ -102,7 +103,7 @@ void CommandPoolManager::SafeReleaseCommandPool(VulkanUtilities::CommandPoolWrap
         {
             if (CmdPoolMgr!=nullptr)
             {
-                CmdPoolMgr->FreeCommandPool(std::move(Pool));
+                CmdPoolMgr->FreeCommandPool(move(Pool));
             }
         }
     private:
@@ -112,7 +113,7 @@ void CommandPoolManager::SafeReleaseCommandPool(VulkanUtilities::CommandPoolWrap
 
     // Discard command pool directly to the release queue since we know exactly which queue it was submitted to 
     // as well as the associated FenceValue
-    m_DeviceVkImpl.GetReleaseQueue(CmdQueueIndex).DiscardResource(CommandPoolDeleter{*this, std::move(CmdPool)}, FenceValue);
+    m_DeviceVkImpl.GetReleaseQueue(CmdQueueIndex).DiscardResource(CommandPoolDeleter{*this, move(CmdPool)}, FenceValue);
 }
 
 void CommandPoolManager::FreeCommandPool(VulkanUtilities::CommandPoolWrapper&& CmdPool)
@@ -121,7 +122,7 @@ void CommandPoolManager::FreeCommandPool(VulkanUtilities::CommandPoolWrapper&& C
 #ifdef DEVELOPMENT
     --m_AllocatedPoolCounter;
 #endif
-    m_CmdPools.emplace_back(std::move(CmdPool));
+    m_CmdPools.emplace_back(move(CmdPool));
 }
 
 void CommandPoolManager::DestroyPools()

@@ -22,6 +22,7 @@
  */
 
 #include "pch.h"
+#include "stl/utility.h"
 #include "DescriptorPoolManager.h"
 #include "RenderDeviceVkImpl.h"
 
@@ -71,7 +72,7 @@ VulkanUtilities::DescriptorPoolWrapper DescriptorPoolManager::GetPool(const char
     else
     {
         auto& LogicalDevice = m_DeviceVkImpl.GetLogicalDevice();
-        auto Pool = std::move(m_Pools.front());
+        auto Pool = move(m_Pools.front());
         VulkanUtilities::SetDescriptorPoolName(LogicalDevice.GetVkDevice(), Pool, DebugName);
         m_Pools.pop_front();
         return Pool;
@@ -86,7 +87,7 @@ void DescriptorPoolManager::DisposePool(VulkanUtilities::DescriptorPoolWrapper&&
         DescriptorPoolDeleter(DescriptorPoolManager&                   _PoolMgr,
                               VulkanUtilities::DescriptorPoolWrapper&& _Pool) noexcept : 
             PoolMgr (&_PoolMgr),
-            Pool    (std::move(_Pool))
+            Pool    (move(_Pool))
         {}
 
         DescriptorPoolDeleter             (const DescriptorPoolDeleter&) = delete;
@@ -95,7 +96,7 @@ void DescriptorPoolManager::DisposePool(VulkanUtilities::DescriptorPoolWrapper&&
 
         DescriptorPoolDeleter(DescriptorPoolDeleter&& rhs)noexcept : 
             PoolMgr (rhs.PoolMgr),
-            Pool    (std::move(rhs.Pool))
+            Pool    (move(rhs.Pool))
         {
             rhs.PoolMgr = nullptr;
         }
@@ -104,7 +105,7 @@ void DescriptorPoolManager::DisposePool(VulkanUtilities::DescriptorPoolWrapper&&
         {
             if (PoolMgr!=nullptr)
             {
-                PoolMgr->FreePool(std::move(Pool));
+                PoolMgr->FreePool(move(Pool));
             }
         }
 
@@ -113,14 +114,14 @@ void DescriptorPoolManager::DisposePool(VulkanUtilities::DescriptorPoolWrapper&&
         VulkanUtilities::DescriptorPoolWrapper Pool;
     };
 
-    m_DeviceVkImpl.SafeReleaseDeviceObject(DescriptorPoolDeleter{*this, std::move(Pool)}, QueueMask);
+    m_DeviceVkImpl.SafeReleaseDeviceObject(DescriptorPoolDeleter{*this, move(Pool)}, QueueMask);
 }
 
 void DescriptorPoolManager::FreePool(VulkanUtilities::DescriptorPoolWrapper&& Pool)
 {
     std::lock_guard<std::mutex> Lock(m_Mutex);
     m_DeviceVkImpl.GetLogicalDevice().ResetDescriptorPool(Pool);
-    m_Pools.emplace_back(std::move(Pool));
+    m_Pools.emplace_back(move(Pool));
 #ifdef DEVELOPMENT
     --m_AllocatedPoolCounter;
 #endif
@@ -166,7 +167,7 @@ DescriptorSetAllocation DescriptorSetAllocator::Allocate(Uint64 CommandQueueMask
             // Move the pool to the front
             if (it != m_Pools.begin())
             {
-                std::swap(*it, m_Pools.front());
+                swap(*it, m_Pools.front());
             }
 
 #ifdef DEVELOPMENT
@@ -261,9 +262,9 @@ void DynamicDescriptorSetAllocator::ReleasePools(Uint64 QueueMask)
 {
     for(auto& Pool : m_AllocatedPools)
     {
-        m_GlobalPoolMgr.DisposePool(std::move(Pool), QueueMask);
+        m_GlobalPoolMgr.DisposePool(move(Pool), QueueMask);
     }
-    m_PeakPoolCount = std::max(m_PeakPoolCount, m_AllocatedPools.size());
+    m_PeakPoolCount = max(m_PeakPoolCount, m_AllocatedPools.size());
     m_AllocatedPools.clear();
 }
 

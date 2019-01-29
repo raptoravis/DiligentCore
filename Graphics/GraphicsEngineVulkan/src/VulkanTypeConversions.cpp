@@ -22,8 +22,8 @@
  */
 
 #include "pch.h"
-#include <unordered_map>
-#include <array>
+#include "stl/array.h"
+#include "stl/unordered_map.h"
 
 #include "VulkanTypeConversions.h"
 #include "PlatformMisc.h"
@@ -805,7 +805,7 @@ public:
     }
 
 private:
-    std::array<VkBlendFactor, BLEND_FACTOR_NUM_FACTORS> m_Map = {};
+    array<VkBlendFactor, BLEND_FACTOR_NUM_FACTORS> m_Map = {};
 };
 
 
@@ -840,7 +840,7 @@ public:
     }
 
 private:
-    std::array<VkLogicOp, LOGIC_OP_NUM_OPERATIONS> m_Map = {};
+    array<VkLogicOp, LOGIC_OP_NUM_OPERATIONS> m_Map = {};
 };
 
 class BlendOperationToVkBlendOp
@@ -863,7 +863,7 @@ public:
     }
 
 private:
-    std::array<VkBlendOp, BLEND_OPERATION_NUM_OPERATIONS> m_Map = {};
+    array<VkBlendOp, BLEND_OPERATION_NUM_OPERATIONS> m_Map = {};
 };
 
 VkPipelineColorBlendAttachmentState RenderTargetBlendDescToVkColorBlendAttachmentState(const RenderTargetBlendDesc &RTBlendDesc)
@@ -887,9 +887,9 @@ VkPipelineColorBlendAttachmentState RenderTargetBlendDescToVkColorBlendAttachmen
     return AttachmentBlendState;
 }
 
-void BlendStateDesc_To_VkBlendStateCI(const BlendStateDesc &BSDesc, 
-                                      VkPipelineColorBlendStateCreateInfo &ColorBlendStateCI,
-                                      std::vector<VkPipelineColorBlendAttachmentState> &ColorBlendAttachments)
+void BlendStateDesc_To_VkBlendStateCI(const BlendStateDesc&                         BSDesc, 
+                                      VkPipelineColorBlendStateCreateInfo&          ColorBlendStateCI,
+                                      vector<VkPipelineColorBlendAttachmentState>&  ColorBlendAttachments)
 {
     // Color blend state (26.1)
     static const LogicOperationToVkLogicOp LogicOpToVkLogicOp;
@@ -927,10 +927,10 @@ VkVertexInputRate LayoutElemFrequencyToVkInputRate(LayoutElement::FREQUENCY freq
     }
 }
 
-void InputLayoutDesc_To_VkVertexInputStateCI(const InputLayoutDesc& LayoutDesc,
-                                             VkPipelineVertexInputStateCreateInfo &VertexInputStateCI,
-                                             std::array<VkVertexInputBindingDescription, iMaxLayoutElements>& BindingDescriptions,
-                                             std::array<VkVertexInputAttributeDescription, iMaxLayoutElements>& AttributeDescription)
+void InputLayoutDesc_To_VkVertexInputStateCI(const InputLayoutDesc&                                         LayoutDesc,
+                                             VkPipelineVertexInputStateCreateInfo&                          VertexInputStateCI,
+                                             array<VkVertexInputBindingDescription, iMaxLayoutElements>&    BindingDescriptions,
+                                             array<VkVertexInputAttributeDescription, iMaxLayoutElements>&  AttributeDescription)
 {
     // Vertex input description (20.2)
     VertexInputStateCI.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -940,7 +940,7 @@ void InputLayoutDesc_To_VkVertexInputStateCI(const InputLayoutDesc& LayoutDesc,
     VertexInputStateCI.pVertexBindingDescriptions = BindingDescriptions.data();
     VertexInputStateCI.vertexAttributeDescriptionCount = LayoutDesc.NumElements;
     VertexInputStateCI.pVertexAttributeDescriptions = AttributeDescription.data();
-    std::array<Int32, iMaxLayoutElements> BufferSlot2BindingDescInd;
+    array<Int32, iMaxLayoutElements> BufferSlot2BindingDescInd;
     BufferSlot2BindingDescInd.fill(-1);
     for(Uint32 elem=0; elem < LayoutDesc.NumElements; ++elem)
     {
@@ -1167,7 +1167,7 @@ public:
 
 private:
     static constexpr const Uint32 MaxFlagBitPos = 15;
-    std::array<VkAccessFlags, MaxFlagBitPos + 1> FlagBitPosToVkAccessFlagsMap;
+    array<VkAccessFlags, MaxFlagBitPos + 1> FlagBitPosToVkAccessFlagsMap;
 };
 
 
@@ -1245,7 +1245,7 @@ public:
 
 private:
     static constexpr const Uint32 MaxFlagBitPos = 20;
-    std::array<RESOURCE_STATE, MaxFlagBitPos + 1> FlagBitPosToResourceState;
+    array<RESOURCE_STATE, MaxFlagBitPos + 1> FlagBitPosToResourceState;
 };
 
 

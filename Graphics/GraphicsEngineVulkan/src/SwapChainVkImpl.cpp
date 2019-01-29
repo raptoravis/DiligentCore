@@ -22,6 +22,7 @@
  */
 
 #include "pch.h"
+#include "stl/algorithm.h"
 #include "SwapChainVkImpl.h"
 #include "RenderDeviceVkImpl.h"
 #include "DeviceContextVkImpl.h"
@@ -111,7 +112,7 @@ void SwapChainVkImpl::CreateVulkanSwapChain()
     auto err = vkGetPhysicalDeviceSurfaceFormatsKHR(vkDeviceHandle, m_VkSurface, &formatCount, NULL);
     CHECK_VK_ERROR_AND_THROW(err, "Failed to query number of supported formats");
     VERIFY_EXPR(formatCount > 0);
-    std::vector<VkSurfaceFormatKHR> SupportedFormats(formatCount);
+    vector<VkSurfaceFormatKHR> SupportedFormats(formatCount);
     err = vkGetPhysicalDeviceSurfaceFormatsKHR(vkDeviceHandle, m_VkSurface, &formatCount, SupportedFormats.data());
     CHECK_VK_ERROR_AND_THROW(err, "Failed to query supported format properties");
     VERIFY_EXPR(formatCount == SupportedFormats.size());
@@ -182,7 +183,7 @@ void SwapChainVkImpl::CreateVulkanSwapChain()
     err = vkGetPhysicalDeviceSurfacePresentModesKHR(vkDeviceHandle, m_VkSurface, &presentModeCount, NULL);
     CHECK_VK_ERROR_AND_THROW(err, "Failed to query surface present mode count");
     VERIFY_EXPR(presentModeCount > 0);
-    std::vector<VkPresentModeKHR> presentModes(presentModeCount);
+    vector<VkPresentModeKHR> presentModes(presentModeCount);
     err = vkGetPhysicalDeviceSurfacePresentModesKHR(vkDeviceHandle, m_VkSurface, &presentModeCount, presentModes.data());
     CHECK_VK_ERROR_AND_THROW(err, "Failed to query surface present modes");
     VERIFY_EXPR(presentModeCount == presentModes.size());
@@ -193,27 +194,27 @@ void SwapChainVkImpl::CreateVulkanSwapChain()
     {
         // If the surface size is undefined, the size is set to
         // the size of the images requested.
-        swapchainExtent.width  = std::min(std::max(m_SwapChainDesc.Width,  surfCapabilities.minImageExtent.width),  surfCapabilities.maxImageExtent.width);
-        swapchainExtent.height = std::min(std::max(m_SwapChainDesc.Height, surfCapabilities.minImageExtent.height), surfCapabilities.maxImageExtent.height);
+        swapchainExtent.width  = min(max(m_SwapChainDesc.Width,  surfCapabilities.minImageExtent.width),  surfCapabilities.maxImageExtent.width);
+        swapchainExtent.height = min(max(m_SwapChainDesc.Height, surfCapabilities.minImageExtent.height), surfCapabilities.maxImageExtent.height);
     }
     else 
     {
         // If the surface size is defined, the swap chain size must match
         swapchainExtent = surfCapabilities.currentExtent;
     }
-    swapchainExtent.width  = std::max(swapchainExtent.width,  1u);
-    swapchainExtent.height = std::max(swapchainExtent.height, 1u);
+    swapchainExtent.width  = max(swapchainExtent.width,  1u);
+    swapchainExtent.height = max(swapchainExtent.height, 1u);
     m_SwapChainDesc.Width  = swapchainExtent.width;
     m_SwapChainDesc.Height = swapchainExtent.height;
 
     // Mailbox is the lowest latency non-tearing presentation mode
     VkPresentModeKHR swapchainPresentMode = VK_PRESENT_MODE_MAILBOX_KHR;
-    bool PresentModeSupported = std::find(presentModes.begin(), presentModes.end(), swapchainPresentMode) != presentModes.end();
+    bool PresentModeSupported = find(presentModes.begin(), presentModes.end(), swapchainPresentMode) != presentModes.end();
     if(!PresentModeSupported)
     {
         swapchainPresentMode = VK_PRESENT_MODE_FIFO_KHR;
         // The FIFO present mode is guaranteed by the spec to be supported
-        VERIFY(std::find(presentModes.begin(), presentModes.end(), swapchainPresentMode) != presentModes.end(), "FIFO present mode must be supported" );
+        VERIFY(find(presentModes.begin(), presentModes.end(), swapchainPresentMode) != presentModes.end(), "FIFO present mode must be supported" );
     }
 
     // Determine the number of VkImage's to use in the swap chain.
@@ -352,7 +353,7 @@ void SwapChainVkImpl::InitBuffersAndViews()
     m_SwapChainImagesInitialized.resize(m_pBackBufferRTV.size(), false);
 
     uint32_t swapchainImageCount = m_SwapChainDesc.BufferCount;
-    std::vector<VkImage> swapchainImages(swapchainImageCount);
+    vector<VkImage> swapchainImages(swapchainImageCount);
     auto err = vkGetSwapchainImagesKHR(LogicalVkDevice, m_VkSwapChain, &swapchainImageCount, swapchainImages.data());
     CHECK_VK_ERROR_AND_THROW(err, "Failed to get swap chain images");
     VERIFY_EXPR(swapchainImageCount == swapchainImages.size());

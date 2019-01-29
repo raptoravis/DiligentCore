@@ -27,7 +27,7 @@
 /// Declaration of Diligent::CommandQueueVkImpl class
 
 #include <mutex>
-#include <deque>
+#include "stl/utility.h"
 #include "vulkan.h"
 #include "CommandQueueVk.h"
 #include "ObjectBase.h"
@@ -70,7 +70,7 @@ public:
 
     virtual void SignalFence(VkFence vkFence)override final;
 
-    void SetFence(RefCntAutoPtr<FenceVkImpl> pFence){m_pFence = std::move(pFence);}
+    void SetFence(RefCntAutoPtr<FenceVkImpl> pFence){m_pFence = move(pFence);}
 
 private:
     std::shared_ptr<VulkanUtilities::VulkanLogicalDevice> m_LogicalDevice;

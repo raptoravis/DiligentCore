@@ -23,6 +23,9 @@
 
 #include "pch.h"
 
+#include "stl/algorithm.h"
+#include "stl/utility.h"
+
 #include "PipelineLayout.h"
 #include "ShaderResourceLayoutVk.h"
 #include "ShaderVkImpl.h"
@@ -77,7 +80,7 @@ public:
     }
 
 private:
-    std::array<VkDescriptorType, SPIRVShaderResourceAttribs::ResourceType::NumResourceTypes> m_Map = {};
+    array<VkDescriptorType, SPIRVShaderResourceAttribs::ResourceType::NumResourceTypes> m_Map = {};
 };
 
 VkDescriptorType PipelineLayout::GetVkDescriptorType(const SPIRVShaderResourceAttribs &Res)
@@ -145,7 +148,7 @@ size_t PipelineLayout::DescriptorSetLayoutManager::DescriptorSetLayout::GetMemor
 #else
     static constexpr size_t MinMemSize = 16;
 #endif
-    MemSize = std::max(MemSize, MinMemSize);
+    MemSize = max(MemSize, MinMemSize);
     return MemSize * sizeof(VkDescriptorSetLayoutBinding);
 }
 
@@ -185,7 +188,7 @@ void PipelineLayout::DescriptorSetLayoutManager::DescriptorSetLayout::Finalize(c
 
 void PipelineLayout::DescriptorSetLayoutManager::DescriptorSetLayout::Release(RenderDeviceVkImpl *pRenderDeviceVk, IMemoryAllocator &MemAllocator, Uint64 CommandQueueMask)
 {
-    pRenderDeviceVk->SafeReleaseDeviceObject(std::move(VkLayout), CommandQueueMask);
+    pRenderDeviceVk->SafeReleaseDeviceObject(move(VkLayout), CommandQueueMask);
     for (uint32_t b=0; b < NumLayoutBindings; ++b)
     {
         if (pBindings[b].pImmutableSamplers != nullptr)
@@ -247,12 +250,12 @@ void PipelineLayout::DescriptorSetLayoutManager::Finalize(const VulkanUtilities:
     }
     m_LayoutBindings.resize(TotalBindings);
     size_t BindingOffset = 0;
-    std::array<VkDescriptorSetLayout, 2> ActiveDescrSetLayouts = {};
+    array<VkDescriptorSetLayout, 2> ActiveDescrSetLayouts = {};
     for (auto &Layout : m_DescriptorSetLayouts)
     {
         if (Layout.SetIndex >= 0)
         {
-            std::copy(Layout.pBindings, Layout.pBindings + Layout.NumLayoutBindings, m_LayoutBindings.begin() + BindingOffset);
+            copy(Layout.pBindings, Layout.pBindings + Layout.NumLayoutBindings, m_LayoutBindings.begin() + BindingOffset);
             Layout.Finalize(LogicalDevice, m_MemAllocator, &m_LayoutBindings[BindingOffset]);
             BindingOffset += Layout.NumLayoutBindings;
             ActiveDescrSetLayouts[Layout.SetIndex] = Layout.VkLayout;
@@ -281,7 +284,7 @@ void PipelineLayout::DescriptorSetLayoutManager::Release(RenderDeviceVkImpl *pRe
     for (auto &Layout : m_DescriptorSetLayouts)
         Layout.Release(pRenderDeviceVk, m_MemAllocator, CommandQueueMask);
 
-    pRenderDeviceVk->SafeReleaseDeviceObject(std::move(m_VkPipelineLayout), CommandQueueMask);
+    pRenderDeviceVk->SafeReleaseDeviceObject(move(m_VkPipelineLayout), CommandQueueMask);
 }
 
 PipelineLayout::DescriptorSetLayoutManager::~DescriptorSetLayoutManager()
@@ -370,7 +373,7 @@ void PipelineLayout::AllocateResourceSlot(const SPIRVShaderResourceAttribs& ResA
                                           Uint32&                           DescriptorSet, // Output parameter
                                           Uint32&                           Binding, // Output parameter
                                           Uint32&                           OffsetInCache,
-                                          std::vector<uint32_t>&            SPIRV)
+                                          vector<uint32_t>&                 SPIRV)
 {
     m_LayoutMgr.AllocateResourceSlot(ResAttribs, vkStaticSampler, ShaderType, DescriptorSet, Binding, OffsetInCache);
     SPIRV[ResAttribs.BindingDecorationOffset] = Binding;
@@ -382,22 +385,22 @@ void PipelineLayout::Finalize(const VulkanUtilities::VulkanLogicalDevice& Logica
     m_LayoutMgr.Finalize(LogicalDevice);
 }
 
-std::array<Uint32, 2> PipelineLayout::GetDescriptorSetSizes(Uint32& NumSets)const
+array<Uint32, 2> PipelineLayout::GetDescriptorSetSizes(Uint32& NumSets)const
 {
     NumSets = 0;
-    std::array<Uint32, 2> SetSizes = {};
+    array<Uint32, 2> SetSizes = {};
 
     const auto &StaticAndMutSet = m_LayoutMgr.GetDescriptorSet(SHADER_VARIABLE_TYPE_STATIC);
     if (StaticAndMutSet.SetIndex >= 0)
     {
-        NumSets = std::max(NumSets, static_cast<Uint32>(StaticAndMutSet.SetIndex + 1));
+        NumSets = max(NumSets, static_cast<Uint32>(StaticAndMutSet.SetIndex + 1));
         SetSizes[StaticAndMutSet.SetIndex] = StaticAndMutSet.TotalDescriptors;
     }
 
     const auto &DynamicSet = m_LayoutMgr.GetDescriptorSet(SHADER_VARIABLE_TYPE_DYNAMIC);
     if (DynamicSet.SetIndex >= 0)
     {
-        NumSets = std::max(NumSets, static_cast<Uint32>(DynamicSet.SetIndex + 1));
+        NumSets = max(NumSets, static_cast<Uint32>(DynamicSet.SetIndex + 1));
         SetSizes[DynamicSet.SetIndex] = DynamicSet.TotalDescriptors;
     }
 
@@ -426,7 +429,7 @@ void PipelineLayout::InitResourceCache(RenderDeviceVkImpl*    pDeviceVkImpl,
         DescrSetName = _DescrSetName.c_str();
 #endif
         DescriptorSetAllocation SetAllocation = pDeviceVkImpl->AllocateDescriptorSet(~Uint64{0}, StaticAndMutSet.VkLayout, DescrSetName);
-        ResourceCache.GetDescriptorSet(StaticAndMutSet.SetIndex).AssignDescriptorSetAllocation(std::move(SetAllocation));
+        ResourceCache.GetDescriptorSet(StaticAndMutSet.SetIndex).AssignDescriptorSetAllocation(move(SetAllocation));
     }
 }
 
@@ -452,7 +455,7 @@ void PipelineLayout::PrepareDescriptorSets(DeviceContextVkImpl*          pCtxVkI
         const auto& Set = m_LayoutMgr.GetDescriptorSet(VarType);
         if (Set.SetIndex >= 0)
         {
-            BindInfo.SetCout = std::max(BindInfo.SetCout, static_cast<Uint32>(Set.SetIndex + 1));
+            BindInfo.SetCout = max(BindInfo.SetCout, static_cast<Uint32>(Set.SetIndex + 1));
             if (BindInfo.SetCout > BindInfo.vkSets.size())
                 BindInfo.vkSets.resize(BindInfo.SetCout);
             VERIFY_EXPR(BindInfo.vkSets[Set.SetIndex] == VK_NULL_HANDLE);

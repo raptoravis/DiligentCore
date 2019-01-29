@@ -22,6 +22,7 @@
 */
 
 #include <limits>
+#include "stl/utility.h"
 #include "VulkanErrors.h"
 #include "VulkanUtilities/VulkanLogicalDevice.h"
 #include "VulkanUtilities/VulkanDebug.h"
@@ -84,7 +85,7 @@ namespace VulkanUtilities
         if (DebugName != nullptr && *DebugName != 0)
             SetVulkanObjectName(m_VkDevice, VkObject, DebugName);
 
-        return VulkanObjectWrapper<VkObjectType>{ GetSharedPtr(), std::move(VkObject) };
+        return VulkanObjectWrapper<VkObjectType>{ GetSharedPtr(), Diligent::move(VkObject) };
     }
 
     CommandPoolWrapper VulkanLogicalDevice::CreateCommandPool(const VkCommandPoolCreateInfo &CmdPoolCI, 
@@ -156,7 +157,7 @@ namespace VulkanUtilities
         if (DebugName != nullptr && *DebugName != 0)
             SetDeviceMemoryName(m_VkDevice, vkDeviceMem, DebugName);
 
-        return DeviceMemoryWrapper{ GetSharedPtr(), std::move(vkDeviceMem) };
+        return DeviceMemoryWrapper{ GetSharedPtr(), Diligent::move(vkDeviceMem) };
     }
 
     PipelineWrapper VulkanLogicalDevice::CreateComputePipeline(const VkComputePipelineCreateInfo  &PipelineCI, 
@@ -175,7 +176,7 @@ namespace VulkanUtilities
         if (DebugName != nullptr && *DebugName != 0)
             SetPipelineName(m_VkDevice, vkPipeline, DebugName);
 
-        return PipelineWrapper{ GetSharedPtr(), std::move(vkPipeline) };
+        return PipelineWrapper{ GetSharedPtr(), Diligent::move(vkPipeline) };
     }
 
     PipelineWrapper VulkanLogicalDevice::CreateGraphicsPipeline(const VkGraphicsPipelineCreateInfo& PipelineCI, 
@@ -194,7 +195,7 @@ namespace VulkanUtilities
         if (DebugName != nullptr && *DebugName != 0)
             SetPipelineName(m_VkDevice, vkPipeline, DebugName);
 
-        return PipelineWrapper{ GetSharedPtr(), std::move(vkPipeline) };
+        return PipelineWrapper{ GetSharedPtr(), Diligent::move(vkPipeline) };
     }
 
     ShaderModuleWrapper VulkanLogicalDevice::CreateShaderModule(const VkShaderModuleCreateInfo& ShaderModuleCI, const char* DebugName)const

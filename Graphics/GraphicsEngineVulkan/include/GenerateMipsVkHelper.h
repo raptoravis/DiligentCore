@@ -26,8 +26,8 @@
  /// \file
 /// Implementation of mipmap generation routines
 
-#include <array>
-#include <unordered_map>
+#include "stl/array.h"
+#include "stl/unordered_map.h"
 #include "VulkanUtilities/VulkanLogicalDevice.h"
 #include "VulkanUtilities/VulkanCommandBuffer.h"
 
@@ -51,14 +51,14 @@ namespace Diligent
         void CreateSRB(IShaderResourceBinding** ppSRB);
 
     private:
-        std::array<RefCntAutoPtr<IPipelineState>, 4>  CreatePSOs(TEXTURE_FORMAT Fmt);
-        std::array<RefCntAutoPtr<IPipelineState>, 4>& FindPSOs  (TEXTURE_FORMAT Fmt);
+        array<RefCntAutoPtr<IPipelineState>, 4>  CreatePSOs(TEXTURE_FORMAT Fmt);
+        array<RefCntAutoPtr<IPipelineState>, 4>& FindPSOs  (TEXTURE_FORMAT Fmt);
 
         RenderDeviceVkImpl& m_DeviceVkImpl;
 
         std::mutex m_PSOMutex;
-	    std::unordered_map< TEXTURE_FORMAT, std::array<RefCntAutoPtr<IPipelineState>, 4> > m_PSOHash;
-        static void GetGlImageFormat(const TextureFormatAttribs& FmtAttribs, std::array<char, 16>& GlFmt);
+	    unordered_map< TEXTURE_FORMAT, std::array<RefCntAutoPtr<IPipelineState>, 4> > m_PSOHash;
+        static void GetGlImageFormat(const TextureFormatAttribs& FmtAttribs, array<char, 16>& GlFmt);
         RefCntAutoPtr<IBuffer> m_ConstantsCB;
     };
 }

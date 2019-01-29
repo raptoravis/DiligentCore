@@ -23,9 +23,9 @@
 
 #pragma once
 
-#include <deque>
 #include <mutex>
 #include <atomic>
+#include "stl/deque.h"
 #include "STDAllocator.h"
 #include "VulkanUtilities/VulkanObjectWrappers.h"
 
@@ -70,7 +70,7 @@ private:
     const VkCommandPoolCreateFlags  m_CmdPoolFlags;
 
     std::mutex                      m_Mutex;
-    std::deque< VulkanUtilities::CommandPoolWrapper, STDAllocatorRawMem<VulkanUtilities::CommandPoolWrapper> > m_CmdPools;
+    deque< VulkanUtilities::CommandPoolWrapper, STDAllocatorRawMem<VulkanUtilities::CommandPoolWrapper> > m_CmdPools;
 
 #ifdef DEVELOPMENT
     std::atomic_int32_t m_AllocatedPoolCounter;

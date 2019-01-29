@@ -23,6 +23,8 @@
 
 #include "pch.h"
 #include <sstream>
+#include "stl/array.h"
+#include "stl/algorithm.h"
 #include "GenerateMipsVkHelper.h"
 #include "RenderDeviceVkImpl.h"
 #include "DeviceContextVkImpl.h"
@@ -42,7 +44,7 @@ static const char* g_GenerateMipsCSSource =
 
 namespace Diligent
 {
-    void GenerateMipsVkHelper::GetGlImageFormat(const TextureFormatAttribs& FmtAttribs, std::array<char, 16>& GlFmt)
+    void GenerateMipsVkHelper::GetGlImageFormat(const TextureFormatAttribs& FmtAttribs, array<char, 16>& GlFmt)
     {
         size_t pos = 0;
         GlFmt[pos++] = 'r';
@@ -102,10 +104,10 @@ namespace Diligent
         GlFmt[pos] = 0;
     }
 
-    std::array<RefCntAutoPtr<IPipelineState>, 4> GenerateMipsVkHelper::CreatePSOs(TEXTURE_FORMAT Fmt)
+    array<RefCntAutoPtr<IPipelineState>, 4> GenerateMipsVkHelper::CreatePSOs(TEXTURE_FORMAT Fmt)
     {
         ShaderCreationAttribs CSCreateAttribs;
-        std::array<RefCntAutoPtr<IPipelineState>, 4> PSOs;
+        array<RefCntAutoPtr<IPipelineState>, 4> PSOs;
         
         CSCreateAttribs.Source = g_GenerateMipsCSSource;
         CSCreateAttribs.EntryPoint = "main";
@@ -123,7 +125,7 @@ namespace Diligent
 
         const auto& FmtAttribs = GetTextureFormatAttribs(Fmt);
         bool IsGamma = FmtAttribs.ComponentType == COMPONENT_TYPE_UNORM_SRGB;
-        std::array<char, 16> GlFmt;
+        array<char, 16> GlFmt;
         GetGlImageFormat(FmtAttribs, GlFmt);
 
         for(Uint32 NonPowOfTwo=0; NonPowOfTwo < 4; ++NonPowOfTwo)
@@ -186,7 +188,7 @@ namespace Diligent
         PSO[0]->CreateShaderResourceBinding(ppSRB, true);
     }
 
-    std::array<RefCntAutoPtr<IPipelineState>, 4>& GenerateMipsVkHelper::FindPSOs(TEXTURE_FORMAT Fmt)
+    array<RefCntAutoPtr<IPipelineState>, 4>& GenerateMipsVkHelper::FindPSOs(TEXTURE_FORMAT Fmt)
     {
         std::lock_guard<std::mutex> Lock(m_PSOMutex);
         auto it = m_PSOHash.find(Fmt);
@@ -244,10 +246,10 @@ namespace Diligent
             // we can't bind the entire texture and have to bind single mip level at a time
             pSrcMipVar->Set(pTexVk->GetMipLevelSRV(TopMip));
 
-            uint32_t SrcWidth  = std::max(TexDesc.Width  >> TopMip, 1u);
-            uint32_t SrcHeight = std::max(TexDesc.Height >> TopMip, 1u);
-            uint32_t DstWidth  = std::max(SrcWidth  >> 1, 1u);
-            uint32_t DstHeight = std::max(SrcHeight >> 1, 1u);
+            uint32_t SrcWidth  = max(TexDesc.Width  >> TopMip, 1u);
+            uint32_t SrcHeight = max(TexDesc.Height >> TopMip, 1u);
+            uint32_t DstWidth  = max(SrcWidth  >> 1, 1u);
+            uint32_t DstHeight = max(SrcHeight >> 1, 1u);
 
             // Determine if the first downsample is more than 2:1.  This happens whenever
             // the source width or height is odd.
@@ -294,13 +296,13 @@ namespace Diligent
             }
 
             constexpr const Uint32 MaxMipsHandledByCS = 4; // Max number of mip levels processed by one CS shader invocation
-            std::array<IDeviceObject*, MaxMipsHandledByCS> MipLevelUAVs;
+            array<IDeviceObject*, MaxMipsHandledByCS> MipLevelUAVs;
             for (Uint32 u = 0; u < MaxMipsHandledByCS; ++u)
-                MipLevelUAVs[u] = pTexVk->GetMipLevelUAV(std::min(TopMip + u + 1, TexDesc.MipLevels - 1));
+                MipLevelUAVs[u] = pTexVk->GetMipLevelUAV(min(TopMip + u + 1, TexDesc.MipLevels - 1));
             pOutMipVar->SetArray(MipLevelUAVs.data(), 0, MaxMipsHandledByCS);
 
             SubresRange.baseMipLevel = TopMip + 1;
-            SubresRange.levelCount = std::min(4u, TexDesc.MipLevels - (TopMip + 1));
+            SubresRange.levelCount = min(4u, TexDesc.MipLevels - (TopMip + 1));
             if (CurrLayout != VK_IMAGE_LAYOUT_GENERAL)
                 Ctx.TransitionImageLayout(*pTexVk, CurrLayout, VK_IMAGE_LAYOUT_GENERAL, SubresRange);
 

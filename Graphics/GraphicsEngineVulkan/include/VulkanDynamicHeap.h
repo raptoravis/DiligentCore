@@ -24,6 +24,8 @@
 #pragma once
 
 #include <mutex>
+#include "stl/utility.h"
+#include "stl/vector.h"
 #include "vulkan.h"
 #include "VulkanUtilities/VulkanMemoryManager.h"
 #include "VulkanUtilities/VulkanLogicalDevice.h"
@@ -177,7 +179,7 @@ class VulkanDynamicHeap
 public:
     VulkanDynamicHeap(VulkanDynamicMemoryManager& DynamicMemMgr, std::string HeapName, Uint32 PageSize) :
         m_GlobalDynamicMemMgr(DynamicMemMgr),
-        m_HeapName(std::move(HeapName)),
+        m_HeapName(move(HeapName)),
         m_MasterBlockSize(PageSize)
     {}
 
@@ -207,7 +209,7 @@ private:
     VulkanDynamicMemoryManager& m_GlobalDynamicMemMgr;
     const std::string m_HeapName;
 
-    std::vector<MasterBlock> m_MasterBlocks;
+    vector<MasterBlock> m_MasterBlocks;
 
     OffsetType m_CurrOffset = InvalidOffset;
     const Uint32 m_MasterBlockSize;

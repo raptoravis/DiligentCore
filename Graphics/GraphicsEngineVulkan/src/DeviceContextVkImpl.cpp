@@ -23,6 +23,8 @@
 
 #include "pch.h"
 #include <sstream>
+#include "stl/utility.h"
+#include "stl/algorithm.h"
 #include "RenderDeviceVkImpl.h"
 #include "DeviceContextVkImpl.h"
 #include "SwapChainVk.h"
@@ -88,7 +90,7 @@ namespace Diligent
             pDeviceVkImpl->GetDynamicDescriptorPool(),
             GetContextObjectName("Dynamic descriptor set allocator", bIsDeferred, ContextId),
         },
-        m_GenerateMipsHelper(std::move(GenerateMipsHelper))
+        m_GenerateMipsHelper(move(GenerateMipsHelper))
     {
         m_GenerateMipsHelper->CreateSRB(&m_GenerateMipsSRB);
 
@@ -135,7 +137,7 @@ namespace Diligent
         auto* pDeviceVkImpl = m_pDevice.RawPtr<RenderDeviceVkImpl>();
 
         auto VkCmdPool = m_CmdPool.Release();
-        pDeviceVkImpl->SafeReleaseDeviceObject(std::move(VkCmdPool), ~Uint64{0});
+        pDeviceVkImpl->SafeReleaseDeviceObject(move(VkCmdPool), ~Uint64{0});
 
         // The main reason we need to idle the GPU is because we need to make sure that all command buffers are returned to the
         // pool. Upload heap, dynamic heap and dynamic descriptor manager return their resources to global managers and
@@ -176,7 +178,7 @@ namespace Diligent
             {
                 if(Pool != nullptr)
                 {
-                    Pool->FreeCommandBuffer(std::move(vkCmdBuff));
+                    Pool->FreeCommandBuffer(move(vkCmdBuff));
                 }
             }
 
@@ -1325,16 +1327,16 @@ namespace Diligent
             CopyRegion.srcOffset.y = pSrcBox->MinY;
             CopyRegion.srcOffset.z = pSrcBox->MinZ;
             CopyRegion.extent.width  = pSrcBox->MaxX - pSrcBox->MinX;
-            CopyRegion.extent.height = std::max(pSrcBox->MaxY - pSrcBox->MinY, 1u);
-            CopyRegion.extent.depth  = std::max(pSrcBox->MaxZ - pSrcBox->MinZ, 1u);
+            CopyRegion.extent.height = max(pSrcBox->MaxY - pSrcBox->MinY, 1u);
+            CopyRegion.extent.depth  = max(pSrcBox->MaxZ - pSrcBox->MinZ, 1u);
         }
         else
         {
             CopyRegion.srcOffset = VkOffset3D{0,0,0};
-            CopyRegion.extent.width  = std::max(DstTexDesc.Width  >> CopyAttribs.SrcMipLevel, 1u);
-            CopyRegion.extent.height = std::max(DstTexDesc.Height >> CopyAttribs.SrcMipLevel, 1u);
+            CopyRegion.extent.width  = max(DstTexDesc.Width  >> CopyAttribs.SrcMipLevel, 1u);
+            CopyRegion.extent.height = max(DstTexDesc.Height >> CopyAttribs.SrcMipLevel, 1u);
             if(DstTexDesc.Type == RESOURCE_DIM_TEX_3D)
-                CopyRegion.extent.depth = std::max(DstTexDesc.Depth >> CopyAttribs.SrcMipLevel, 1u);
+                CopyRegion.extent.depth = max(DstTexDesc.Depth >> CopyAttribs.SrcMipLevel, 1u);
             else
                 CopyRegion.extent.depth = 1;
         }
@@ -1410,12 +1412,12 @@ namespace Diligent
             // (imageExtent.width + imageOffset.x) must be less than or equal to the image subresource width, and
             // (imageExtent.height + imageOffset.y) must be less than or equal to the image subresource height (18.4),
             // so we need to clamp UpdateRegionWidth and Height
-            const Uint32 MipWidth  = std::max(TexDesc.Width  >> MipLevel, 1u);
-            const Uint32 MipHeight = std::max(TexDesc.Height >> MipLevel, 1u);
+            const Uint32 MipWidth  = max(TexDesc.Width  >> MipLevel, 1u);
+            const Uint32 MipHeight = max(TexDesc.Height >> MipLevel, 1u);
             VERIFY_EXPR(MipWidth > Region.MinX);
-            UpdateRegionWidth  = std::min(UpdateRegionWidth,  MipWidth  - Region.MinX);
+            UpdateRegionWidth  = min(UpdateRegionWidth,  MipWidth  - Region.MinX);
             VERIFY_EXPR(MipHeight > Region.MinY);
-            UpdateRegionHeight = std::min(UpdateRegionHeight, MipHeight - Region.MinY);
+            UpdateRegionHeight = min(UpdateRegionHeight, MipHeight - Region.MinY);
         }
         else
         {
@@ -1460,13 +1462,13 @@ namespace Diligent
         // For UpdateTextureRegion(), use UploadHeap, not dynamic heap
         const auto& DeviceLimits = m_pDevice.RawPtr<const RenderDeviceVkImpl>()->GetPhysicalDevice().GetProperties().limits;
         // Source buffer offset must be multiple of 4 (18.4)
-        auto BufferOffsetAlignment = std::max(DeviceLimits.optimalBufferCopyOffsetAlignment, VkDeviceSize{4});
+        auto BufferOffsetAlignment = max(DeviceLimits.optimalBufferCopyOffsetAlignment, VkDeviceSize{4});
         // If the calling command's VkImage parameter is a compressed image, bufferOffset must be a multiple of 
         // the compressed texel block size in bytes (18.4)
         const auto& FmtAttribs = GetTextureFormatAttribs(TexDesc.Format);
         if (FmtAttribs.ComponentType == COMPONENT_TYPE_COMPRESSED)
         {
-            BufferOffsetAlignment = std::max(BufferOffsetAlignment, VkDeviceSize{FmtAttribs.ComponentSize});
+            BufferOffsetAlignment = max(BufferOffsetAlignment, VkDeviceSize{FmtAttribs.ComponentSize});
         }
         auto Allocation = m_UploadHeap.Allocate(CopyInfo.MemorySize, BufferOffsetAlignment);
         // The allocation will stay in the upload heap until the end of the frame at which point all upload
@@ -1610,23 +1612,23 @@ namespace Diligent
         Box FullExtentBox;
         if (pMapRegion == nullptr)
         {
-            FullExtentBox.MaxX = std::max(TexDesc.Width  >> MipLevel, 1u);
-            FullExtentBox.MaxY = std::max(TexDesc.Height >> MipLevel, 1u);
+            FullExtentBox.MaxX = max(TexDesc.Width  >> MipLevel, 1u);
+            FullExtentBox.MaxY = max(TexDesc.Height >> MipLevel, 1u);
             if (TexDesc.Type == RESOURCE_DIM_TEX_3D)
-                FullExtentBox.MaxZ = std::max(TexDesc.Depth >> MipLevel, 1u);
+                FullExtentBox.MaxZ = max(TexDesc.Depth >> MipLevel, 1u);
             pMapRegion = &FullExtentBox;
         }
         
         auto CopyInfo = GetBufferToTextureCopyInfo(TexDesc, MipLevel, *pMapRegion);
         const auto& DeviceLimits = m_pDevice.RawPtr<RenderDeviceVkImpl>()->GetPhysicalDevice().GetProperties().limits;
         // Source buffer offset must be multiple of 4 (18.4)
-        auto Alignment = std::max(DeviceLimits.optimalBufferCopyOffsetAlignment, VkDeviceSize{4});
+        auto Alignment = max(DeviceLimits.optimalBufferCopyOffsetAlignment, VkDeviceSize{4});
         // If the calling command's VkImage parameter is a compressed image, bufferOffset must be a multiple of 
         // the compressed texel block size in bytes (18.4)
         const auto& FmtAttribs = GetTextureFormatAttribs(TexDesc.Format);
         if (FmtAttribs.ComponentType == COMPONENT_TYPE_COMPRESSED)
         {
-            Alignment = std::max(Alignment, VkDeviceSize{FmtAttribs.ComponentSize});
+            Alignment = max(Alignment, VkDeviceSize{FmtAttribs.ComponentSize});
         }
         auto Allocation = AllocateDynamicSpace(CopyInfo.MemorySize, static_cast<Uint32>(Alignment));
 
@@ -1634,7 +1636,7 @@ namespace Diligent
         MappedData.Stride      = CopyInfo.Stride;
         MappedData.DepthStride = CopyInfo.DepthStride;
 
-        auto it = m_MappedTextures.emplace(MappedTextureKey{&TextureVk, MipLevel, ArraySlice}, MappedTexture{CopyInfo, std::move(Allocation)});
+        auto it = m_MappedTextures.emplace(MappedTextureKey{&TextureVk, MipLevel, ArraySlice}, MappedTexture{CopyInfo, move(Allocation)});
         if(!it.second)
             LOG_ERROR_MESSAGE("Mip level ", MipLevel, ", slice ", ArraySlice, " of texture '", TexDesc.Name, "' has already been mapped");
     }
@@ -1728,7 +1730,7 @@ namespace Diligent
     void DeviceContextVkImpl::SignalFence(IFence* pFence, Uint64 Value)
     {
         VERIFY(!m_bIsDeferred, "Fence can only be signalled from immediate context");
-        m_PendingFences.emplace_back( std::make_pair(Value, pFence) );
+        m_PendingFences.emplace_back( make_pair(Value, pFence) );
     };
 
     void DeviceContextVkImpl::TransitionImageLayout(ITexture* pTexture, VkImageLayout NewLayout)

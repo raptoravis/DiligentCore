@@ -54,7 +54,7 @@ public:
                                     Uint32                 NumDeferredContexts)override final;
 
     void AttachToVulkanDevice(std::shared_ptr<VulkanUtilities::VulkanInstance>       Instance,
-                              std::unique_ptr<VulkanUtilities::VulkanPhysicalDevice> PhysicalDevice,
+                              unique_ptr<VulkanUtilities::VulkanPhysicalDevice>      PhysicalDevice,
                               std::shared_ptr<VulkanUtilities::VulkanLogicalDevice>  LogicalDevice,
                               size_t                 CommandQueueCount,
                               ICommandQueueVk**      ppCommandQueues,
@@ -169,7 +169,7 @@ void EngineFactoryVkImpl::CreateDeviceAndContextsVk( const EngineVkAttribs& Crea
         DeviceCreateInfo.pEnabledFeatures = &DeviceFeatures; // NULL or a pointer to a VkPhysicalDeviceFeatures structure that contains 
                                                              // boolean indicators of all the features to be enabled.
 
-        std::vector<const char*> DeviceExtensions = 
+        vector<const char*> DeviceExtensions = 
         { 
             VK_KHR_SWAPCHAIN_EXTENSION_NAME, 
             VK_KHR_MAINTENANCE1_EXTENSION_NAME // To allow negative viewport height
@@ -185,8 +185,8 @@ void EngineFactoryVkImpl::CreateDeviceAndContextsVk( const EngineVkAttribs& Crea
         auto &RawMemAllocator = GetRawAllocator();
         pCmdQueueVk = NEW_RC_OBJ(RawMemAllocator, "CommandQueueVk instance", CommandQueueVkImpl)(LogicalDevice, QueueInfo.queueFamilyIndex);
 
-        std::array<ICommandQueueVk*, 1> CommandQueues = {{pCmdQueueVk}};
-        AttachToVulkanDevice(Instance, std::move(PhysicalDevice), LogicalDevice, CommandQueues.size(), CommandQueues.data(), CreationAttribs, ppDevice, ppContexts, NumDeferredContexts);
+        array<ICommandQueueVk*, 1> CommandQueues = {{pCmdQueueVk}};
+        AttachToVulkanDevice(Instance, move(PhysicalDevice), LogicalDevice, CommandQueues.size(), CommandQueues.data(), CreationAttribs, ppDevice, ppContexts, NumDeferredContexts);
 
         FenceDesc Desc;
         Desc.Name = "Command queue fence";
@@ -194,7 +194,7 @@ void EngineFactoryVkImpl::CreateDeviceAndContextsVk( const EngineVkAttribs& Crea
         bool IsDeviceInternal = true;
         auto* pRenderDeviceVk = ValidatedCast<RenderDeviceVkImpl>(*ppDevice);
         RefCntAutoPtr<FenceVkImpl> pFenceVk( NEW_RC_OBJ(RawMemAllocator, "FenceVkImpl instance", FenceVkImpl)(pRenderDeviceVk, Desc, IsDeviceInternal) );
-        pCmdQueueVk->SetFence(std::move(pFenceVk));
+        pCmdQueueVk->SetFence(move(pFenceVk));
     }
     catch(std::runtime_error& )
     {
@@ -220,7 +220,7 @@ void EngineFactoryVkImpl::CreateDeviceAndContextsVk( const EngineVkAttribs& Crea
 ///                                   contexts are written to ppContexts array starting 
 ///                                   at position 1
 void EngineFactoryVkImpl::AttachToVulkanDevice(std::shared_ptr<VulkanUtilities::VulkanInstance>       Instance,
-                                               std::unique_ptr<VulkanUtilities::VulkanPhysicalDevice> PhysicalDevice,
+                                               unique_ptr<VulkanUtilities::VulkanPhysicalDevice>      PhysicalDevice,
                                                std::shared_ptr<VulkanUtilities::VulkanLogicalDevice>  LogicalDevice,
                                                size_t                 CommandQueueCount,
                                                ICommandQueueVk**      ppCommandQueues,
@@ -239,7 +239,7 @@ void EngineFactoryVkImpl::AttachToVulkanDevice(std::shared_ptr<VulkanUtilities::
     try
     {
         auto &RawMemAllocator = GetRawAllocator();
-        RenderDeviceVkImpl *pRenderDeviceVk( NEW_RC_OBJ(RawMemAllocator, "RenderDeviceVkImpl instance", RenderDeviceVkImpl)(RawMemAllocator, EngineAttribs, CommandQueueCount, ppCommandQueues, Instance, std::move(PhysicalDevice), LogicalDevice, NumDeferredContexts ) );
+        RenderDeviceVkImpl *pRenderDeviceVk( NEW_RC_OBJ(RawMemAllocator, "RenderDeviceVkImpl instance", RenderDeviceVkImpl)(RawMemAllocator, EngineAttribs, CommandQueueCount, ppCommandQueues, Instance, move(PhysicalDevice), LogicalDevice, NumDeferredContexts ) );
         pRenderDeviceVk->QueryInterface(IID_RenderDevice, reinterpret_cast<IObject**>(ppDevice) );
 
         std::shared_ptr<GenerateMipsVkHelper> GenerateMipsHelper(new GenerateMipsVkHelper(*pRenderDeviceVk));

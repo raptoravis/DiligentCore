@@ -21,8 +21,8 @@
 *  of the possibility of such damages.
 */
 
-#include <vector>
 #include <cstring>
+#include "stl/vector.h"
 #include "VulkanErrors.h"
 #include "VulkanUtilities/VulkanInstance.h"
 #include "VulkanUtilities/VulkanDebug.h"
@@ -90,7 +90,7 @@ namespace VulkanUtilities
             VERIFY_EXPR(ExtensionCount == m_Extensions.size());
         }
 
-        std::vector<const char*> GlobalExtensions = 
+        Diligent::vector<const char*> GlobalExtensions = 
         { 
             VK_KHR_SURFACE_EXTENSION_NAME,
 
@@ -229,7 +229,7 @@ namespace VulkanUtilities
             uint32_t QueueFamilyCount = 0;
             vkGetPhysicalDeviceQueueFamilyProperties(Device, &QueueFamilyCount, nullptr);
             VERIFY_EXPR(QueueFamilyCount > 0);
-            std::vector<VkQueueFamilyProperties> QueueFamilyProperties(QueueFamilyCount);
+            Diligent::vector<VkQueueFamilyProperties> QueueFamilyProperties(QueueFamilyCount);
             vkGetPhysicalDeviceQueueFamilyProperties(Device, &QueueFamilyCount, QueueFamilyProperties.data());
             VERIFY_EXPR(QueueFamilyCount == QueueFamilyProperties.size());
 

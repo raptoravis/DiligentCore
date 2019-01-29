@@ -24,6 +24,8 @@
 #include "pch.h"
 #include <chrono>
 #include <thread>
+#include "stl/algorithm.h"
+#include "stl/utility.h"
 #include "VulkanDynamicHeap.h"
 #include "RenderDeviceVkImpl.h"
 
@@ -34,7 +36,7 @@ static VkDeviceSize GetDefaultAlignment(const VulkanUtilities::VulkanPhysicalDev
 {
     const auto& Props = PhysicalDevice.GetProperties();
     const auto& Limits = Props.limits;
-    return std::max(std::max(Limits.minUniformBufferOffsetAlignment, Limits.minTexelBufferOffsetAlignment), Limits.minStorageBufferOffsetAlignment);
+    return max(max(Limits.minUniformBufferOffsetAlignment, Limits.minTexelBufferOffsetAlignment), Limits.minStorageBufferOffsetAlignment);
 }
 
 VulkanDynamicMemoryManager::VulkanDynamicMemoryManager(IMemoryAllocator&   Allocator, 
@@ -107,8 +109,8 @@ void VulkanDynamicMemoryManager::Destroy()
     if (m_VkBuffer)
     {
         m_DeviceVk.GetLogicalDevice().UnmapMemory(m_BufferMemory);
-        m_DeviceVk.SafeReleaseDeviceObject(std::move(m_VkBuffer),     m_CommandQueueMask);
-        m_DeviceVk.SafeReleaseDeviceObject(std::move(m_BufferMemory), m_CommandQueueMask);
+        m_DeviceVk.SafeReleaseDeviceObject(move(m_VkBuffer),     m_CommandQueueMask);
+        m_DeviceVk.SafeReleaseDeviceObject(move(m_BufferMemory), m_CommandQueueMask);
     }
     m_CPUAddress = nullptr;
 }
@@ -120,7 +122,7 @@ VulkanDynamicMemoryManager::~VulkanDynamicMemoryManager()
     LOG_INFO_MESSAGE("Dynamic memory manager usage stats:\n"
                      "                       Total size: ", FormatMemorySize(Size, 2),
                      ". Peak allocated size: ", FormatMemorySize(m_TotalPeakSize, 2, Size),
-                     ". Peak utilization: ", std::fixed, std::setprecision(1), static_cast<double>(m_TotalPeakSize) / static_cast<double>(std::max(Size, size_t{1})) * 100.0, '%' );
+                     ". Peak utilization: ", std::fixed, std::setprecision(1), static_cast<double>(m_TotalPeakSize) / static_cast<double>(max(Size, size_t{1})) * 100.0, '%' );
 }
 
 
@@ -187,7 +189,7 @@ VulkanDynamicMemoryManager::MasterBlock VulkanDynamicMemoryManager::AllocateMast
 
     if (Block.IsValid())
     {
-        m_TotalPeakSize = std::max(m_TotalPeakSize, GetUsedSize());
+        m_TotalPeakSize = max(m_TotalPeakSize, GetUsedSize());
     }
 
     return Block;
@@ -247,9 +249,9 @@ VulkanDynamicAllocation VulkanDynamicHeap::Allocate(Uint32 SizeInBytes, Uint32 A
     {
         m_CurrAlignedSize += static_cast<Uint32>(AlignedSize);
         m_CurrUsedSize    += SizeInBytes;
-        m_PeakAlignedSize = std::max(m_PeakAlignedSize, m_CurrAlignedSize);
-        m_PeakUsedSize    = std::max(m_PeakUsedSize,    m_CurrUsedSize);
-        m_PeakAllocatedSize   = std::max(m_PeakAllocatedSize,   m_CurrAllocatedSize);
+        m_PeakAlignedSize   = max(m_PeakAlignedSize, m_CurrAlignedSize);
+        m_PeakUsedSize      = max(m_PeakUsedSize,    m_CurrUsedSize);
+        m_PeakAllocatedSize = max(m_PeakAllocatedSize,   m_CurrAllocatedSize);
         
         VERIFY_EXPR((AlignedOffset & (Alignment-1)) == 0);
         return VulkanDynamicAllocation{ m_GlobalDynamicMemMgr, AlignedOffset, SizeInBytes };
@@ -281,8 +283,8 @@ VulkanDynamicHeap::~VulkanDynamicHeap()
                                                                      FormatMemorySize(m_PeakAlignedSize,   2, m_PeakAllocatedSize), " / ", 
                                                                      FormatMemorySize(m_PeakAllocatedSize, 2, m_PeakAllocatedSize),
                                                                      " (", PeakAllocatedPages, (PeakAllocatedPages == 1 ? " page)" : " pages)"),
-        ". Peak efficiency (used/aligned): ",    std::fixed, std::setprecision(1), static_cast<double>(m_PeakUsedSize) / static_cast<double>(std::max(m_PeakAlignedSize, 1U)) * 100.0, '%',
-        ". Peak utilization (used/allocated): ", std::fixed, std::setprecision(1), static_cast<double>(m_PeakUsedSize) / static_cast<double>(std::max(m_PeakAllocatedSize, 1U)) * 100.0, '%'
+        ". Peak efficiency (used/aligned): ",    std::fixed, std::setprecision(1), static_cast<double>(m_PeakUsedSize) / static_cast<double>(max(m_PeakAlignedSize, 1U)) * 100.0, '%',
+        ". Peak utilization (used/allocated): ", std::fixed, std::setprecision(1), static_cast<double>(m_PeakUsedSize) / static_cast<double>(max(m_PeakAllocatedSize, 1U)) * 100.0, '%'
     );
 }
 

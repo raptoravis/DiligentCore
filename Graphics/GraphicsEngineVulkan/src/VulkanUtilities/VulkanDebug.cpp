@@ -9,6 +9,7 @@
 */
 
 #include <sstream>
+#include "stl/utility.h"
 
 #include "VulkanUtilities/VulkanDebug.h"
 #include "Errors.h"
@@ -573,7 +574,7 @@ namespace VulkanUtilities
             FlagsString += VkAccessFlagBitToString( static_cast<VkAccessFlagBits>(Bit) );
             Flags = Flags & (Flags - 1);
         }
-        return std::move(FlagsString);
+        return Diligent::move(FlagsString);
     }
 
     const char* VkObjectTypeToString(VkObjectType ObjectType)

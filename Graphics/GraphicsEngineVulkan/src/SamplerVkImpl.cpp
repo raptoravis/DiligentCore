@@ -22,6 +22,7 @@
  */
 
 #include "pch.h"
+#include "stl/utility.h"
 #include "SamplerVkImpl.h"
 #include "RenderDeviceVkImpl.h"
 #include "VulkanTypeConversions.h"
@@ -75,7 +76,7 @@ SamplerVkImpl::SamplerVkImpl(IReferenceCounters* pRefCounters, RenderDeviceVkImp
 
 SamplerVkImpl::~SamplerVkImpl()
 {
-    m_pDevice->SafeReleaseDeviceObject(std::move(m_VkSampler), m_CommandQueueMask);
+    m_pDevice->SafeReleaseDeviceObject(move(m_VkSampler), m_CommandQueueMask);
 }
 
 IMPLEMENT_QUERY_INTERFACE( SamplerVkImpl, IID_SamplerVk, TSamplerBase )

@@ -26,6 +26,9 @@
 /// \file
 /// Declaration of Diligent::TextureVkImpl class
 
+#include "stl/vector.h"
+#include "stl/unique_ptr.h"
+
 #include "TextureVk.h"
 #include "RenderDeviceVk.h"
 #include "TextureBase.h"
@@ -87,7 +90,7 @@ public:
 
 protected:
     void CreateViewInternal( const struct TextureViewDesc& ViewDesc, ITextureView** ppView, bool bIsDefaultView )override;
-    //void PrepareVkInitData(const TextureData &InitData, Uint32 NumSubresources, std::vector<Vk_SUBRESOURCE_DATA> &VkInitData);
+    //void PrepareVkInitData(const TextureData &InitData, Uint32 NumSubresources, vector<Vk_SUBRESOURCE_DATA> &VkInitData);
     
     VulkanUtilities::ImageViewWrapper CreateImageView(TextureViewDesc &ViewDesc);
 
@@ -95,8 +98,8 @@ protected:
     VulkanUtilities::VulkanMemoryAllocation m_MemoryAllocation;
 
     // Texture views needed for mipmap generation
-    std::vector<std::unique_ptr<TextureViewVkImpl, STDDeleter<TextureViewVkImpl, FixedBlockMemoryAllocator> > > m_MipLevelSRV;
-    std::vector<std::unique_ptr<TextureViewVkImpl, STDDeleter<TextureViewVkImpl, FixedBlockMemoryAllocator> > > m_MipLevelUAV;
+    vector<unique_ptr<TextureViewVkImpl, STDDeleter<TextureViewVkImpl, FixedBlockMemoryAllocator> > > m_MipLevelSRV;
+    vector<unique_ptr<TextureViewVkImpl, STDDeleter<TextureViewVkImpl, FixedBlockMemoryAllocator> > > m_MipLevelUAV;
 };
 
 }

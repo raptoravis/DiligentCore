@@ -22,6 +22,7 @@
 */
 #include <sstream>
 
+#include "stl/utility.h"
 #include "VulkanUtilities/VulkanCommandBufferPool.h"
 #include "VulkanUtilities/VulkanDebug.h"
 #include "Errors.h"
@@ -33,7 +34,7 @@ namespace VulkanUtilities
     VulkanCommandBufferPool::VulkanCommandBufferPool(std::shared_ptr<const VulkanLogicalDevice> LogicalDevice,
                                                      uint32_t                                   queueFamilyIndex, 
                                                      VkCommandPoolCreateFlags                   flags) :
-        m_LogicalDevice(std::move(LogicalDevice))
+        m_LogicalDevice(Diligent::move(LogicalDevice))
     {
         VkCommandPoolCreateInfo CmdPoolCI = {};
         CmdPoolCI.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -115,6 +116,6 @@ namespace VulkanUtilities
     {
         m_LogicalDevice.reset();
         m_CmdBuffers.clear();
-        return std::move(m_CmdPool);
+        return Diligent::move(m_CmdPool);
     }
 }

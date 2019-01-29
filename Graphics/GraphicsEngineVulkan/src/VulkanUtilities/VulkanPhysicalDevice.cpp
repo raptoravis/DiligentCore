@@ -23,15 +23,16 @@
 
 #include <limits>
 #include <cstring>
+#include "stl/unique_ptr.h"
 #include "VulkanErrors.h"
 #include "VulkanUtilities/VulkanPhysicalDevice.h"
 
 namespace VulkanUtilities
 {
-    std::unique_ptr<VulkanPhysicalDevice> VulkanPhysicalDevice::Create(VkPhysicalDevice vkDevice)
+    Diligent::unique_ptr<VulkanPhysicalDevice> VulkanPhysicalDevice::Create(VkPhysicalDevice vkDevice)
     {
         auto *PhysicalDevice = new VulkanPhysicalDevice(vkDevice);
-        return std::unique_ptr<VulkanPhysicalDevice>(PhysicalDevice);
+        return Diligent::unique_ptr<VulkanPhysicalDevice>(PhysicalDevice);
     }
 
     VulkanPhysicalDevice::VulkanPhysicalDevice(VkPhysicalDevice vkDevice) :

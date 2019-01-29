@@ -24,6 +24,7 @@
 #pragma once
 
 #include <memory>
+#include "stl/utility.h"
 #include "VulkanLogicalDevice.h"
 
 namespace VulkanUtilities
@@ -54,7 +55,7 @@ namespace VulkanUtilities
         VulkanObjectWrapper& operator = (const VulkanObjectWrapper&) = delete;
 
         VulkanObjectWrapper(VulkanObjectWrapper&& rhs)noexcept : 
-            m_pLogicalDevice(std::move(rhs.m_pLogicalDevice)),
+            m_pLogicalDevice(Diligent::move(rhs.m_pLogicalDevice)),
             m_VkObject      (rhs.m_VkObject)
         {
             rhs.m_VkObject = VK_NULL_HANDLE;
@@ -62,7 +63,7 @@ namespace VulkanUtilities
         VulkanObjectWrapper& operator = (VulkanObjectWrapper&& rhs)noexcept
         {
             Release();
-            m_pLogicalDevice = std::move(rhs.m_pLogicalDevice);
+            m_pLogicalDevice = Diligent::move(rhs.m_pLogicalDevice);
             m_VkObject = rhs.m_VkObject;
             rhs.m_VkObject = VK_NULL_HANDLE;
             return *this;
@@ -78,7 +79,7 @@ namespace VulkanUtilities
             // For externally managed objects, m_pLogicalDevice is null
             if(m_pLogicalDevice && m_VkObject != VK_NULL_HANDLE)
             {
-                m_pLogicalDevice->ReleaseVulkanObject(std::move(*this));
+                m_pLogicalDevice->ReleaseVulkanObject(Diligent::move(*this));
             }
             m_VkObject = VK_NULL_HANDLE;
             m_pLogicalDevice.reset();

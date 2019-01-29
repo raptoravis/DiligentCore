@@ -25,6 +25,8 @@
 
 /// \file
 /// Declaration of Diligent::ShaderVkImpl class
+#include <memory>
+#include "stl/vector.h"
 
 #include "RenderDeviceVk.h"
 #include "ShaderVk.h"
@@ -71,7 +73,7 @@ public:
         return m_StaticVarsMgr.GetVariable(Index);
     }
 
-    virtual const std::vector<uint32_t>& GetSPIRV()const override final
+    virtual const vector<uint32_t>& GetSPIRV()const override final
     {
         return m_SPIRV;
     }
@@ -97,7 +99,7 @@ private:
     ShaderVariableManagerVk m_StaticVarsMgr;
 
     std::string           m_EntryPoint;
-    std::vector<uint32_t> m_SPIRV;
+    vector<uint32_t>      m_SPIRV;
 };
 
 }

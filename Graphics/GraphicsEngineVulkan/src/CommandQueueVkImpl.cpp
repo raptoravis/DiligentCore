@@ -67,7 +67,7 @@ Uint64 CommandQueueVkImpl::Submit(const VkSubmitInfo& SubmitInfo)
     DEV_CHECK_ERR(err == VK_SUCCESS, "Failed to submit command buffer to the command queue"); (void)err;
 
     // We must atomically place the (value, fence) pair into the deque
-    m_pFence->AddPendingFence(std::move(vkFence), FenceValue);
+    m_pFence->AddPendingFence(move(vkFence), FenceValue);
 
     return FenceValue;
 }

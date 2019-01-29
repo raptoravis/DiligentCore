@@ -21,6 +21,7 @@
 *  of the possibility of such damages.
 */
 #include <sstream>
+#include "stl/utility.h"
 
 #include "VulkanUtilities/VulkanFencePool.h"
 #include "Errors.h"
@@ -29,7 +30,7 @@
 namespace VulkanUtilities
 {
     VulkanFencePool::VulkanFencePool(std::shared_ptr<const VulkanLogicalDevice> LogicalDevice)noexcept :
-        m_LogicalDevice(std::move(LogicalDevice))
+        m_LogicalDevice(Diligent::move(LogicalDevice))
     {}
 
     VulkanFencePool::~VulkanFencePool()
@@ -48,7 +49,7 @@ namespace VulkanUtilities
         FenceWrapper Fence;
         if(!m_Fences.empty())
         {
-            Fence = std::move(m_Fences.back());
+            Fence = Diligent::move(m_Fences.back());
             m_LogicalDevice->ResetFence(Fence);
             m_Fences.pop_back();
         }
@@ -66,6 +67,6 @@ namespace VulkanUtilities
     void VulkanFencePool::DisposeFence(FenceWrapper&& Fence)
     {
         DEV_CHECK_ERR(m_LogicalDevice->GetFenceStatus(Fence) == VK_SUCCESS, "Disposing a fence that has not been signaled");
-        m_Fences.emplace_back(std::move(Fence));
+        m_Fences.emplace_back(Diligent::move(Fence));
     }
 }

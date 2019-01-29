@@ -26,8 +26,8 @@
 /// \file
 /// Declaration of Diligent::FramebufferCache class
 
-#include <unordered_map>
 #include <mutex>
+#include "stl/unordered_map.h"
 #include "VulkanUtilities/VulkanObjectWrappers.h"
 
 namespace Diligent
@@ -82,9 +82,9 @@ private:
     };
     
     std::mutex m_Mutex;
-    std::unordered_map<FramebufferCacheKey, VulkanUtilities::FramebufferWrapper, FramebufferCacheKeyHash> m_Cache;
-    std::unordered_multimap<VkImageView, FramebufferCacheKey> m_ViewToKeyMap;
-    std::unordered_multimap<VkRenderPass, FramebufferCacheKey> m_RenderPassToKeyMap;
+    unordered_map<FramebufferCacheKey, VulkanUtilities::FramebufferWrapper, FramebufferCacheKeyHash> m_Cache;
+    unordered_multimap<VkImageView, FramebufferCacheKey> m_ViewToKeyMap;
+    unordered_multimap<VkRenderPass, FramebufferCacheKey> m_RenderPassToKeyMap;
 };
 
 }

@@ -23,6 +23,9 @@
 
 #include "pch.h"
 
+#include "stl/utility.h"
+#include "stl/unordered_map.h"
+
 #include "ShaderResourceLayoutVk.h"
 #include "ShaderResourceCacheVk.h"
 #include "BufferVkImpl.h"
@@ -60,7 +63,7 @@ void ShaderResourceLayoutVk::AllocateMemory(std::shared_ptr<const SPIRVShaderRes
     VERIFY_EXPR(!m_pResources);
     VERIFY_EXPR(pSrcResources);
 
-    m_pResources = std::move(pSrcResources);
+    m_pResources = move(pSrcResources);
 
     Uint32 AllowedTypeBits = GetAllowedTypeBits(AllowedVarTypes, NumAllowedTypes); (void)AllowedTypeBits;
 
@@ -89,7 +92,7 @@ void ShaderResourceLayoutVk::AllocateMemory(std::shared_ptr<const SPIRVShaderRes
         return;
 
     auto* pRawMem = ALLOCATE(Allocator, "Raw memory buffer for shader resource layout resources", MemSize);
-    m_ResourceBuffer = std::unique_ptr<void, STDDeleterRawMem<void> >(pRawMem, Allocator);
+    m_ResourceBuffer = unique_ptr<void, STDDeleterRawMem<void> >(pRawMem, Allocator);
 }
 
 void ShaderResourceLayoutVk::InitializeStaticResourceLayout(std::shared_ptr<const SPIRVShaderResources> pSrcResources,
@@ -97,9 +100,9 @@ void ShaderResourceLayoutVk::InitializeStaticResourceLayout(std::shared_ptr<cons
                                                             ShaderResourceCacheVk&                      StaticResourceCache)
 {
     auto AllowedVarType = SHADER_VARIABLE_TYPE_STATIC;
-    AllocateMemory(std::move(pSrcResources), LayoutDataAllocator, &AllowedVarType, 1);
+    AllocateMemory(move(pSrcResources), LayoutDataAllocator, &AllowedVarType, 1);
 
-    std::array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES> CurrResInd = {};
+    array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES> CurrResInd = {};
     Uint32 StaticResCacheSize = 0;
 
     m_pResources->ProcessResources(
@@ -138,7 +141,7 @@ void ShaderResourceLayoutVk::Initialize(Uint32 NumShaders,
                                         ShaderResourceLayoutVk                       Layouts[],
                                         std::shared_ptr<const SPIRVShaderResources>  pShaderResources[],
                                         IMemoryAllocator&                            LayoutDataAllocator,
-                                        std::vector<uint32_t>                        SPIRVs[],
+                                        vector<uint32_t>                             SPIRVs[],
                                         class PipelineLayout&                        PipelineLayout)
 {
     SHADER_VARIABLE_TYPE* AllowedVarTypes = nullptr;
@@ -147,13 +150,13 @@ void ShaderResourceLayoutVk::Initialize(Uint32 NumShaders,
 
     for (Uint32 s=0; s < NumShaders; ++s)
     {
-        Layouts[s].AllocateMemory(std::move(pShaderResources[s]), LayoutDataAllocator, AllowedVarTypes, NumAllowedTypes);
+        Layouts[s].AllocateMemory(move(pShaderResources[s]), LayoutDataAllocator, AllowedVarTypes, NumAllowedTypes);
     }
     
     VERIFY_EXPR(NumShaders <= MaxShadersInPipeline);
-    std::array<std::array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES>, MaxShadersInPipeline> CurrResInd = {};
+    array<array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES>, MaxShadersInPipeline> CurrResInd = {};
 #ifdef _DEBUG
-    std::unordered_map<Uint32, std::pair<Uint32, Uint32>> dbgBindings_CacheOffsets;
+    unordered_map<Uint32, pair<Uint32, Uint32>> dbgBindings_CacheOffsets;
 #endif
 
     auto AddResource = [&](Uint32                            ShaderInd,
@@ -184,7 +187,7 @@ void ShaderResourceLayoutVk::Initialize(Uint32 NumShaders,
             VERIFY(Binding     > Binding_OffsetIt->second.first,  "Binding for descriptor set ", DescriptorSet, " is not strictly monotonic");
             VERIFY(CacheOffset > Binding_OffsetIt->second.second, "Cache offset for descriptor set ", DescriptorSet, " is not strictly monotonic");
         }
-        dbgBindings_CacheOffsets[DescriptorSet] = std::make_pair(Binding, CacheOffset);
+        dbgBindings_CacheOffsets[DescriptorSet] = make_pair(Binding, CacheOffset);
 #endif
 
         auto& ResInd = CurrResInd[ShaderInd][Attribs.VarType];
@@ -833,10 +836,10 @@ void ShaderResourceLayoutVk::CommitDynamicResources(const ShaderResourceCacheVk&
 #endif
 
     // Do not zero-initiaize arrays!
-    std::array<VkDescriptorImageInfo,  ImgUpdateBatchSize>       DescrImgInfoArr;
-    std::array<VkDescriptorBufferInfo, BuffUpdateBatchSize>      DescrBuffInfoArr;
-    std::array<VkBufferView,           TexelBuffUpdateBatchSize> DescrBuffViewArr;
-    std::array<VkWriteDescriptorSet,   WriteDescriptorSetBatchSize> WriteDescrSetArr;
+    array<VkDescriptorImageInfo,  ImgUpdateBatchSize>          DescrImgInfoArr;
+    array<VkDescriptorBufferInfo, BuffUpdateBatchSize>         DescrBuffInfoArr;
+    array<VkBufferView,           TexelBuffUpdateBatchSize>    DescrBuffViewArr;
+    array<VkWriteDescriptorSet,   WriteDescriptorSetBatchSize> WriteDescrSetArr;
 
     Uint32 ResNum = 0, ArrElem = 0;
     auto DescrImgIt  = DescrImgInfoArr.begin();

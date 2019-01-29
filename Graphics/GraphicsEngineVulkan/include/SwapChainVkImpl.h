@@ -26,6 +26,8 @@
 /// \file
 /// Declaration of Diligent::SwapChainVkImpl class
 
+#include "stl/vector.h"
+
 #include "SwapChainVk.h"
 #include "SwapChainBase.h"
 #include "VulkanUtilities/VulkanInstance.h"
@@ -79,10 +81,10 @@ private:
     VkSwapchainKHR m_VkSwapChain   = VK_NULL_HANDLE;
     VkFormat       m_VkColorFormat = VK_FORMAT_UNDEFINED;
 
-    std::vector<VulkanUtilities::SemaphoreWrapper> m_ImageAcquiredSemaphores;
-    std::vector<VulkanUtilities::SemaphoreWrapper> m_DrawCompleteSemaphores;
-    std::vector< RefCntAutoPtr<ITextureViewVk>, STDAllocatorRawMem<RefCntAutoPtr<ITextureViewVk>> > m_pBackBufferRTV;
-    std::vector<bool, STDAllocatorRawMem<bool> > m_SwapChainImagesInitialized;
+    vector<VulkanUtilities::SemaphoreWrapper> m_ImageAcquiredSemaphores;
+    vector<VulkanUtilities::SemaphoreWrapper> m_DrawCompleteSemaphores;
+    vector< RefCntAutoPtr<ITextureViewVk>, STDAllocatorRawMem<RefCntAutoPtr<ITextureViewVk>> > m_pBackBufferRTV;
+    vector<bool, STDAllocatorRawMem<bool> > m_SwapChainImagesInitialized;
 
     RefCntAutoPtr<ITextureViewVk> m_pDepthBufferDSV;
     Uint32 m_SemaphoreIndex = 0;

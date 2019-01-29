@@ -22,6 +22,7 @@
  */
 
 #include "pch.h"
+#include "stl/utility.h"
 #include "BufferViewVkImpl.h"
 #include "RenderDeviceVkImpl.h"
 #include "BufferVkImpl.h"
@@ -36,13 +37,13 @@ BufferViewVkImpl::BufferViewVkImpl( IReferenceCounters*                  pRefCou
                                     VulkanUtilities::BufferViewWrapper&& BuffView,
                                     bool                                 bIsDefaultView ) :
     TBufferViewBase( pRefCounters, pDevice, ViewDesc, pBuffer, bIsDefaultView ),
-    m_BuffView(std::move(BuffView))
+    m_BuffView(Diligent::move(BuffView))
 {
 }
 
 BufferViewVkImpl::~BufferViewVkImpl()
 {
-    m_pDevice->SafeReleaseDeviceObject(std::move(m_BuffView), m_pBuffer->GetDesc().CommandQueueMask);
+    m_pDevice->SafeReleaseDeviceObject(Diligent::move(m_BuffView), m_pBuffer->GetDesc().CommandQueueMask);
 }
 
 IMPLEMENT_QUERY_INTERFACE( BufferViewVkImpl, IID_BufferViewVk, TBufferViewBase )

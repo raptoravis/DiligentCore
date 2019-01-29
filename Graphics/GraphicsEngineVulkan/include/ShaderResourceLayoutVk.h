@@ -94,8 +94,9 @@
 //      ** All variable types are preserved
 //      ** Bindings, descriptor sets and offsets are assigned during the initialization
 
-#include <array>
 #include <memory>
+#include "stl/array.h"
+#include "stl/unique_ptr.h"
 
 #include "ShaderBase.h"
 #include "HashUtils.h"
@@ -133,7 +134,7 @@ public:
                            ShaderResourceLayoutVk                       Layouts[],
                            std::shared_ptr<const SPIRVShaderResources>  pShaderResources[],
                            IMemoryAllocator&                            LayoutDataAllocator,
-                           std::vector<uint32_t>                        SPIRVs[],
+                           vector<uint32_t>                             SPIRVs[],
                            class PipelineLayout&                        PipelineLayout);
 
     // sizeof(VkResource) == 24 (x64)
@@ -295,13 +296,13 @@ private:
 
     IObject&                                            m_Owner;
     const VulkanUtilities::VulkanLogicalDevice&         m_LogicalDevice;
-    std::unique_ptr<void, STDDeleterRawMem<void> >      m_ResourceBuffer;
+    unique_ptr<void, STDDeleterRawMem<void> >           m_ResourceBuffer;
 
     // We must use shared_ptr to reference ShaderResources instance, because
     // there may be multiple objects referencing the same set of resources
     std::shared_ptr<const SPIRVShaderResources>         m_pResources;
 
-    std::array<Uint16, SHADER_VARIABLE_TYPE_NUM_TYPES+1>  m_NumResources = {};
+    array<Uint16, SHADER_VARIABLE_TYPE_NUM_TYPES+1>  m_NumResources = {};
 };
 
 }

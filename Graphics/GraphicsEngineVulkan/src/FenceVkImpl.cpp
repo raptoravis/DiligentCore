@@ -23,6 +23,7 @@
 
 #include "pch.h"
 
+#include "stl/utility.h"
 #include "FenceVkImpl.h"
 #include "EngineMemory.h"
 #include "RenderDeviceVkImpl.h"
@@ -58,7 +59,7 @@ Uint64 FenceVkImpl :: GetCompletedValue()
         {
             if (Value_Fence.first > m_LastCompletedFenceValue)
                 m_LastCompletedFenceValue = Value_Fence.first;
-            m_FencePool.DisposeFence(std::move(Value_Fence.second));
+            m_FencePool.DisposeFence(move(Value_Fence.second));
             m_PendingFences.pop_front();
         }
         else
@@ -94,7 +95,7 @@ void FenceVkImpl :: Wait()
         DEV_CHECK_ERR(status == VK_SUCCESS, "All pending fences must now be complete!"); (void)status;
         if (val_fence.first > m_LastCompletedFenceValue)
             m_LastCompletedFenceValue = val_fence.first;
-        m_FencePool.DisposeFence(std::move(val_fence.second));
+        m_FencePool.DisposeFence(move(val_fence.second));
     }
     m_PendingFences.clear();
 }

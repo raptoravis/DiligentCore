@@ -26,7 +26,8 @@
 /// \file
 /// Type conversion routines
 
-#include <array>
+#include "stl/array.h"
+#include "stl/vector.h"
 #include "GraphicsTypes.h"
 
 namespace Diligent
@@ -39,14 +40,14 @@ VkFormat TypeToVkFormat(VALUE_TYPE ValType, Uint32 NumComponents, Bool bIsNormal
 
 VkPipelineRasterizationStateCreateInfo RasterizerStateDesc_To_VkRasterizationStateCI(const RasterizerStateDesc &RasterizerDesc);
 VkPipelineDepthStencilStateCreateInfo  DepthStencilStateDesc_To_VkDepthStencilStateCI(const DepthStencilStateDesc &DepthStencilDesc);
-void BlendStateDesc_To_VkBlendStateCI(const BlendStateDesc&                             BSDesc, 
-                                      VkPipelineColorBlendStateCreateInfo&              ColorBlendStateCI,
-                                      std::vector<VkPipelineColorBlendAttachmentState>& ColorBlendAttachments);
+void BlendStateDesc_To_VkBlendStateCI(const BlendStateDesc&                         BSDesc, 
+                                      VkPipelineColorBlendStateCreateInfo&          ColorBlendStateCI,
+                                      vector<VkPipelineColorBlendAttachmentState>&  ColorBlendAttachments);
 
 void InputLayoutDesc_To_VkVertexInputStateCI(const InputLayoutDesc&                                             LayoutDesc, 
                                              VkPipelineVertexInputStateCreateInfo&                              VertexInputStateCI,
-                                             std::array<VkVertexInputBindingDescription, iMaxLayoutElements>&   BindingDescriptions,
-                                             std::array<VkVertexInputAttributeDescription, iMaxLayoutElements>& AttributeDescription);
+                                             array<VkVertexInputBindingDescription, iMaxLayoutElements>&        BindingDescriptions,
+                                             array<VkVertexInputAttributeDescription, iMaxLayoutElements>&      AttributeDescription);
 
 void PrimitiveTopology_To_VkPrimitiveTopologyAndPatchCPCount(PRIMITIVE_TOPOLOGY   PrimTopology, 
                                                              VkPrimitiveTopology& VkPrimTopology, 

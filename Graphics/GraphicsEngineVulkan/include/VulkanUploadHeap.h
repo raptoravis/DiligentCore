@@ -23,7 +23,9 @@
 
 #pragma once
 
-#include <unordered_map>
+#include "stl/vector.h"
+#include "stl/utility.h"
+
 #include "VulkanUtilities/VulkanMemoryManager.h"
 #include "VulkanUtilities/VulkanObjectWrappers.h"
 
@@ -114,8 +116,8 @@ private:
         UploadPageInfo(VulkanUtilities::VulkanMemoryAllocation&& _MemAllocation, 
                        VulkanUtilities::BufferWrapper&&          _Buffer,
                        Uint8*                                    _CPUAddress) :
-            MemAllocation(std::move(_MemAllocation)),
-            Buffer       (std::move(_Buffer)),
+            MemAllocation(move(_MemAllocation)),
+            Buffer       (move(_Buffer)),
             CPUAddress   (_CPUAddress)
         {
         }
@@ -123,7 +125,7 @@ private:
         VulkanUtilities::BufferWrapper          Buffer;
         Uint8* const                            CPUAddress = nullptr;
     };
-    std::vector<UploadPageInfo> m_Pages;
+    vector<UploadPageInfo> m_Pages;
 
     struct CurrPageInfo
     {
