@@ -510,7 +510,7 @@ const HLSL2GLSLConverterImpl& HLSL2GLSLConverterImpl::GetInstance()
 HLSL2GLSLConverterImpl::HLSL2GLSLConverterImpl()
 {
     // Populate HLSL keywords hash map
-#define DEFINE_KEYWORD(keyword)m_HLSLKeywords.insert( std::make_pair( #keyword, TokenInfo( TokenType::kw_##keyword, #keyword ) ) );
+#define DEFINE_KEYWORD(keyword)m_HLSLKeywords.insert( stl::make_pair( #keyword, TokenInfo( TokenType::kw_##keyword, #keyword ) ) );
     ITERATE_KEYWORDS(DEFINE_KEYWORD)
 #undef DEFINE_KEYWORD
     
@@ -947,7 +947,7 @@ bool SkipPrefix(const Char* RefStr, IterType &begin, IterType end)
 void HLSL2GLSLConverterImpl::ConversionStream::InsertIncludes( String &GLSLSource, IShaderSourceInputStreamFactory* pSourceStreamFactory )
 {
     // Put all the includes into the set to avoid multiple inclusion
-    std::unordered_set<String> ProcessedIncludes;
+    stl::unordered_set<String> ProcessedIncludes;
 
     do
     {
@@ -1497,7 +1497,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::RegisterStruct(TokenListType::ite
     //        ^
     VERIFY_PARSER_STATE( Token, Token != m_Tokens.end() && Token->Type == TokenType::Identifier, "Identifier expected" );
     auto &StructName = Token->Literal;
-    m_StructDefinitions.insert(std::make_pair(StructName.c_str(), Token));
+    m_StructDefinitions.insert(stl::make_pair(StructName.c_str(), Token));
 
     ++Token;
     // struct VSOutput
@@ -1601,7 +1601,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ParseSamplers( TokenListType::ite
                 const auto &SamplerName = Token->Literal;
 
                 // Add sampler state into the hash map
-                SamplersHash.insert( std::make_pair( SamplerName, bIsComparison ) );
+                SamplersHash.insert( stl::make_pair( SamplerName, bIsComparison ) );
 
                 ++Token;
                 // SamplerState LinearClamp ;
@@ -1726,7 +1726,7 @@ void ParseImageFormat(const String &Comment, String& ImageFormat)
 //        Texture3D g_Tex3D;                            -> sampler3D g_Tex3D;
 //
 void HLSL2GLSLConverterImpl::ConversionStream::ProcessTextureDeclaration( TokenListType::iterator &Token, 
-                                                                          const std::vector<SamplerHashType> &Samplers, 
+                                                                          const stl::vector<SamplerHashType> &Samplers, 
                                                                           ObjectsTypeHashType &Objects, 
                                                                           const char* SamplerSuffix )
 {
@@ -1943,7 +1943,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessTextureDeclaration( TokenL
                 TexDeclToken->Literal.append( "IMAGE_WRITEONLY " ); // defined as 'writeonly' on GLES and as '' on desktop in GLSLDefinitions.h
         }
         TexDeclToken->Literal.append( CompleteGLSLSampler );
-        Objects.m.insert( std::make_pair( HashMapStringKey(TextureName), HLSLObjectInfo(CompleteGLSLSampler, NumComponents) ) );
+        Objects.m.insert( stl::make_pair( HashMapStringKey(TextureName), HLSLObjectInfo(CompleteGLSLSampler, NumComponents) ) );
 
         // In global sceop, multiple variables can be declared in the same statement
         if( IsGlobalScope )
@@ -2567,7 +2567,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ParseShaderParameter(TokenListTyp
 
 // The function parses shader arguments and puts them into Params array
 void HLSL2GLSLConverterImpl::ConversionStream::ProcessFunctionParameters( TokenListType::iterator &Token, 
-                                                                          std::vector<ShaderParameterInfo>& Params, 
+                                                                          stl::vector<ShaderParameterInfo>& Params, 
                                                                           bool &bIsVoid )
 {
     // void TestPS  ( in VSOutput In,
@@ -2850,7 +2850,7 @@ void DefineInterfaceVar( int location, const char *inout, const String& ParamTyp
     OutSS << "layout(location = " << location << ") " << inout << ' ' << ParamType << ' ' << ParamName << ";\n";
 }
 
-String HLSL2GLSLConverterImpl::ConversionStream::BuildParameterName(const std::vector<const ShaderParameterInfo*>& MemberStack, Char Separator, const Char* Prefix, const Char *SubstituteInstName, const Char *Index )
+String HLSL2GLSLConverterImpl::ConversionStream::BuildParameterName(const stl::vector<const ShaderParameterInfo*>& MemberStack, Char Separator, const Char* Prefix, const Char *SubstituteInstName, const Char *Index )
 {
     String FullName(Prefix);
     auto it = MemberStack.begin();
@@ -2872,8 +2872,8 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessShaderArgument( const Shad
                                                                       stringstream &PrologueSS,
                                                                       TArgHandler ArgHandler)
 {
-    std::vector<const ShaderParameterInfo*> MemberStack;
-    std::vector<std::vector<ShaderParameterInfo>::const_iterator> MemberItStack;
+    stl::vector<const ShaderParameterInfo*> MemberStack;
+    stl::vector<stl::vector<ShaderParameterInfo>::const_iterator> MemberItStack;
     MemberStack.push_back(&RootParam);
     MemberItStack.push_back(RootParam.members.cbegin());
     
@@ -2950,7 +2950,7 @@ bool HLSL2GLSLConverterImpl::ConversionStream::RequiresFlatQualifier(const Strin
     return RequiresFlat;
 }
 
-void HLSL2GLSLConverterImpl::ConversionStream::ProcessFragmentShaderArguments(std::vector<ShaderParameterInfo>& Params,
+void HLSL2GLSLConverterImpl::ConversionStream::ProcessFragmentShaderArguments(stl::vector<ShaderParameterInfo>& Params,
                                                                               String &GlobalVariables,
                                                                               std::stringstream &ReturnHandlerSS,
                                                                               String &Prologue)
@@ -2962,7 +2962,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessFragmentShaderArguments(st
         if( Param.storageQualifier == ShaderParameterInfo::StorageQualifier::In )
         {
             ProcessShaderArgument(Param, PSInd, InVar, PrologueSS,
-                [&](const std::vector<const ShaderParameterInfo*> &MemberStack, const ShaderParameterInfo& Param, const String &Getter)
+                [&](const stl::vector<const ShaderParameterInfo*> &MemberStack, const ShaderParameterInfo& Param, const String &Getter)
                 {
                     String FullParamName = BuildParameterName(MemberStack, '.');
                     if(!Getter.empty())
@@ -2980,7 +2980,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessFragmentShaderArguments(st
                  Param.storageQualifier == ShaderParameterInfo::StorageQualifier::Ret)
         {
             ProcessShaderArgument(Param, PSInd, OutVar, PrologueSS, 
-                [&](const std::vector<const ShaderParameterInfo*> &MemberStack, const ShaderParameterInfo& Param, const String &Setter)
+                [&](const stl::vector<const ShaderParameterInfo*> &MemberStack, const ShaderParameterInfo& Param, const String &Setter)
                 {
                     String FullParamName = BuildParameterName(MemberStack, '.', "", Param.storageQualifier == ShaderParameterInfo::StorageQualifier::Ret ? "_RET_VAL_" : "");
                     if(!Setter.empty())
@@ -3027,7 +3027,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessFragmentShaderArguments(st
 }
 
 
-void HLSL2GLSLConverterImpl::ConversionStream::ProcessVertexShaderArguments( std::vector<ShaderParameterInfo>& Params,
+void HLSL2GLSLConverterImpl::ConversionStream::ProcessVertexShaderArguments( stl::vector<ShaderParameterInfo>& Params,
                                                                              String &GlobalVariables,
                                                                              std::stringstream &ReturnHandlerSS,
                                                                              String &Prologue )
@@ -3035,13 +3035,13 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessVertexShaderArguments( std
     stringstream GlobalVarsSS, PrologueSS, InterfaceVarsSS;
     int OutLocation = 0;
     int AutoInputLocation = 0; // Automatically assigned input location
-    std::unordered_map<int, const Char*> LocationToSemantic;
+    stl::unordered_map<int, const Char*> LocationToSemantic;
     for( const auto &Param : Params )
     {
         if( Param.storageQualifier == ShaderParameterInfo::StorageQualifier::In )
         {
             ProcessShaderArgument(Param, VSInd, InVar, PrologueSS, 
-                [&](const std::vector<const ShaderParameterInfo*> &MemberStack, const ShaderParameterInfo& Param, const String &Getter)
+                [&](const stl::vector<const ShaderParameterInfo*> &MemberStack, const ShaderParameterInfo& Param, const String &Getter)
                 {
                     String FullParamName = BuildParameterName(MemberStack, '.');
                     if(!Getter.empty())
@@ -3079,7 +3079,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessVertexShaderArguments( std
                  Param.storageQualifier == ShaderParameterInfo::StorageQualifier::Ret)
         {
             ProcessShaderArgument(Param, VSInd, OutVar, PrologueSS, 
-                [&](const std::vector<const ShaderParameterInfo*> &MemberStack, const ShaderParameterInfo& Param, const String &Setter)
+                [&](const stl::vector<const ShaderParameterInfo*> &MemberStack, const ShaderParameterInfo& Param, const String &Setter)
                 {
                     String FullParamName = BuildParameterName(MemberStack, '.', "", Param.storageQualifier == ShaderParameterInfo::StorageQualifier::Ret ? "_RET_VAL_" : "");
                     if(!Setter.empty())
@@ -3101,7 +3101,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessVertexShaderArguments( std
 }
 
 void HLSL2GLSLConverterImpl::ConversionStream::ProcessGeometryShaderArguments( TokenListType::iterator &TypeToken,
-                                                                               std::vector<ShaderParameterInfo>& Params,
+                                                                               stl::vector<ShaderParameterInfo>& Params,
                                                                                String &GlobalVariables,
                                                                                String &Prologue )
 {
@@ -3110,7 +3110,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessGeometryShaderArguments( T
     // void SelectArraySliceGS(triangle QuadVSOut In[3], 
     // ^
 
-    std::unordered_map<HashMapStringKey, String, HashMapStringKey::Hasher> Attributes;
+    stl::unordered_map<HashMapStringKey, String, HashMapStringKey::Hasher> Attributes;
     ProcessShaderAttributes(Token, Attributes);
     auto MaxVertexCountIt = Attributes.find("maxvertexcount");
     if (MaxVertexCountIt == Attributes.end())
@@ -3149,7 +3149,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessGeometryShaderArguments( T
             PrologueSS << "    for(int i=0; i < _NumElements; ++i)\n    {\n";
             
             ProcessShaderArgument(TopLevelParam, GSInd, InVar, PrologueSS, 
-                [&](const std::vector<const ShaderParameterInfo*> &MemberStack, const ShaderParameterInfo& Param, const String &Getter)
+                [&](const stl::vector<const ShaderParameterInfo*> &MemberStack, const ShaderParameterInfo& Param, const String &Getter)
                 {
                     String FullIndexedParamName = BuildParameterName(MemberStack, '.', "", "", "[i]");
                     PrologueSS << "    ";
@@ -3186,7 +3186,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessGeometryShaderArguments( T
             EmitVertexDefineSS << "#define " << TopLevelParam.Name << "_Append(VERTEX){\\\n";
 
             ProcessShaderArgument(TopLevelParam, GSInd, OutVar, PrologueSS, 
-                [&](const std::vector<const ShaderParameterInfo*> &MemberStack, const ShaderParameterInfo& Param, const String &Setter)
+                [&](const stl::vector<const ShaderParameterInfo*> &MemberStack, const ShaderParameterInfo& Param, const String &Setter)
                 {
                     String MacroArgumentName = BuildParameterName(MemberStack, '.', "", "VERTEX");
                     if(!Setter.empty())
@@ -3213,7 +3213,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessGeometryShaderArguments( T
 }
 
 void HLSL2GLSLConverterImpl::ConversionStream::ProcessComputeShaderArguments( TokenListType::iterator &TypeToken,
-                                                                              std::vector<ShaderParameterInfo>& Params,
+                                                                              stl::vector<ShaderParameterInfo>& Params,
                                                                               String &GlobalVariables,
                                                                               String &Prologue )
 {
@@ -3285,7 +3285,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessComputeShaderArguments( To
         if( Param.storageQualifier == ShaderParameterInfo::StorageQualifier::In )
         {
             ProcessShaderArgument(Param, CSInd, InVar, PrologueSS, 
-                [&](const std::vector<const ShaderParameterInfo*> &MemberStack,  const ShaderParameterInfo& Param, const String &Getter)
+                [&](const stl::vector<const ShaderParameterInfo*> &MemberStack,  const ShaderParameterInfo& Param, const String &Getter)
                 {
                     String FullParamName = BuildParameterName(MemberStack, '.');
                     if(Getter.empty())
@@ -3372,7 +3372,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessHullShaderConstantFunction
     // TypeToken
     VERIFY_PARSER_STATE( TypeToken, TypeToken != m_Tokens.begin(), "Function \"", EntryPointToken->Literal, "\" misses return type" );
 
-    std::vector<ShaderParameterInfo> Params;
+    stl::vector<ShaderParameterInfo> Params;
     auto ArgsListEndToken = TypeToken;
     bool bIsVoid = false;
     ProcessFunctionParameters( ArgsListEndToken, Params, bIsVoid );
@@ -3405,7 +3405,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessHullShaderConstantFunction
             else
             {
                 ProcessShaderArgument(TopLevelParam, HSInd, InVar, PrologueSS, 
-                    [&](const std::vector<const ShaderParameterInfo*> &MemberStack, const ShaderParameterInfo& Param, const String &Getter)
+                    [&](const stl::vector<const ShaderParameterInfo*> &MemberStack, const ShaderParameterInfo& Param, const String &Getter)
                     {
                         String FullIndexedParamName = BuildParameterName(MemberStack, '.');
                         if(Getter.empty())
@@ -3422,7 +3422,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessHullShaderConstantFunction
                  TopLevelParam.storageQualifier == ShaderParameterInfo::StorageQualifier::Ret)
         {
             ProcessShaderArgument(TopLevelParam, HSInd, OutVar, PrologueSS, 
-                [&](const std::vector<const ShaderParameterInfo*> &MemberStack, const ShaderParameterInfo& Param, const String &Setter)
+                [&](const stl::vector<const ShaderParameterInfo*> &MemberStack, const ShaderParameterInfo& Param, const String &Setter)
                 {
                     String SrcParamName = BuildParameterName(MemberStack, '.', "", Param.storageQualifier == ShaderParameterInfo::StorageQualifier::Ret ? "_RET_VAL_" : "");
                     if(Setter.empty())
@@ -3463,7 +3463,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessHullShaderConstantFunction
 }
 
 void HLSL2GLSLConverterImpl::ConversionStream::ProcessShaderAttributes(TokenListType::iterator &Token,
-                                                                       std::unordered_map<HashMapStringKey, String, HashMapStringKey::Hasher>& Attributes)
+                                                                       stl::unordered_map<HashMapStringKey, String, HashMapStringKey::Hasher>& Attributes)
 {
     VERIFY_EXPR(Token->IsBuiltInType() || Token->Type == TokenType::Identifier);
     // [patchconstantfunc("ConstantHS")]
@@ -3523,7 +3523,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessShaderAttributes(TokenList
 }
 
 void HLSL2GLSLConverterImpl::ConversionStream::ProcessHullShaderArguments( TokenListType::iterator &TypeToken,
-                                                                           std::vector<ShaderParameterInfo>& Params,
+                                                                           stl::vector<ShaderParameterInfo>& Params,
                                                                            String &Globals,
                                                                            std::stringstream &ReturnHandlerSS,
                                                                            String &Prologue )
@@ -3556,7 +3556,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessHullShaderArguments( Token
         triangle_ccw
     }topology = OutputTopology::undefined;
     
-    std::unordered_map<HashMapStringKey, String, HashMapStringKey::Hasher> Attributes;
+    stl::unordered_map<HashMapStringKey, String, HashMapStringKey::Hasher> Attributes;
     ProcessShaderAttributes(Token, Attributes);
 
     auto DomainIt = Attributes.find("domain");
@@ -3664,7 +3664,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessHullShaderArguments( Token
             }
 
             ProcessShaderArgument(TopLevelParam, HSInd, InVar, PrologueSS, 
-                [&](const std::vector<const ShaderParameterInfo*> &MemberStack, const ShaderParameterInfo& Param, String Getter)
+                [&](const stl::vector<const ShaderParameterInfo*> &MemberStack, const ShaderParameterInfo& Param, String Getter)
                 {
                     // All inputs from vertex shaders to the TCS are aggregated into arrays, based on the size of the input patch. 
                     // The size of these arrays is the number of input patches provided by the patch primitive.
@@ -3699,7 +3699,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessHullShaderArguments( Token
                  TopLevelParam.storageQualifier == ShaderParameterInfo::StorageQualifier::Ret)
         {
             ProcessShaderArgument(TopLevelParam, HSInd, OutVar, PrologueSS, 
-                [&](const std::vector<const ShaderParameterInfo*> &MemberStack, const ShaderParameterInfo& Param, const String &Setter)
+                [&](const stl::vector<const ShaderParameterInfo*> &MemberStack, const ShaderParameterInfo& Param, const String &Setter)
                 {
                     String SrcParamName = BuildParameterName(MemberStack, '.', "", Param.storageQualifier == ShaderParameterInfo::StorageQualifier::Ret ? "_RET_VAL_" : "");
                     if(!Setter.empty())
@@ -3723,7 +3723,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessHullShaderArguments( Token
     Globals = GlobalsSS.str() + InterfaceVarsInSS.str() + InterfaceVarsOutSS.str();
 }
 
-void ParseAttributesInComment(const String &Comment, std::unordered_map<HashMapStringKey, String, HashMapStringKey::Hasher> &Attributes)
+void ParseAttributesInComment(const String &Comment, stl::unordered_map<HashMapStringKey, String, HashMapStringKey::Hasher> &Attributes)
 {
     auto Pos = Comment.begin();
     //    /* partitioning = fractional_even, outputtopology = triangle_cw */
@@ -3788,7 +3788,7 @@ void ParseAttributesInComment(const String &Comment, std::unordered_map<HashMapS
 }
 
 void HLSL2GLSLConverterImpl::ConversionStream::ProcessDomainShaderArguments( TokenListType::iterator &TypeToken,
-                                                                             std::vector<ShaderParameterInfo>& Params,
+                                                                             stl::vector<ShaderParameterInfo>& Params,
                                                                              String &Globals,
                                                                              std::stringstream &ReturnHandlerSS,
                                                                              String &Prologue )
@@ -3798,7 +3798,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessDomainShaderArguments( Tok
     // DSOut main( HS_CONSTANT_DATA_OUTPUT input, 
     // ^
     
-    std::unordered_map<HashMapStringKey, String, HashMapStringKey::Hasher> Attributes;
+    stl::unordered_map<HashMapStringKey, String, HashMapStringKey::Hasher> Attributes;
     ParseAttributesInComment(TypeToken->Delimiter, Attributes);
     ProcessShaderAttributes(Token, Attributes);
 
@@ -3872,7 +3872,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessDomainShaderArguments( Tok
             }
 
             ProcessShaderArgument(TopLevelParam, DSInd, InVar, PrologueSS, 
-                [&](const std::vector<const ShaderParameterInfo*> &MemberStack, const ShaderParameterInfo& Param, const String &Getter)
+                [&](const stl::vector<const ShaderParameterInfo*> &MemberStack, const ShaderParameterInfo& Param, const String &Getter)
                 {
                     // All inputs from vertex shaders to the TCS are aggregated into arrays, based on the size of the input patch. 
                     // The size of these arrays is the number of input patches provided by the patch primitive.
@@ -3903,7 +3903,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessDomainShaderArguments( Tok
                  TopLevelParam.storageQualifier == ShaderParameterInfo::StorageQualifier::Ret)
         {
             ProcessShaderArgument(TopLevelParam, DSInd, OutVar, PrologueSS, 
-                [&](const std::vector<const ShaderParameterInfo*> &MemberStack, const ShaderParameterInfo& Param, const String &Setter)
+                [&](const stl::vector<const ShaderParameterInfo*> &MemberStack, const ShaderParameterInfo& Param, const String &Setter)
                 {
                     String SrcParamName = BuildParameterName(MemberStack, '.', "", Param.storageQualifier == ShaderParameterInfo::StorageQualifier::Ret ? "_RET_VAL_" : "");
                     if(Setter.empty())
@@ -4076,7 +4076,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::ProcessShaderDeclaration( TokenLi
     // TypeToken
     VERIFY_PARSER_STATE( TypeToken, TypeToken != m_Tokens.begin(), "Function \"", EntryPointToken->Literal, "\" misses return type" );
 
-    std::vector<ShaderParameterInfo> ShaderParams;
+    stl::vector<ShaderParameterInfo> ShaderParams;
     auto ArgsListEndToken = TypeToken;
     bool bIsVoid = false;
     ProcessFunctionParameters( ArgsListEndToken, ShaderParams, bIsVoid );
@@ -4422,7 +4422,7 @@ void HLSL2GLSLConverterImpl::ConversionStream::Convert(const Char* EntryPoint, S
     try
     {
         auto GLSLSource = Convert(EntryPoint, ShaderType, IncludeDefintions, SamplerSuffix);
-        StringDataBlobImpl *pDataBlob = MakeNewRCObj<StringDataBlobImpl>()( std::move(GLSLSource) );
+        StringDataBlobImpl *pDataBlob = MakeNewRCObj<StringDataBlobImpl>()( stl::move(GLSLSource) );
         pDataBlob->QueryInterface( IID_DataBlob, reinterpret_cast<IObject**>(ppGLSLSource) );
     }
     catch(std::runtime_error&)
@@ -4435,7 +4435,7 @@ String HLSL2GLSLConverterImpl::ConversionStream::Convert( const Char* EntryPoint
 {
     TokenListType TokensCopy(m_bPreserveTokens ? m_Tokens : TokenListType());
 
-    std::unordered_map<String, bool> SamplersHash;
+    stl::unordered_map<String, bool> SamplersHash;
     auto Token = m_Tokens.begin();
     // Process constant buffers, fix floating point constants and 
     // remove flow control attributes
@@ -4483,7 +4483,7 @@ String HLSL2GLSLConverterImpl::ConversionStream::Convert( const Char* EntryPoint
     // and a function argument list.
     {
         TokenListType::iterator FunctionStart = m_Tokens.end();
-        std::vector< SamplerHashType > Samplers;
+        stl::vector< SamplerHashType > Samplers;
         
         // Find all samplers in the global scope
         Samplers.emplace_back();

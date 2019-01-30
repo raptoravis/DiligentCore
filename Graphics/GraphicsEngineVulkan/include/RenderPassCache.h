@@ -100,9 +100,9 @@ public:
         {
             if(Hash == 0)
             {
-                Hash = ComputeHash(NumRenderTargets, SampleCount, DSVFormat);
+                Hash = ComputeHash(NumRenderTargets, SampleCount, Uint32{DSVFormat});
                 for(Uint32 rt = 0; rt < NumRenderTargets; ++rt)
-                    HashCombine(Hash, RTVFormats[rt]);
+                    HashCombine(Hash, Uint32{RTVFormats[rt]});
             }
             return Hash;
         }

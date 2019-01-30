@@ -26,6 +26,7 @@ set(STL
     interface/stl/array.h
     interface/stl/deque.h
     interface/stl/functional.h
+    interface/stl/list.h
     interface/stl/map.h
     interface/stl/set.h
     interface/stl/unique_ptr.h
