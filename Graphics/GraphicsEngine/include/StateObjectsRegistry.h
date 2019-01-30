@@ -30,6 +30,7 @@
 
 #include "DeviceObject.h"
 #include "STDAllocator.h"
+#include "GraphicsAccessories.h"
 
 namespace Diligent
 {
@@ -200,7 +201,7 @@ namespace Diligent
 
         /// Hash map that stores weak pointers to the referenced objects
         using HashMapElem = stl::pair< const ResourceDescType, RefCntWeakPtr<IDeviceObject> > ;
-        stl::unordered_map<ResourceDescType, RefCntWeakPtr<IDeviceObject>, stl::hash<ResourceDescType>, stl::equal_to<ResourceDescType>, STDAllocatorRawMem<HashMapElem> > m_DescToObjHashMap;
+        stl::unordered_map<ResourceDescType, RefCntWeakPtr<IDeviceObject>, Diligent::hash<ResourceDescType>, stl::equal_to<ResourceDescType>, STDAllocatorRawMem<HashMapElem> > m_DescToObjHashMap;
 
         /// Registry name used for debug output
         const String m_RegistryName;

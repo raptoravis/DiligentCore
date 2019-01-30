@@ -219,27 +219,27 @@ size_t ShaderResources::GetHash()const
         nullptr, 0,
         [&](const D3DShaderResourceAttribs& CB, Uint32)
         {
-            HashCombine(hash, CB);
+            HashCombine(hash, CB.GetHash());
         },
         [&](const D3DShaderResourceAttribs& Sam, Uint32)
         {
-            HashCombine(hash, Sam);
+            HashCombine(hash, Sam.GetHash());
         },
         [&](const D3DShaderResourceAttribs& TexSRV, Uint32)
         {
-            HashCombine(hash, TexSRV);
+            HashCombine(hash, TexSRV.GetHash());
         },
         [&](const D3DShaderResourceAttribs& TexUAV, Uint32)
         {
-            HashCombine(hash, TexUAV);
+            HashCombine(hash, TexUAV.GetHash());
         },
         [&](const D3DShaderResourceAttribs& BufSRV, Uint32)
         {
-            HashCombine(hash, BufSRV);
+            HashCombine(hash, BufSRV.GetHash());
         },
         [&](const D3DShaderResourceAttribs& BufUAV, Uint32)
         {
-            HashCombine(hash, BufUAV);
+            HashCombine(hash, BufUAV.GetHash());
         }
     );
 

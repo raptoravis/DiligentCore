@@ -61,6 +61,14 @@ public:
         bool operator == (const FramebufferCacheKey &rhs)const;
         size_t GetHash()const;
 
+        struct Hasher
+        {
+            std::size_t operator() (const FramebufferCacheKey& Key)const
+            {
+                return Key.GetHash();
+            }
+        };
+
     private:
         mutable size_t Hash = 0;
     };
@@ -73,16 +81,8 @@ private:
     
     RenderDeviceVkImpl& m_DeviceVk;
 
-    struct FramebufferCacheKeyHash
-    {
-        std::size_t operator() (const FramebufferCacheKey& Key)const
-        {
-            return Key.GetHash();
-        }
-    };
-    
     std::mutex m_Mutex;
-    stl::unordered_map<FramebufferCacheKey, VulkanUtilities::FramebufferWrapper, FramebufferCacheKeyHash> m_Cache;
+    stl::unordered_map<FramebufferCacheKey, VulkanUtilities::FramebufferWrapper, FramebufferCacheKey::Hasher> m_Cache;
     stl::unordered_multimap<VkImageView, FramebufferCacheKey> m_ViewToKeyMap;
     stl::unordered_multimap<VkRenderPass, FramebufferCacheKey> m_RenderPassToKeyMap;
 };

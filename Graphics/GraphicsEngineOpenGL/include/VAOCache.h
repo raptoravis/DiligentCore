@@ -98,7 +98,7 @@ private:
         }
     };
 
-    struct VAOCacheKeyHashFunc
+    struct VAOCacheKeyHasher
     {
         std::size_t operator() ( const VAOCacheKey& Key )const
         {
@@ -127,7 +127,7 @@ private:
 
     friend class RenderDeviceGLImpl;
     ThreadingTools::LockFlag m_CacheLockFlag;
-    stl::unordered_map<VAOCacheKey, GLObjectWrappers::GLVertexArrayObj, VAOCacheKeyHashFunc> m_Cache;
+    stl::unordered_map<VAOCacheKey, GLObjectWrappers::GLVertexArrayObj, VAOCacheKeyHasher> m_Cache;
     stl::unordered_multimap<const IPipelineState*, VAOCacheKey> m_PSOToKey;
     stl::unordered_multimap<const IBuffer*, VAOCacheKey> m_BuffToKey;
 

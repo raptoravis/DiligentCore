@@ -24,6 +24,7 @@
 #include "stl/algorithm.h"
 #include "GraphicsAccessories.h"
 #include "DebugUtilities.h"
+#include "HashUtils.h"
 
 namespace Diligent
 {
@@ -896,6 +897,110 @@ if ( (State & ExclusiveState) != 0 && (State & ~ExclusiveState) != 0 )\
     }
     
     return true;
+}
+
+template<typename EnumType>
+auto ToUnderlyingType(EnumType val)
+{
+    return static_cast<typename std::underlying_type<EnumType>::type>(val);
+}
+
+/// Hash function specialization for Diligent::SamplerDesc structure.
+size_t hash<SamplerDesc>::operator()( const SamplerDesc& SamDesc ) const
+{
+    // Sampler name is ignored in comparison operator
+    // and should not be hashed
+    return ComputeHash( // SamDesc.Name,
+                        ToUnderlyingType(SamDesc.MinFilter),
+                        ToUnderlyingType(SamDesc.MagFilter),
+                        ToUnderlyingType(SamDesc.MipFilter),
+                        ToUnderlyingType(SamDesc.AddressU),
+                        ToUnderlyingType(SamDesc.AddressV),
+                        ToUnderlyingType(SamDesc.AddressW),
+                        SamDesc.MipLODBias,
+                        SamDesc.MaxAnisotropy,
+                        ToUnderlyingType(SamDesc.ComparisonFunc),
+                        SamDesc.BorderColor[0], 
+                        SamDesc.BorderColor[1], 
+                        SamDesc.BorderColor[2], 
+                        SamDesc.BorderColor[3],
+                        SamDesc.MinLOD, SamDesc.MaxLOD );
+}
+
+/// Hash function specialization for Diligent::StencilOpDesc structure.
+size_t hash<StencilOpDesc>::operator()( const StencilOpDesc& StOpDesc ) const
+{
+    return ComputeHash( ToUnderlyingType( StOpDesc.StencilFailOp ),
+                        ToUnderlyingType( StOpDesc.StencilDepthFailOp ),
+                        ToUnderlyingType( StOpDesc.StencilPassOp ),
+                        ToUnderlyingType( StOpDesc.StencilFunc ) );
+}
+
+/// Hash function specialization for Diligent::DepthStencilStateDesc structure.
+size_t hash<DepthStencilStateDesc>::operator()( const DepthStencilStateDesc& DepthStencilDesc ) const
+{
+    return ComputeHash( DepthStencilDesc.DepthEnable,
+                        DepthStencilDesc.DepthWriteEnable,
+                        ToUnderlyingType(DepthStencilDesc.DepthFunc),
+                        DepthStencilDesc.StencilEnable,
+                        DepthStencilDesc.StencilReadMask,
+                        DepthStencilDesc.StencilWriteMask,
+                        hash<StencilOpDesc>{}(DepthStencilDesc.FrontFace),
+                        hash<StencilOpDesc>{}(DepthStencilDesc.BackFace) );
+}
+
+/// Hash function specialization for Diligent::RasterizerStateDesc structure.
+size_t hash<RasterizerStateDesc>::operator()( const RasterizerStateDesc& RasterizerDesc ) const
+{
+    return ComputeHash( ToUnderlyingType( RasterizerDesc.FillMode ),
+                        ToUnderlyingType( RasterizerDesc.CullMode ),
+                        RasterizerDesc.FrontCounterClockwise,
+                        RasterizerDesc.DepthBias,
+                        RasterizerDesc.DepthBiasClamp,
+                        RasterizerDesc.SlopeScaledDepthBias,
+                        RasterizerDesc.DepthClipEnable,
+                        RasterizerDesc.ScissorEnable,
+                        RasterizerDesc.AntialiasedLineEnable );
+}
+
+/// Hash function specialization for Diligent::BlendStateDesc structure.
+size_t hash<BlendStateDesc>::operator()( const BlendStateDesc& BSDesc ) const
+{
+    std::size_t Seed = 0;
+    for( int i = 0; i < BlendStateDesc::MaxRenderTargets; ++i )
+    {
+        const auto& rt = BSDesc.RenderTargets[i];
+        HashCombine( Seed, 
+                     rt.BlendEnable,
+                     ToUnderlyingType( rt.SrcBlend ),
+                     ToUnderlyingType( rt.DestBlend ),
+                     ToUnderlyingType( rt.BlendOp ),
+                     ToUnderlyingType( rt.SrcBlendAlpha ),
+                     ToUnderlyingType( rt.DestBlendAlpha ),
+                     ToUnderlyingType( rt.BlendOpAlpha ),
+                     rt.RenderTargetWriteMask );
+    }
+    HashCombine( Seed,
+                    BSDesc.AlphaToCoverageEnable,
+                    BSDesc.IndependentBlendEnable );
+    return Seed;
+}
+
+
+/// Hash function specialization for Diligent::TextureViewDesc structure.
+size_t hash<TextureViewDesc>::operator()( const TextureViewDesc& TexViewDesc ) const
+{
+    std::size_t Seed = 0;
+    HashCombine( Seed,
+                 ToUnderlyingType(TexViewDesc.ViewType),
+                 ToUnderlyingType(TexViewDesc.TextureDim),
+                 ToUnderlyingType(TexViewDesc.Format),
+                 TexViewDesc.MostDetailedMip,
+                 TexViewDesc.NumMipLevels,
+                 TexViewDesc.FirstArraySlice,
+                 TexViewDesc.NumArraySlices,
+                 TexViewDesc.AccessFlags );
+    return Seed;
 }
 
 }

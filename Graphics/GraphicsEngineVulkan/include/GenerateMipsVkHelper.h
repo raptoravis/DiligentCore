@@ -57,7 +57,7 @@ namespace Diligent
         RenderDeviceVkImpl& m_DeviceVkImpl;
 
         std::mutex m_PSOMutex;
-	    stl::unordered_map< TEXTURE_FORMAT, std::array<RefCntAutoPtr<IPipelineState>, 4> > m_PSOHash;
+	    stl::unordered_map< TEXTURE_FORMAT, stl::array<RefCntAutoPtr<IPipelineState>, 4>, stl::hash<Uint32> > m_PSOHash;
         static void GetGlImageFormat(const TextureFormatAttribs& FmtAttribs, stl::array<char, 16>& GlFmt);
         RefCntAutoPtr<IBuffer> m_ConstantsCB;
     };

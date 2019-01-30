@@ -27,6 +27,7 @@
 #include <memory>
 #include <cstring>
 
+#include "../../Primitives/interface/stl/functional.h"
 #include "../../Primitives/interface/Errors.h"
 #include "../../Platforms/Basic/interface/DebugUtilities.h"
 
@@ -36,9 +37,9 @@ namespace Diligent
 {
     // http://www.boost.org/doc/libs/1_35_0/doc/html/hash/combine.html
     template<typename T>
-    void HashCombine(std::size_t &Seed, const T& Val)
+    void HashCombine(std::size_t& Seed, const T& Val)
     {
-        Seed ^= std::hash<T>()(Val) + 0x9e3779b9 + (Seed << 6) + (Seed >> 2);
+        Seed ^= stl::hash<T>{}(Val) + 0x9e3779b9 + (Seed << 6) + (Seed >> 2);
     }
 
     template<typename FirstArgType, typename... RestArgsType>
@@ -165,6 +166,14 @@ namespace Diligent
             return Hash;
         }
 
+        struct Hasher
+        {
+            size_t operator()( const HashMapStringKey &Key ) const
+            {
+                return Key.GetHash();
+            }                  
+        };
+
         const Char* GetStr()const{ return StrPtr; }
 
     private:
@@ -183,17 +192,5 @@ namespace Diligent
         std::unique_ptr< Char[] > StringBuff; // Must be declared first
         const Char* StrPtr;// Must be declared after StringBuff
         mutable size_t Hash;
-    };
-}
-
-namespace std
-{
-    template<>
-    struct hash<Diligent::HashMapStringKey>
-    {
-        size_t operator()( const Diligent::HashMapStringKey &Key ) const
-        {
-            return Key.GetHash();
-        }                  
     };
 }

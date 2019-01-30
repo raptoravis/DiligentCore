@@ -31,6 +31,11 @@
 #include "../../GraphicsEngine/interface/Texture.h"
 #include "../../GraphicsEngine/interface/Buffer.h"
 #include "../../GraphicsEngine/interface/RenderDevice.h"
+#include "../../GraphicsEngine/interface/Sampler.h"
+#include "../../GraphicsEngine/interface/DepthStencilState.h"
+#include "../../GraphicsEngine/interface/RasterizerState.h"
+#include "../../GraphicsEngine/interface/BlendState.h"
+
 #include "../../../Platforms/Basic/interface/DebugUtilities.h"
 
 namespace Diligent
@@ -283,5 +288,46 @@ inline bool IsAnisotropicFilter(FILTER_TYPE FilterType)
 }
 
 bool VerifyResourceStates(RESOURCE_STATE State, bool IsTexture);
+
+// Hash functions
+template<typename T>
+struct hash;
+
+template<>
+struct hash<SamplerDesc>
+{
+    size_t operator()( const SamplerDesc& SamDesc ) const;
+};
+
+template<>
+struct hash<StencilOpDesc>
+{
+    size_t operator()( const StencilOpDesc& StOpDesc ) const;
+};
+
+template<>
+struct hash<DepthStencilStateDesc>
+{
+    size_t operator()( const DepthStencilStateDesc& DepthStencilDesc ) const;
+};
+
+template<>
+struct hash<RasterizerStateDesc>
+{
+    size_t operator()( const RasterizerStateDesc& RasterizerDesc ) const;
+};
+
+template<>
+struct hash<BlendStateDesc>
+{
+    size_t operator()( const BlendStateDesc& BSDesc ) const;
+};
+
+
+template<>
+struct hash<TextureViewDesc>
+{
+    size_t operator()( const TextureViewDesc& TexViewDesc ) const;
+};
 
 }

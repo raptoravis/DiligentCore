@@ -137,7 +137,7 @@ namespace Diligent
         stl::vector< PendingBufferOperation > m_InWorkOperations;
 
         std::mutex m_UploadBuffCacheMtx;
-        stl::unordered_map< UploadBufferDesc, stl::deque<RefCntAutoPtr<UploadBufferGL> > > m_UploadBufferCache;
+        stl::unordered_map< UploadBufferDesc, stl::deque<RefCntAutoPtr<UploadBufferGL> >, Diligent::hash<UploadBufferDesc> > m_UploadBufferCache;
     };
 
     TextureUploaderGL::TextureUploaderGL(IReferenceCounters *pRefCounters, IRenderDevice *pDevice, const TextureUploaderDesc Desc) :

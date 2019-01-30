@@ -64,12 +64,12 @@ namespace Diligent
         {}
 
         RingBuffer(RingBuffer&& rhs)noexcept : 
-            m_CompletedFrameHeads(move(rhs.m_CompletedFrameHeads)),
-            m_Tail          (rhs.m_Tail),
-            m_Head          (rhs.m_Head),
-            m_MaxSize       (rhs.m_MaxSize),
-            m_UsedSize      (rhs.m_UsedSize),
-            m_CurrFrameSize (rhs.m_CurrFrameSize)
+            m_CompletedFrameHeads(stl::move(rhs.m_CompletedFrameHeads)),
+            m_Tail               (rhs.m_Tail),
+            m_Head               (rhs.m_Head),
+            m_MaxSize            (rhs.m_MaxSize),
+            m_UsedSize           (rhs.m_UsedSize),
+            m_CurrFrameSize      (rhs.m_CurrFrameSize)
         {
             rhs.m_Tail          = 0;
             rhs.m_Head          = 0;
@@ -80,12 +80,12 @@ namespace Diligent
 
         RingBuffer& operator = (RingBuffer&& rhs)noexcept
         {
-            m_CompletedFrameHeads = move(rhs.m_CompletedFrameHeads);
-            m_Tail          = rhs.m_Tail;
-            m_Head          = rhs.m_Head;
-            m_MaxSize       = rhs.m_MaxSize;
-            m_UsedSize      = rhs.m_UsedSize;
-            m_CurrFrameSize = rhs.m_CurrFrameSize;
+            m_CompletedFrameHeads = stl::move(rhs.m_CompletedFrameHeads);
+            m_Tail                = rhs.m_Tail;
+            m_Head                = rhs.m_Head;
+            m_MaxSize             = rhs.m_MaxSize;
+            m_UsedSize            = rhs.m_UsedSize;
+            m_CurrFrameSize       = rhs.m_CurrFrameSize;
 
             rhs.m_MaxSize       = 0;
             rhs.m_Tail          = 0;

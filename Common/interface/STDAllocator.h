@@ -123,6 +123,11 @@ struct STDAllocator
         return allocate(count);
     }
 
+    T* allocate(std::size_t count, std::size_t alignment, std::size_t offset)
+    {
+        return allocate(count, alignment, offset, 0);
+    }
+
     T* allocate(std::size_t count, int flags)
     {
         return allocate(count);

@@ -67,20 +67,17 @@ namespace Diligent
                    NumArguments == rhs.NumArguments;
         }
 
+        struct Hasher
+        {
+            size_t operator()( const FunctionStubHashKey &Key ) const
+            {
+                return ComputeHash(Key.Object.GetHash(), Key.Function.GetHash(), Key.NumArguments);
+            }
+        };
+
         HashMapStringKey Object;
         HashMapStringKey Function;
         Uint32 NumArguments;
-    };
-}
-
-namespace std
-{
-    template<>struct hash < Diligent::FunctionStubHashKey >
-    {
-        size_t operator()( const Diligent::FunctionStubHashKey &Key ) const
-        {
-            return ComputeHash(Key.Object, Key.Function, Key.NumArguments);
-        }
     };
 }
 
@@ -137,7 +134,7 @@ namespace Diligent
             ObjectsTypeHashType(ObjectsTypeHashType&) = delete;
             ObjectsTypeHashType& operator = (ObjectsTypeHashType&) = delete;
 
-            std::unordered_map<HashMapStringKey, HLSLObjectInfo> m;
+            std::unordered_map<HashMapStringKey, HLSLObjectInfo, HashMapStringKey::Hasher> m;
         };
         
         struct GLSLStubInfo
@@ -152,7 +149,7 @@ namespace Diligent
         // Hash map that maps GLSL object, method and number of arguments
         // passed to the original function, to the GLSL stub function
         // Example: {"sampler2D", "Sample", 2} -> {"Sample_2", "_SWIZZLE"}
-        std::unordered_map<FunctionStubHashKey, GLSLStubInfo> m_GLSLStubs;
+        std::unordered_map<FunctionStubHashKey, GLSLStubInfo, FunctionStubHashKey::Hasher> m_GLSLStubs;
 
         enum class TokenType
         {
@@ -361,7 +358,7 @@ namespace Diligent
             void ProcessHullShaderConstantFunction( const Char *FuncName, bool &bTakesInputPatch );
 
             void ProcessShaderAttributes( TokenListType::iterator &TypeToken,
-                                          std::unordered_map<HashMapStringKey, String>& Attributes);
+                                          std::unordered_map<HashMapStringKey, String, HashMapStringKey::Hasher>& Attributes);
 
             void ProcessHullShaderArguments( TokenListType::iterator &TypeToken,
                                              std::vector<ShaderParameterInfo>& Params,
@@ -390,7 +387,7 @@ namespace Diligent
             TokenListType m_Tokens;
 
             // List of tokens defining structs
-            std::unordered_map<HashMapStringKey, TokenListType::iterator> m_StructDefinitions;
+            std::unordered_map<HashMapStringKey, TokenListType::iterator, HashMapStringKey::Hasher> m_StructDefinitions;
 
             // Stack of parsed objects, for every scope level.
             // There are currently only two levels: 
@@ -410,20 +407,20 @@ namespace Diligent
         
         // HLSL keyword->token info hash map
         // Example: "Texture2D" -> TokenInfo(TokenType::Texture2D, "Texture2D")
-        std::unordered_map<HashMapStringKey, TokenInfo> m_HLSLKeywords;
+        std::unordered_map<HashMapStringKey, TokenInfo, HashMapStringKey::Hasher> m_HLSLKeywords;
 
         // Set of all GLSL image types (image1D, uimage1D, iimage1D, image2D, ... )
-        std::unordered_set<HashMapStringKey> m_ImageTypes;
+        std::unordered_set<HashMapStringKey, HashMapStringKey::Hasher> m_ImageTypes;
 
         // Set of all HLSL atomic operations (InterlockedAdd, InterlockedOr, ...)
-        std::unordered_set<HashMapStringKey> m_AtomicOperations;
+        std::unordered_set<HashMapStringKey, HashMapStringKey::Hasher> m_AtomicOperations;
 
         // HLSL semantic -> glsl variable, for every shader stage and input/output type (in == 0, out == 1)
         // Example: [vertex, output] SV_Position -> gl_Position
         //          [fragment, input] SV_Position -> gl_FragCoord
         static constexpr int InVar = 0;
         static constexpr int OutVar = 1;
-        std::unordered_map<HashMapStringKey, String> m_HLSLSemanticToGLSLVar[6][2];
+        std::unordered_map<HashMapStringKey, String, HashMapStringKey::Hasher> m_HLSLSemanticToGLSLVar[6][2];
     };
 }
 

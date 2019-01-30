@@ -114,7 +114,7 @@ DescriptorHeapAllocation DescriptorHeapAllocationManager::Allocate(uint32_t Coun
     if (m_HeapDesc.Flags & D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE)
         GPUHandle.ptr += Allocation.UnalignedOffset * m_DescriptorSize;
 
-    m_MaxAllocatedSize = std::max(m_MaxAllocatedSize, m_FreeBlockManager.GetUsedSize());
+    m_MaxAllocatedSize = stl::max(m_MaxAllocatedSize, m_FreeBlockManager.GetUsedSize());
 
 #ifdef DEVELOPMENT
     ++m_AllocationsCounter;

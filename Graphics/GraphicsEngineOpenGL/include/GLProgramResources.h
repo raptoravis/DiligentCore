@@ -258,7 +258,7 @@ namespace Diligent
             return Index < m_VariablesByIndex.size() ? m_VariablesByIndex[Index] : nullptr;
         }
 
-        const stl::unordered_map<HashMapStringKey, CGLShaderVariable>& GetVariables(){return m_VariableHash;}
+        const stl::unordered_map<HashMapStringKey, CGLShaderVariable, HashMapStringKey::Hasher>& GetVariables(){return m_VariableHash;}
         
         Uint32 GetVariableCount()const
         {
@@ -277,7 +277,7 @@ namespace Diligent
         stl::vector<StorageBlockInfo>  m_StorageBlocks;
         
         /// Hash map to look up shader variables by name.
-        stl::unordered_map<HashMapStringKey, CGLShaderVariable> m_VariableHash;
+        stl::unordered_map<HashMapStringKey, CGLShaderVariable, HashMapStringKey::Hasher> m_VariableHash;
         stl::vector<CGLShaderVariable*>                         m_VariablesByIndex;
         // When adding new member DO NOT FORGET TO UPDATE GLProgramResources( GLProgramResources&& ProgramResources )!!!
     };

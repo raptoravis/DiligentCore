@@ -545,25 +545,26 @@ void ShaderResources::Initialize(ID3DBlob*           pShaderByteCode,
     VERIFY(CurrSampler == GetNumSamplers(), "Not all Samplers are initialized which will cause a crash when ~D3DShaderResourceAttribs() is called" );
 }
 
-}
 
-namespace std
+template<typename T>
+struct hash;
+
+template<>
+struct hash<D3DShaderResourceAttribs>
 {
-    template<>
-    struct hash<Diligent::D3DShaderResourceAttribs>
+    size_t operator()(const D3DShaderResourceAttribs& Attribs) const
     {
-        size_t operator()(const Diligent::D3DShaderResourceAttribs &Attribs) const
-        {
-            return Attribs.GetHash();
-        }
-    };
+        return Attribs.GetHash();
+    }
+};
 
-    template<>
-    struct hash<Diligent::ShaderResources>
+template<>
+struct hash<ShaderResources>
+{
+    size_t operator()(const ShaderResources& Res) const
     {
-        size_t operator()(const Diligent::ShaderResources &Res) const
-        {
-            return Res.GetHash();
-        }
-    };
+        return Res.GetHash();
+    }
+};
+
 }

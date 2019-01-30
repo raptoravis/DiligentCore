@@ -28,20 +28,21 @@
 #include "../../../Common/interface/HashUtils.h"
 #include "../../../Common/interface/RefCntAutoPtr.h"
 
-namespace std
-{
-    template<>
-    struct hash<Diligent::UploadBufferDesc>
-    {
-        size_t operator()(const Diligent::UploadBufferDesc &Desc) const
-        {
-            return Diligent::ComputeHash(Desc.Width, Desc.Height, Desc.Depth, static_cast<Diligent::Int32>(Desc.Format));
-        }
-    };
-}
 
 namespace Diligent
 {
+    template<typename T>
+    struct hash;
+
+    template<>
+    struct hash<UploadBufferDesc>
+    {
+        size_t operator()(const UploadBufferDesc& Desc) const
+        {
+            return ComputeHash(Desc.Width, Desc.Height, Desc.Depth, static_cast<Int32>(Desc.Format));
+        }
+    };
+
     class UploadBufferBase : public ObjectBase<IUploadBuffer>
     {
     public:

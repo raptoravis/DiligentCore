@@ -167,7 +167,7 @@ namespace Diligent
         stl::vector< PendingBufferOperation > m_InWorkOperations;
 
         std::mutex m_UploadBuffCacheMtx;
-        stl::unordered_map< UploadBufferDesc, stl::deque< RefCntAutoPtr<UploadBufferD3D11> > > m_UploadBufferCache;
+        stl::unordered_map< UploadBufferDesc, stl::deque< RefCntAutoPtr<UploadBufferD3D11> >, Diligent::hash<UploadBufferDesc> > m_UploadBufferCache;
     };
 
     TextureUploaderD3D11::TextureUploaderD3D11(IReferenceCounters *pRefCounters, IRenderDevice *pDevice, const TextureUploaderDesc Desc) :

@@ -107,6 +107,14 @@ public:
             return Hash;
         }
 
+        struct Hasher
+        {
+            std::size_t operator() (const RenderPassCacheKey& Key)const
+            {
+                return Key.GetHash();
+            }
+        };
+
     private:
         mutable size_t Hash = 0;
     };
@@ -114,18 +122,10 @@ public:
     VkRenderPass GetRenderPass(const RenderPassCacheKey& Key);
 
 private:
-
-    struct RenderPassCacheKeyHash
-    {
-        std::size_t operator() (const RenderPassCacheKey& Key)const
-        {
-            return Key.GetHash();
-        }
-    };
     
     RenderDeviceVkImpl& m_DeviceVkImpl;
     std::mutex m_Mutex;
-    stl::unordered_map<RenderPassCacheKey, VulkanUtilities::RenderPassWrapper, RenderPassCacheKeyHash> m_Cache;
+    stl::unordered_map<RenderPassCacheKey, VulkanUtilities::RenderPassWrapper, RenderPassCacheKey::Hasher> m_Cache;
 };
 
 }

@@ -79,17 +79,16 @@ private:
             for( int rt = 0; rt < MaxRenderTargets; ++rt )
                 RTIds[rt] = 0;
         }
-    };
 
-    struct FBOCacheKeyHashFunc
-    {
-        std::size_t operator() ( const FBOCacheKey& Key )const;
+        struct Hasher
+        {
+            std::size_t operator() ( const FBOCacheKey& Key )const;
+        };
     };
-
 
     friend class RenderDeviceGLImpl;
     ThreadingTools::LockFlag m_CacheLockFlag;
-    stl::unordered_map<FBOCacheKey, GLObjectWrappers::GLFrameBufferObj, FBOCacheKeyHashFunc> m_Cache;
+    stl::unordered_map<FBOCacheKey, GLObjectWrappers::GLFrameBufferObj, FBOCacheKey::Hasher> m_Cache;
     
     // Multimap that sets up correspondence between unique texture id and all
     // FBOs it is used in

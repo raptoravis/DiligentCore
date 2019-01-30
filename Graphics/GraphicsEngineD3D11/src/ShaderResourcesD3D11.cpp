@@ -114,7 +114,7 @@ ShaderResourcesD3D11::ShaderResourcesD3D11(RenderDeviceD3D11Impl* pDeviceD3D11Im
 
         ~NewResourceHandler()
         {
-            Resources.InitStaticSamplers(move(m_StaticSamplers));
+            Resources.InitStaticSamplers(stl::move(m_StaticSamplers));
         }
 
     private:

@@ -59,7 +59,7 @@ namespace Diligent
         {
             if( Hash == 0 )
             {
-                Hash = ComputeHash( StrKey, ArrayIndex );
+                Hash = ComputeHash( StrKey.GetHash(), ArrayIndex );
             }
 
             return Hash;

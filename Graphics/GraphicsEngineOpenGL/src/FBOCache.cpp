@@ -31,6 +31,7 @@
 #include "RenderDeviceGLImpl.h"
 #include "TextureBaseGL.h"
 #include "GLContextState.h"
+#include "GraphicsAccessories.h"
 
 namespace Diligent
 {
@@ -62,11 +63,11 @@ bool FBOCache::FBOCacheKey::operator == (const FBOCacheKey &Key)const
     return true;
 }
 
-std::size_t FBOCache::FBOCacheKeyHashFunc::operator() ( const FBOCacheKey& Key )const
+std::size_t FBOCache::FBOCacheKey::Hasher::operator() ( const FBOCacheKey& Key )const
 {
     if( Key.Hash == 0 )
     {
-        stl::hash<TextureViewDesc> TexViewDescHasher;
+        hash<TextureViewDesc> TexViewDescHasher;
         Key.Hash = 0;
         HashCombine( Key.Hash, Key.NumRenderTargets );
         for( Uint32 rt = 0; rt < Key.NumRenderTargets; ++rt )
