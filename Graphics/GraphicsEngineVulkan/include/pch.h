@@ -46,28 +46,6 @@
 
 #include "GraphicsTypes.h"
 
-namespace Diligent
-{
-    template<typename T>
-    struct hash;
-
-    template<>struct hash<TEXTURE_FORMAT>
-    {
-        size_t operator()( const TEXTURE_FORMAT &fmt ) const
-        {
-            return std::hash<size_t>()(size_t{fmt});
-        }
-    };
-
-    template<>struct hash<VkFormat>
-    {
-        size_t operator()( const VkFormat &fmt ) const
-        {
-            return std::hash<int>()(int{fmt});
-        }
-    };
-}
-
 #include "PlatformDefinitions.h"
 #include "Errors.h"
 #include "RefCntAutoPtr.h"

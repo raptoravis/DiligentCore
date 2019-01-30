@@ -437,26 +437,3 @@ private:
 };
 
 }
-
-namespace std
-{
-#if 0
-    template<>
-    struct hash<Diligent::D3DShaderResourceAttribs>
-    {
-        size_t operator()(const Diligent::D3DShaderResourceAttribs &Attribs) const
-        {
-            return Attribs.GetHash();
-        }
-    };
-
-    template<>
-    struct hash<Diligent::ShaderResources>
-    {
-        size_t operator()(const Diligent::ShaderResources &Res) const
-        {
-            return Res.GetHash();
-        }
-    };
-#endif
-}

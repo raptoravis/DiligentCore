@@ -448,7 +448,7 @@ public:
 
 private:
     TEXTURE_FORMAT m_VkFmtToTexFmtMap[VK_FORMAT_RANGE_SIZE] = {};
-    std::unordered_map<VkFormat, TEXTURE_FORMAT> m_VkFmtToTexFmtMapExt;
+    std::unordered_map<VkFormat, TEXTURE_FORMAT, stl::hash<std::underlying_type<VkFormat>::type>> m_VkFmtToTexFmtMapExt;
 };
 
 TEXTURE_FORMAT VkFormatToTexFormat(VkFormat VkFmt)
