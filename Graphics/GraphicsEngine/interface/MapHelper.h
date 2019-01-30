@@ -73,11 +73,11 @@ public:
 
     /// Move constructor: takes over resource ownership from Helper
     MapHelper(MapHelper&& Helper) :
-        m_pBuffer       ( move(Helper.m_pBuffer) ),
-        m_pMappedData   ( move(Helper.m_pMappedData) ),
-        m_pContext      ( move(Helper.m_pContext) ),
-        m_MapType       ( move(Helper.m_MapType) ),
-        m_MapFlags      ( move(Helper.m_MapFlags) )
+        m_pBuffer       ( stl::move(Helper.m_pBuffer) ),
+        m_pMappedData   ( stl::move(Helper.m_pMappedData) ),
+        m_pContext      ( stl::move(Helper.m_pContext) ),
+        m_MapType       ( stl::move(Helper.m_MapType) ),
+        m_MapFlags      ( stl::move(Helper.m_MapFlags) )
     {
         Helper.m_pBuffer     = nullptr;
         Helper.m_pContext    = nullptr;
@@ -89,11 +89,11 @@ public:
     /// Move-assignement operator: takes over resource ownership from Helper
     MapHelper& operator = (MapHelper&& Helper)
     {
-        m_pBuffer       = move(Helper.m_pBuffer);
-        m_pMappedData   = move(Helper.m_pMappedData);
-        m_pContext      = move( Helper.m_pContext );
-        m_MapType       = move(Helper.m_MapType);
-        m_MapFlags      = move(Helper.m_MapFlags);
+        m_pBuffer       = stl::move(Helper.m_pBuffer);
+        m_pMappedData   = stl::move(Helper.m_pMappedData);
+        m_pContext      = stl::move( Helper.m_pContext );
+        m_MapType       = stl::move(Helper.m_MapType);
+        m_MapFlags      = stl::move(Helper.m_MapFlags);
         Helper.m_pBuffer     = nullptr;
         Helper.m_pContext    = nullptr;
         Helper.m_pMappedData = nullptr;
