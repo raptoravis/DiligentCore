@@ -21,10 +21,12 @@
  *  of the possibility of such damages.
  */
 
-#include <unordered_set>
-#include <unordered_map>
 #include <memory>
-#include <array>
+#include "stl/vector.h"
+#include "stl/utility.h"
+#include "stl/unordered_map.h"
+#include "stl/unordered_set.h"
+#include "stl/unique_ptr.h"
 
 #if PLATFORM_ANDROID
     // Android specific include files.
@@ -314,7 +316,7 @@ static void LogCompilerError(const char* DebugOutputMessage,
     }
 }
 
-static std::vector<unsigned int> CompileShaderInternal(glslang::TShader&           Shader,
+static stl::vector<unsigned int> CompileShaderInternal(glslang::TShader&           Shader,
                                                        EShMessages                 messages,
                                                        glslang::TShader::Includer* pIncluder,
                                                        const char*                 ShaderSource,
@@ -347,7 +349,7 @@ static std::vector<unsigned int> CompileShaderInternal(glslang::TShader&        
     std::vector<unsigned int> spirv;
     glslang::GlslangToSpv(*Program.getIntermediate(Shader.getStage()), spirv);
 
-    return std::move(spirv);
+    return stl::vector<unsigned int>(spirv);
 }
 
 
@@ -384,7 +386,7 @@ public:
             };
 
         m_IncludeRes.emplace(pNewInclude);
-        m_DataBlobs.emplace(pNewInclude, std::move(pFileData));
+        m_DataBlobs.emplace(pNewInclude, stl::move(pFileData));
         return pNewInclude;
     }
 
@@ -407,11 +409,11 @@ public:
 
 private:
     IShaderSourceInputStreamFactory* const m_pInputStreamFactory;
-    std::unordered_set<std::unique_ptr<IncludeResult>> m_IncludeRes;
-    std::unordered_map<IncludeResult*, RefCntAutoPtr<IDataBlob>> m_DataBlobs;
+    stl::unordered_set<stl::unique_ptr<IncludeResult>> m_IncludeRes;
+    stl::unordered_map<IncludeResult*, RefCntAutoPtr<IDataBlob>> m_DataBlobs;
 };
 
-std::vector<unsigned int> HLSLtoSPIRV(const ShaderCreationAttribs& Attribs, IDataBlob** ppCompilerOutput)
+stl::vector<unsigned int> HLSLtoSPIRV(const ShaderCreationAttribs& Attribs, IDataBlob** ppCompilerOutput)
 {
     EShLanguage ShLang = ShaderTypeToShLanguage(Attribs.Desc.ShaderType);
     glslang::TShader Shader(ShLang);
@@ -477,7 +479,7 @@ std::vector<unsigned int> HLSLtoSPIRV(const ShaderCreationAttribs& Attribs, IDat
     return CompileShaderInternal(Shader, messages, &Includer, SourceCode, SourceCodeLen, ppCompilerOutput);
 }
 
-std::vector<unsigned int> GLSLtoSPIRV(const SHADER_TYPE ShaderType, const char* ShaderSource, int SourceCodeLen, IDataBlob** ppCompilerOutput) 
+stl::vector<unsigned int> GLSLtoSPIRV(const SHADER_TYPE ShaderType, const char* ShaderSource, int SourceCodeLen, IDataBlob** ppCompilerOutput) 
 {
     EShLanguage ShLang = ShaderTypeToShLanguage(ShaderType);
     glslang::TShader Shader(ShLang);

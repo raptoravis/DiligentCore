@@ -33,8 +33,9 @@
 //    | Uniform Buffers | Storage Buffers | Storage Images | Sampled Images | Atomic Counters | Separate Samplers | Separate Images |  Immutable Samplers  |   Stage Inputs   |   Resource Names   |
 
 #include <memory>
-#include <vector>
 #include <sstream>
+#include "stl/vector.h"
+#include "stl/unique_ptr.h"
 
 #include "Shader.h"
 #include "Sampler.h"
@@ -208,7 +209,7 @@ class SPIRVShaderResources
 public:
     SPIRVShaderResources(IMemoryAllocator&      Allocator,
                          IRenderDevice*         pRenderDevice,
-                         std::vector<uint32_t>  spirv_binary,
+                         stl::vector<uint32_t>  spirv_binary,
                          const ShaderDesc&      shaderDesc,
                          const char*            CombinedSamplerSuffix,
                          bool                   LoadShaderStageInputs,
@@ -416,7 +417,7 @@ private:
 
     // Memory buffer that holds all resources as continuous chunk of memory:
     // |  UBs  |  SBs  |  StrgImgs  |  SmplImgs  |  ACs  |  SepSamplers  |  SepImgs  | Immutable Samplers | Stage Inputs | Resource Names |
-    std::unique_ptr< void, STDDeleterRawMem<void> > m_MemoryBuffer;
+    stl::unique_ptr< void, STDDeleterRawMem<void> > m_MemoryBuffer;
     StringPool m_ResourceNames;
 
     const char* m_CombinedSamplerSuffix = nullptr;

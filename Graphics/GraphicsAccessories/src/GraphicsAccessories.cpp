@@ -900,7 +900,7 @@ if ( (State & ExclusiveState) != 0 && (State & ~ExclusiveState) != 0 )\
 }
 
 template<typename EnumType>
-auto ToUnderlyingType(EnumType val)
+auto ToUnderlyingType(EnumType val) -> typename std::underlying_type<EnumType>::type
 {
     return static_cast<typename std::underlying_type<EnumType>::type>(val);
 }

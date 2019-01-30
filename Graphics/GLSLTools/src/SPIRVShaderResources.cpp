@@ -22,6 +22,7 @@
  */
 
 #include <iomanip>
+#include "stl/utility.h"
 #include "SPIRVShaderResources.h"
 #include "spirv_parser.hpp"
 #include "spirv_cross.hpp"
@@ -147,7 +148,7 @@ const std::string& GetUBName(spirv_cross::Compiler& Compiler, const spirv_cross:
 
 SPIRVShaderResources::SPIRVShaderResources(IMemoryAllocator&      Allocator, 
                                            IRenderDevice*         pRenderDevice,
-                                           std::vector<uint32_t>  spirv_binary,
+                                           stl::vector<uint32_t>  spirv_binary,
                                            const ShaderDesc&      shaderDesc,
                                            const char*            CombinedSamplerSuffix,
                                            bool                   LoadShaderStageInputs,
@@ -158,7 +159,7 @@ SPIRVShaderResources::SPIRVShaderResources(IMemoryAllocator&      Allocator,
 	spirv_cross::Parser parser(move(spirv_binary));
 	parser.parse();
     auto ParsedIRSource = parser.get_parsed_ir().source;
-    spirv_cross::Compiler Compiler(std::move(parser.get_parsed_ir()));
+    spirv_cross::Compiler Compiler(stl::move(parser.get_parsed_ir()));
 
     spv::ExecutionModel ExecutionModel = ShaderTypeToExecutionModel(shaderDesc.ShaderType);
     auto EntryPoints = Compiler.get_entry_points_and_stages();
@@ -563,7 +564,7 @@ void SPIRVShaderResources::Initialize(IMemoryAllocator&       Allocator,
     if (MemorySize)
     {
         auto *pRawMem = Allocator.Allocate(MemorySize, "Memory for shader resources", __FILE__, __LINE__);
-        m_MemoryBuffer = std::unique_ptr<void, STDDeleterRawMem<void>>(pRawMem, Allocator);
+        m_MemoryBuffer = stl::unique_ptr<void, STDDeleterRawMem<void>>(pRawMem, Allocator);
         char* NamesPool = reinterpret_cast<char*>(m_MemoryBuffer.get()) + 
                           m_TotalResources       * sizeof(SPIRVShaderResourceAttribs) +
                           m_NumImmutableSamplers * sizeof(SamplerPtrType) +
