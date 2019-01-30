@@ -657,7 +657,7 @@ VkPipelineRasterizationStateCreateInfo RasterizerStateDesc_To_VkRasterizationSta
     RSStateCI.flags = 0; // Reserved for future use.
 
     // If depth clamping is enabled, before the incoming fragment's zf is compared to za, zf is clamped to 
-    // [min(n,f), max(n,f)], where n and f are the minDepth and maxDepth depth range values of the viewport 
+    // [stl::min(n,f), stl::max(n,f)], where n and f are the minDepth and maxDepth depth range values of the viewport 
     // used by this fragment, respectively (25.10)
     // This value is the opposite of clip enable
     RSStateCI.depthClampEnable = RasterizerDesc.DepthClipEnable ? VK_FALSE : VK_TRUE;
@@ -805,7 +805,7 @@ public:
     }
 
 private:
-    array<VkBlendFactor, BLEND_FACTOR_NUM_FACTORS> m_Map = {};
+    stl::array<VkBlendFactor, BLEND_FACTOR_NUM_FACTORS> m_Map = {};
 };
 
 
@@ -840,7 +840,7 @@ public:
     }
 
 private:
-    array<VkLogicOp, LOGIC_OP_NUM_OPERATIONS> m_Map = {};
+    stl::array<VkLogicOp, LOGIC_OP_NUM_OPERATIONS> m_Map = {};
 };
 
 class BlendOperationToVkBlendOp
@@ -863,7 +863,7 @@ public:
     }
 
 private:
-    array<VkBlendOp, BLEND_OPERATION_NUM_OPERATIONS> m_Map = {};
+    stl::array<VkBlendOp, BLEND_OPERATION_NUM_OPERATIONS> m_Map = {};
 };
 
 VkPipelineColorBlendAttachmentState RenderTargetBlendDescToVkColorBlendAttachmentState(const RenderTargetBlendDesc &RTBlendDesc)
@@ -887,9 +887,9 @@ VkPipelineColorBlendAttachmentState RenderTargetBlendDescToVkColorBlendAttachmen
     return AttachmentBlendState;
 }
 
-void BlendStateDesc_To_VkBlendStateCI(const BlendStateDesc&                         BSDesc, 
-                                      VkPipelineColorBlendStateCreateInfo&          ColorBlendStateCI,
-                                      vector<VkPipelineColorBlendAttachmentState>&  ColorBlendAttachments)
+void BlendStateDesc_To_VkBlendStateCI(const BlendStateDesc&                              BSDesc, 
+                                      VkPipelineColorBlendStateCreateInfo&               ColorBlendStateCI,
+                                      stl::vector<VkPipelineColorBlendAttachmentState>&  ColorBlendAttachments)
 {
     // Color blend state (26.1)
     static const LogicOperationToVkLogicOp LogicOpToVkLogicOp;
@@ -927,10 +927,10 @@ VkVertexInputRate LayoutElemFrequencyToVkInputRate(LayoutElement::FREQUENCY freq
     }
 }
 
-void InputLayoutDesc_To_VkVertexInputStateCI(const InputLayoutDesc&                                         LayoutDesc,
-                                             VkPipelineVertexInputStateCreateInfo&                          VertexInputStateCI,
-                                             array<VkVertexInputBindingDescription, iMaxLayoutElements>&    BindingDescriptions,
-                                             array<VkVertexInputAttributeDescription, iMaxLayoutElements>&  AttributeDescription)
+void InputLayoutDesc_To_VkVertexInputStateCI(const InputLayoutDesc&                                              LayoutDesc,
+                                             VkPipelineVertexInputStateCreateInfo&                               VertexInputStateCI,
+                                             stl::array<VkVertexInputBindingDescription, iMaxLayoutElements>&    BindingDescriptions,
+                                             stl::array<VkVertexInputAttributeDescription, iMaxLayoutElements>&  AttributeDescription)
 {
     // Vertex input description (20.2)
     VertexInputStateCI.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -940,7 +940,7 @@ void InputLayoutDesc_To_VkVertexInputStateCI(const InputLayoutDesc&             
     VertexInputStateCI.pVertexBindingDescriptions = BindingDescriptions.data();
     VertexInputStateCI.vertexAttributeDescriptionCount = LayoutDesc.NumElements;
     VertexInputStateCI.pVertexAttributeDescriptions = AttributeDescription.data();
-    array<Int32, iMaxLayoutElements> BufferSlot2BindingDescInd;
+    stl::array<Int32, iMaxLayoutElements> BufferSlot2BindingDescInd;
     BufferSlot2BindingDescInd.fill(-1);
     for(Uint32 elem=0; elem < LayoutDesc.NumElements; ++elem)
     {
@@ -1167,7 +1167,7 @@ public:
 
 private:
     static constexpr const Uint32 MaxFlagBitPos = 15;
-    array<VkAccessFlags, MaxFlagBitPos + 1> FlagBitPosToVkAccessFlagsMap;
+    stl::array<VkAccessFlags, MaxFlagBitPos + 1> FlagBitPosToVkAccessFlagsMap;
 };
 
 
@@ -1245,7 +1245,7 @@ public:
 
 private:
     static constexpr const Uint32 MaxFlagBitPos = 20;
-    array<RESOURCE_STATE, MaxFlagBitPos + 1> FlagBitPosToResourceState;
+    stl::array<RESOURCE_STATE, MaxFlagBitPos + 1> FlagBitPosToResourceState;
 };
 
 

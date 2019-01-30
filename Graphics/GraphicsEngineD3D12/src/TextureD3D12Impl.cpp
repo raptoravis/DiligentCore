@@ -207,7 +207,7 @@ TextureD3D12Impl :: TextureD3D12Impl(IReferenceCounters*        pRefCounters,
         auto InitContext = pRenderDeviceD3D12->AllocateCommandContext();
 	    // copy data to the intermediate upload heap and then schedule a copy from the upload heap to the default texture
         VERIFY_EXPR(CheckState(RESOURCE_STATE_COPY_DEST));
-        vector<D3D12_SUBRESOURCE_DATA, STDAllocatorRawMem<D3D12_SUBRESOURCE_DATA> > D3D12SubResData(InitData.NumSubresources, D3D12_SUBRESOURCE_DATA(), STD_ALLOCATOR_RAW_MEM(D3D12_SUBRESOURCE_DATA, GetRawAllocator(), "Allocator for vector<D3D12_SUBRESOURCE_DATA>") );
+        stl::vector<D3D12_SUBRESOURCE_DATA, STDAllocatorRawMem<D3D12_SUBRESOURCE_DATA> > D3D12SubResData(InitData.NumSubresources, D3D12_SUBRESOURCE_DATA(), STD_ALLOCATOR_RAW_MEM(D3D12_SUBRESOURCE_DATA, GetRawAllocator(), "Allocator for vector<D3D12_SUBRESOURCE_DATA>") );
         for(size_t subres=0; subres < D3D12SubResData.size(); ++subres)
         {
             D3D12SubResData[subres].pData = InitData.pSubResources[subres].pData;
@@ -244,7 +244,7 @@ TextureD3D12Impl :: TextureD3D12Impl(IReferenceCounters*        pRefCounters,
         // Add reference to the object to the release queue to keep it alive
         // until copy operation is complete.  This must be done after
         // submitting command list for execution!
-        pRenderDeviceD3D12->SafeReleaseDeviceObject(move(UploadBuffer), Uint64{1} << QueueIndex);
+        pRenderDeviceD3D12->SafeReleaseDeviceObject(stl::move(UploadBuffer), Uint64{1} << QueueIndex);
     }
 
     if(m_Desc.MiscFlags & MISC_TEXTURE_FLAG_GENERATE_MIPS)
@@ -400,7 +400,7 @@ void TextureD3D12Impl::CreateViewInternal( const struct TextureViewDesc &ViewDes
         }
 
         auto pViewD3D12 = NEW_RC_OBJ(TexViewAllocator, "TextureViewD3D12Impl instance", TextureViewD3D12Impl, bIsDefaultView ? this : nullptr)
-                                    (GetDevice(), UpdatedViewDesc, this, move(ViewHandleAlloc), bIsDefaultView );
+                                    (GetDevice(), UpdatedViewDesc, this, stl::move(ViewHandleAlloc), bIsDefaultView );
         VERIFY( pViewD3D12->GetDesc().ViewType == ViewDesc.ViewType, "Incorrect view type" );
 
         if( bIsDefaultView )
@@ -419,7 +419,7 @@ TextureD3D12Impl :: ~TextureD3D12Impl()
 {
     // D3D12 object can only be destroyed when it is no longer used by the GPU
     auto *pDeviceD3D12Impl = ValidatedCast<RenderDeviceD3D12Impl>(GetDevice());
-    pDeviceD3D12Impl->SafeReleaseDeviceObject(move(m_pd3d12Resource), m_Desc.CommandQueueMask);
+    pDeviceD3D12Impl->SafeReleaseDeviceObject(stl::move(m_pd3d12Resource), m_Desc.CommandQueueMask);
 }
 
 void TextureD3D12Impl::CreateSRV( TextureViewDesc& SRVDesc, D3D12_CPU_DESCRIPTOR_HANDLE SRVHandle )

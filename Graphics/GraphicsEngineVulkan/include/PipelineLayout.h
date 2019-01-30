@@ -52,7 +52,7 @@ public:
     void Finalize(const VulkanUtilities::VulkanLogicalDevice& LogicalDevice);
 
     VkPipelineLayout GetVkPipelineLayout()const{return m_LayoutMgr.GetVkPipelineLayout();}
-    array<Uint32, 2> GetDescriptorSetSizes(Uint32& NumSets)const;
+    stl::array<Uint32, 2> GetDescriptorSetSizes(Uint32& NumSets)const;
     void InitResourceCache(RenderDeviceVkImpl*    pDeviceVkImpl,
                            ShaderResourceCacheVk& ResourceCache,
                            IMemoryAllocator&      CacheMemAllocator,
@@ -64,7 +64,7 @@ public:
                               Uint32&                           DescriptorSet, 
                               Uint32&                           Binding,
                               Uint32&                           OffsetInCache,
-                              vector<uint32_t>&                 SPIRV);
+                              stl::vector<uint32_t>&            SPIRV);
 
     Uint32 GetTotalDescriptors(SHADER_VARIABLE_TYPE VarType)const
     {
@@ -88,8 +88,8 @@ public:
 
     struct DescriptorSetBindInfo
     {
-        vector<VkDescriptorSet>      vkSets;
-        vector<uint32_t>             DynamicOffsets;
+        stl::vector<VkDescriptorSet> vkSets;
+        stl::vector<uint32_t>        DynamicOffsets;
         const ShaderResourceCacheVk* pResourceCache     = nullptr;
         VkPipelineBindPoint          BindPoint          = VK_PIPELINE_BIND_POINT_MAX_ENUM;
         Uint32                       SetCout            = 0;
@@ -196,9 +196,9 @@ private:
 
     private:
         IMemoryAllocator &m_MemAllocator;
-        VulkanUtilities::PipelineLayoutWrapper m_VkPipelineLayout;
-        array<DescriptorSetLayout, 2>          m_DescriptorSetLayouts;
-        vector<VkDescriptorSetLayoutBinding, STDAllocatorRawMem<VkDescriptorSetLayoutBinding>> m_LayoutBindings;
+        VulkanUtilities::PipelineLayoutWrapper      m_VkPipelineLayout;
+        stl::array<DescriptorSetLayout, 2>          m_DescriptorSetLayouts;
+        stl::vector<VkDescriptorSetLayoutBinding, STDAllocatorRawMem<VkDescriptorSetLayoutBinding>> m_LayoutBindings;
         uint8_t m_ActiveSets = 0;
     };
 

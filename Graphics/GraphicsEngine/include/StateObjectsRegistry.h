@@ -103,7 +103,7 @@ namespace Diligent
             }
 
             // Try to construct the new element in place
-            auto Elems = m_DescToObjHashMap.emplace( make_pair( ObjectDesc, RefCntWeakPtr<IDeviceObject>(pObject) ) );
+            auto Elems = m_DescToObjHashMap.emplace( stl::make_pair( ObjectDesc, RefCntWeakPtr<IDeviceObject>(pObject) ) );
             // It is theorertically possible that the same object can be found
             // in the registry. This might happen if two threads try to create
             // the same object at the same time. They both will not find the
@@ -199,8 +199,8 @@ namespace Diligent
         Atomics::AtomicLong m_NumDeletedObjects;
 
         /// Hash map that stores weak pointers to the referenced objects
-        using HashMapElem = pair< const ResourceDescType, RefCntWeakPtr<IDeviceObject> > ;
-        unordered_map<ResourceDescType, RefCntWeakPtr<IDeviceObject>, hash<ResourceDescType>, equal_to<ResourceDescType>, STDAllocatorRawMem<HashMapElem> > m_DescToObjHashMap;
+        using HashMapElem = stl::pair< const ResourceDescType, RefCntWeakPtr<IDeviceObject> > ;
+        stl::unordered_map<ResourceDescType, RefCntWeakPtr<IDeviceObject>, stl::hash<ResourceDescType>, stl::equal_to<ResourceDescType>, STDAllocatorRawMem<HashMapElem> > m_DescToObjHashMap;
 
         /// Registry name used for debug output
         const String m_RegistryName;

@@ -42,7 +42,7 @@ class IShaderVk : public IShader
 public:
 
     /// Returns SPIRV bytecode
-    virtual const vector<uint32_t>& GetSPIRV()const = 0;
+    virtual const stl::vector<uint32_t>& GetSPIRV()const = 0;
 };
 
 }

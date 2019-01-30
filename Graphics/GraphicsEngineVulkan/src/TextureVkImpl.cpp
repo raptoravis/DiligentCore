@@ -202,7 +202,7 @@ TextureVkImpl :: TextureVkImpl(IReferenceCounters*          pRefCounters,
         if( InitData.NumSubresources != ExpectedNumSubresources )
             LOG_ERROR_AND_THROW("Incorrect number of subresources in init data. ", ExpectedNumSubresources, " expected, while ", InitData.NumSubresources, " provided");
 
-        vector<VkBufferImageCopy> Regions(InitData.NumSubresources);
+        stl::vector<VkBufferImageCopy> Regions(InitData.NumSubresources);
 
         Uint64 uploadBufferSize = 0;
         Uint32 subres = 0;
@@ -213,9 +213,9 @@ TextureVkImpl :: TextureVkImpl(IReferenceCounters*          pRefCounters,
                 const auto& SubResData = InitData.pSubResources[subres]; (void)SubResData;
                 auto& CopyRegion = Regions[subres];
 
-                auto MipWidth  = max(m_Desc.Width  >> mip, 1u);
-                auto MipHeight = max(m_Desc.Height >> mip, 1u);
-                auto MipDepth  = (m_Desc.Type == RESOURCE_DIM_TEX_3D) ? max(m_Desc.Depth >> mip, 1u) : 1u;
+                auto MipWidth  = stl::max(m_Desc.Width  >> mip, 1u);
+                auto MipHeight = stl::max(m_Desc.Height >> mip, 1u);
+                auto MipDepth  = (m_Desc.Type == RESOURCE_DIM_TEX_3D) ? stl::max(m_Desc.Depth >> mip, 1u) : 1u;
 
                 CopyRegion.bufferOffset = uploadBufferSize; // offset in bytes from the start of the buffer object
                 // bufferRowLength and bufferImageHeight specify the data in buffer memory as a subregion 
@@ -341,13 +341,13 @@ TextureVkImpl :: TextureVkImpl(IReferenceCounters*          pRefCounters,
             static_cast<uint32_t>(Regions.size()), Regions.data());
 
         Uint32 QueueIndex = 0;
-	    pRenderDeviceVk->ExecuteAndDisposeTransientCmdBuff(QueueIndex, vkCmdBuff, move(CmdPool));
+	    pRenderDeviceVk->ExecuteAndDisposeTransientCmdBuff(QueueIndex, vkCmdBuff, stl::move(CmdPool));
 
         // After command buffer is submitted, safe-release resources. This strategy
         // is little overconservative as the resources will be released after the first
         // command buffer submitted through the immediate context will be completed
-        pRenderDeviceVk->SafeReleaseDeviceObject(move(StagingBuffer),           Uint64{1} << Uint64{QueueIndex});
-        pRenderDeviceVk->SafeReleaseDeviceObject(move(StagingMemoryAllocation), Uint64{1} << Uint64{QueueIndex});
+        pRenderDeviceVk->SafeReleaseDeviceObject(stl::move(StagingBuffer),           Uint64{1} << Uint64{QueueIndex});
+        pRenderDeviceVk->SafeReleaseDeviceObject(stl::move(StagingMemoryAllocation), Uint64{1} << Uint64{QueueIndex});
     }
     else
     {
@@ -380,7 +380,7 @@ TextureVkImpl :: TextureVkImpl(IReferenceCounters*          pRefCounters,
             UNEXPECTED("Unexpected aspect mask");
         }
         Uint32 QueueIndex = 0;
-        pRenderDeviceVk->ExecuteAndDisposeTransientCmdBuff(QueueIndex, vkCmdBuff, move(CmdPool));
+        pRenderDeviceVk->ExecuteAndDisposeTransientCmdBuff(QueueIndex, vkCmdBuff, stl::move(CmdPool));
     }
 
 
@@ -473,7 +473,7 @@ void TextureVkImpl::CreateViewInternal( const struct TextureViewDesc &ViewDesc, 
         VulkanUtilities::ImageViewWrapper ImgView = CreateImageView(UpdatedViewDesc);
 
         auto pViewVk = NEW_RC_OBJ(TexViewAllocator, "TextureViewVkImpl instance", TextureViewVkImpl, bIsDefaultView ? this : nullptr)
-                                    (GetDevice(), UpdatedViewDesc, this, move(ImgView), bIsDefaultView );
+                                    (GetDevice(), UpdatedViewDesc, this, stl::move(ImgView), bIsDefaultView );
         VERIFY( pViewVk->GetDesc().ViewType == ViewDesc.ViewType, "Incorrect view type" );
 
         if( bIsDefaultView )
@@ -492,8 +492,8 @@ TextureVkImpl :: ~TextureVkImpl()
 {
     // Vk object can only be destroyed when it is no longer used by the GPU
     // Wrappers for external texture will not be destroyed as they are created with null device pointer
-    m_pDevice->SafeReleaseDeviceObject(move(m_VulkanImage),      m_Desc.CommandQueueMask);
-    m_pDevice->SafeReleaseDeviceObject(move(m_MemoryAllocation), m_Desc.CommandQueueMask);
+    m_pDevice->SafeReleaseDeviceObject(stl::move(m_VulkanImage),      m_Desc.CommandQueueMask);
+    m_pDevice->SafeReleaseDeviceObject(stl::move(m_MemoryAllocation), m_Desc.CommandQueueMask);
 }
 
 VulkanUtilities::ImageViewWrapper TextureVkImpl::CreateImageView(TextureViewDesc& ViewDesc)
@@ -540,7 +540,7 @@ VulkanUtilities::ImageViewWrapper TextureVkImpl::CreateImageView(TextureViewDesc
             else
             {
                 ImageViewCI.viewType = VK_IMAGE_VIEW_TYPE_3D;
-                Uint32 MipDepth = max(m_Desc.Depth >> ViewDesc.MostDetailedMip, 1U);
+                Uint32 MipDepth = stl::max(m_Desc.Depth >> ViewDesc.MostDetailedMip, 1U);
                 if (ViewDesc.FirstDepthSlice != 0 || ViewDesc.NumDepthSlices != MipDepth)
                 {
                     LOG_ERROR("3D texture view '", (ViewDesc.Name ? ViewDesc.Name : ""), "' (most detailed mip: ", ViewDesc.MostDetailedMip,

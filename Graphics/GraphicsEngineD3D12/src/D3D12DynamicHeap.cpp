@@ -84,7 +84,7 @@ D3D12DynamicMemoryManager::D3D12DynamicMemoryManager(IMemoryAllocator&      Allo
     {
         D3D12DynamicPage Page(m_DeviceD3D12Impl.GetD3D12Device(), PageSize);
         auto Size = Page.GetSize();
-        m_AvailablePages.emplace(Size, move(Page));
+        m_AvailablePages.emplace(Size, stl::move(Page));
     }
 }
 
@@ -98,7 +98,7 @@ D3D12DynamicPage D3D12DynamicMemoryManager::AllocatePage(Uint64 SizeInBytes)
     if (PageIt != m_AvailablePages.end())
     {
         VERIFY_EXPR(PageIt->first >= SizeInBytes);
-        D3D12DynamicPage Page(move(PageIt->second));
+        D3D12DynamicPage Page(stl::move(PageIt->second));
         m_AvailablePages.erase(PageIt);
         return Page;
     }
@@ -108,7 +108,7 @@ D3D12DynamicPage D3D12DynamicMemoryManager::AllocatePage(Uint64 SizeInBytes)
     }
 }
 
-void D3D12DynamicMemoryManager::ReleasePages(vector<D3D12DynamicPage>& Pages, Uint64 QueueMask)
+void D3D12DynamicMemoryManager::ReleasePages(stl::vector<D3D12DynamicPage>& Pages, Uint64 QueueMask)
 {
     struct StalePage
     {
@@ -116,7 +116,7 @@ void D3D12DynamicMemoryManager::ReleasePages(vector<D3D12DynamicPage>& Pages, Ui
         D3D12DynamicMemoryManager* Mgr;
 
         StalePage(D3D12DynamicPage&& _Page, D3D12DynamicMemoryManager& _Mgr)noexcept :
-            Page (move(_Page)),
+            Page (stl::move(_Page)),
             Mgr  (&_Mgr)
         {
         }
@@ -126,7 +126,7 @@ void D3D12DynamicMemoryManager::ReleasePages(vector<D3D12DynamicPage>& Pages, Ui
         StalePage& operator= (      StalePage&&) = delete;
             
         StalePage(StalePage&& rhs)noexcept : 
-            Page (move(rhs.Page)),
+            Page (stl::move(rhs.Page)),
             Mgr  (rhs.Mgr)
         {
             rhs.Mgr  = nullptr;
@@ -141,13 +141,13 @@ void D3D12DynamicMemoryManager::ReleasePages(vector<D3D12DynamicPage>& Pages, Ui
                 --Mgr->m_AllocatedPageCounter;
 #endif
                 auto PageSize = Page.GetSize();
-                Mgr->m_AvailablePages.emplace(PageSize, move(Page));
+                Mgr->m_AvailablePages.emplace(PageSize, stl::move(Page));
             }
         }
     };
     for(auto& Page : Pages)
     {
-        m_DeviceD3D12Impl.SafeReleaseDeviceObject(StalePage{move(Page), *this}, QueueMask);
+        m_DeviceD3D12Impl.SafeReleaseDeviceObject(StalePage{stl::move(Page), *this}, QueueMask);
     }
 }
 
@@ -182,8 +182,8 @@ D3D12DynamicHeap::~D3D12DynamicHeap()
                                 FormatMemorySize(m_PeakAlignedSize,   2, m_PeakAlignedSize), " / ",
                                 FormatMemorySize(m_PeakAllocatedSize, 2, m_PeakAllocatedSize),
                                 " (", PeakAllocatedPages, (PeakAllocatedPages == 1 ? " page)" : " pages)"),
-        ". Peak efficiency (used/aligned): ",   std::fixed, std::setprecision(1), static_cast<double>(m_PeakUsedSize) / static_cast<double>(max(m_PeakAlignedSize, Uint64{1})) * 100.0, '%',
-        ". Peak utilization (used/allocated): ", std::fixed, std::setprecision(1), static_cast<double>(m_PeakUsedSize) / static_cast<double>(max(m_PeakAllocatedSize, Uint64{1})) * 100.0, '%');
+        ". Peak efficiency (used/aligned): ",   std::fixed, std::setprecision(1), static_cast<double>(m_PeakUsedSize) / static_cast<double>(stl::max(m_PeakAlignedSize, Uint64{1})) * 100.0, '%',
+        ". Peak utilization (used/allocated): ", std::fixed, std::setprecision(1), static_cast<double>(m_PeakUsedSize) / static_cast<double>(stl::max(m_PeakAllocatedSize, Uint64{1})) * 100.0, '%');
 }
 
 D3D12DynamicAllocation D3D12DynamicHeap::Allocate(Uint64 SizeInBytes, Uint64 Alignment, Uint64 DvpCtxFrameNumber)
@@ -204,9 +204,9 @@ D3D12DynamicAllocation D3D12DynamicHeap::Allocate(Uint64 SizeInBytes, Uint64 Ali
             m_AvailableSize = NewPage.GetSize();
             
             m_CurrAllocatedSize += m_AvailableSize;
-            m_PeakAllocatedSize  = max(m_PeakAllocatedSize, m_CurrAllocatedSize);
+            m_PeakAllocatedSize  = stl::max(m_PeakAllocatedSize, m_CurrAllocatedSize);
 
-            m_AllocatedPages.emplace_back(move(NewPage));
+            m_AllocatedPages.emplace_back(stl::move(NewPage));
         }
     }
 
@@ -219,10 +219,10 @@ D3D12DynamicAllocation D3D12DynamicHeap::Allocate(Uint64 SizeInBytes, Uint64 Ali
         m_CurrOffset    += AdjustedSize;
         
         m_CurrUsedSize += SizeInBytes;
-        m_PeakUsedSize  = max(m_PeakUsedSize, m_CurrUsedSize);
+        m_PeakUsedSize  = stl::max(m_PeakUsedSize, m_CurrUsedSize);
 
         m_CurrAlignedSize += AdjustedSize;
-        m_PeakAlignedSize  = max(m_PeakAlignedSize, m_CurrAlignedSize);
+        m_PeakAlignedSize  = stl::max(m_PeakAlignedSize, m_CurrAlignedSize);
         
         auto& CurrPage = m_AllocatedPages.back();
         return D3D12DynamicAllocation

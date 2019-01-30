@@ -168,7 +168,7 @@ protected:
 	ID3D12RootSignature* m_pCurComputeRootSignature  = nullptr;
 
     static constexpr int MaxPendingBarriers = 16;
-	vector<D3D12_RESOURCE_BARRIER, STDAllocatorRawMem<D3D12_RESOURCE_BARRIER> > m_PendingResourceBarriers;
+	stl::vector<D3D12_RESOURCE_BARRIER, STDAllocatorRawMem<D3D12_RESOURCE_BARRIER> > m_PendingResourceBarriers;
 
     ShaderDescriptorHeaps m_BoundDescriptorHeaps;
     

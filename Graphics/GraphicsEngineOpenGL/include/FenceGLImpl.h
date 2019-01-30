@@ -58,11 +58,11 @@ public:
 
     void AddPendingFence(GLObjectWrappers::GLSyncObj&& Fence, Uint64 Value)
     {
-        m_PendingFences.emplace_back(Value, move(Fence));
+        m_PendingFences.emplace_back(Value, stl::move(Fence));
     }
 
 private:
-    deque<pair<Uint64, GLObjectWrappers::GLSyncObj> > m_PendingFences;
+    stl::deque<stl::pair<Uint64, GLObjectWrappers::GLSyncObj> > m_PendingFences;
     volatile Uint64 m_LastCompletedFenceValue = 0;
 };
 

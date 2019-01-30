@@ -27,7 +27,7 @@
 
 #include "../../External/EASTL/include/EASTL/algorithm.h"
 
-namespace Diligent
+namespace stl
 {
 
 using eastl::max;
@@ -42,7 +42,7 @@ using eastl::find;
 
 #include <algorithm>
 
-namespace Diligent
+namespace stl
 {
 
 using std::max;

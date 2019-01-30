@@ -372,15 +372,15 @@ protected:
     // This is safe because every object unregisters itself
     // when it is deleted.
     StateObjectsRegistry<SamplerDesc> m_SamplersRegistry;     ///< Sampler state registry
-    vector<TextureFormatInfoExt, STDAllocatorRawMem<TextureFormatInfoExt> > m_TextureFormatsInfo;
-    vector<bool, STDAllocatorRawMem<bool> > m_TexFmtInfoInitFlags;
+    stl::vector<TextureFormatInfoExt, STDAllocatorRawMem<TextureFormatInfoExt> > m_TextureFormatsInfo;
+    stl::vector<bool, STDAllocatorRawMem<bool> > m_TexFmtInfoInitFlags;
     
     /// Weak reference to the immediate context. Immediate context holds strong reference
     /// to the device, so we must use weak reference to avoid circular dependencies.
     RefCntWeakPtr<IDeviceContext> m_wpImmediateContext;
 
     /// Weak references to deferred contexts. 
-    vector< RefCntWeakPtr<IDeviceContext>, STDAllocatorRawMem<RefCntWeakPtr<IDeviceContext> > > m_wpDeferredContexts;
+    stl::vector< RefCntWeakPtr<IDeviceContext>, STDAllocatorRawMem<RefCntWeakPtr<IDeviceContext> > > m_wpDeferredContexts;
 
     IMemoryAllocator&         m_RawMemAllocator;         ///< Raw memory allocator
     FixedBlockMemoryAllocator m_TexObjAllocator;         ///< Allocator for texture objects

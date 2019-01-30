@@ -69,8 +69,8 @@ namespace VulkanUtilities
         VkAllocationCallbacks* const m_pVkAllocator;
         VkInstance m_VkInstance = VK_NULL_HANDLE;
 
-        Diligent::vector<VkLayerProperties>     m_Layers;
-        Diligent::vector<VkExtensionProperties> m_Extensions;
-        Diligent::vector<VkPhysicalDevice>      m_PhysicalDevices;
+        stl::vector<VkLayerProperties>     m_Layers;
+        stl::vector<VkExtensionProperties> m_Extensions;
+        stl::vector<VkPhysicalDevice>      m_PhysicalDevices;
     };
 }

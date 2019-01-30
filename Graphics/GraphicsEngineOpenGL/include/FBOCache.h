@@ -89,11 +89,11 @@ private:
 
     friend class RenderDeviceGLImpl;
     ThreadingTools::LockFlag m_CacheLockFlag;
-    unordered_map<FBOCacheKey, GLObjectWrappers::GLFrameBufferObj, FBOCacheKeyHashFunc> m_Cache;
+    stl::unordered_map<FBOCacheKey, GLObjectWrappers::GLFrameBufferObj, FBOCacheKeyHashFunc> m_Cache;
     
     // Multimap that sets up correspondence between unique texture id and all
     // FBOs it is used in
-    unordered_multimap<Diligent::UniqueIdentifier, FBOCacheKey> m_TexIdToKey;
+    stl::unordered_multimap<Diligent::UniqueIdentifier, FBOCacheKey> m_TexIdToKey;
 };
 
 }

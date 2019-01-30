@@ -111,7 +111,7 @@ private:
     VulkanUtilities::BufferViewWrapper CreateView(struct BufferViewDesc &ViewDesc);
     Uint32        m_DynamicOffsetAlignment = 0;
 
-    vector<VulkanDynamicAllocation, STDAllocatorRawMem<VulkanDynamicAllocation> > m_DynamicAllocations;
+    stl::vector<VulkanDynamicAllocation, STDAllocatorRawMem<VulkanDynamicAllocation> > m_DynamicAllocations;
 
     VulkanUtilities::BufferWrapper m_VulkanBuffer;
     VulkanUtilities::VulkanMemoryAllocation m_MemoryAllocation;

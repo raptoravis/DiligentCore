@@ -85,10 +85,10 @@ public:
 
 	void IdleGPU();
 
-    using PooledCommandContext = unique_ptr<CommandContext, STDDeleterRawMem<CommandContext> >;
+    using PooledCommandContext = stl::unique_ptr<CommandContext, STDDeleterRawMem<CommandContext> >;
     PooledCommandContext AllocateCommandContext(const Char *ID = "");
     void CloseAndExecuteTransientCommandContext(Uint32 CommandQueueIndex, PooledCommandContext&& Ctx);
-    Uint64 CloseAndExecuteCommandContext(Uint32 QueueIndex, PooledCommandContext&& Ctx, bool DiscardStaleObjects, vector<pair<Uint64, RefCntAutoPtr<IFence> > >* pSignalFences);
+    Uint64 CloseAndExecuteCommandContext(Uint32 QueueIndex, PooledCommandContext&& Ctx, bool DiscardStaleObjects, stl::vector<stl::pair<Uint64, RefCntAutoPtr<IFence> > >* pSignalFences);
 
     // Disposes an unused command context
     void DisposeCommandContext(PooledCommandContext&& Ctx);
@@ -119,7 +119,7 @@ private:
     CommandListManager m_CmdListManager;
 
     std::mutex m_ContextPoolMutex;
-	vector< PooledCommandContext, STDAllocatorRawMem<PooledCommandContext> > m_ContextPool;
+	stl::vector< PooledCommandContext, STDAllocatorRawMem<PooledCommandContext> > m_ContextPool;
 #ifdef DEVELOPMENT
     Atomics::AtomicLong m_AllocatedCtxCounter = 0;
 #endif

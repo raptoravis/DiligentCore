@@ -82,7 +82,7 @@ ShaderGLImpl::ShaderGLImpl(IReferenceCounters *pRefCounters, RenderDeviceGLImpl 
         // The function glGetShaderiv() tells how many bytes to allocate; the length includes the NULL terminator. 
         glGetShaderiv(ShaderObj, GL_INFO_LOG_LENGTH, &infoLogLen);
 
-        vector<GLchar> infoLog(infoLogLen);
+        stl::vector<GLchar> infoLog(infoLogLen);
         if (infoLogLen > 0)
         {
             int charsWritten = 0;
@@ -144,7 +144,7 @@ ShaderGLImpl::ShaderGLImpl(IReferenceCounters *pRefCounters, RenderDeviceGLImpl 
             glGetProgramiv( m_GlProgObj, GL_INFO_LOG_LENGTH, &LengthWithNull );
 
             // The maxLength includes the NULL character
-            vector<char> shaderProgramInfoLog( LengthWithNull );
+            stl::vector<char> shaderProgramInfoLog( LengthWithNull );
 
             // Notice that glGetProgramInfoLog is used, not glGetShaderInfoLog.
             glGetProgramInfoLog( m_GlProgObj, LengthWithNull, &Length, &shaderProgramInfoLog[0] );
@@ -164,7 +164,7 @@ ShaderGLImpl::ShaderGLImpl(IReferenceCounters *pRefCounters, RenderDeviceGLImpl 
     }
     else
     {
-        m_GLShaderObj = move( ShaderObj );
+        m_GLShaderObj = stl::move( ShaderObj );
     }
 }
 

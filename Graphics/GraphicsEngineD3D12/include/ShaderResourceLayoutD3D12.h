@@ -311,12 +311,12 @@ private:
     }
 
     void AllocateMemory(IMemoryAllocator&                                         Allocator,
-                        const array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES>& CbvSrvUavCount,
-                        const array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES>& SamplerCount);
+                        const stl::array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES>& CbvSrvUavCount,
+                        const stl::array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES>& SamplerCount);
 
-    unique_ptr<void, STDDeleterRawMem<void> > m_ResourceBuffer;
-    array<Uint16, SHADER_VARIABLE_TYPE_NUM_TYPES + 1> m_CbvSrvUavOffsets = {};
-    array<Uint16, SHADER_VARIABLE_TYPE_NUM_TYPES + 1> m_SamplersOffsets  = {};
+    stl::unique_ptr<void, STDDeleterRawMem<void> > m_ResourceBuffer;
+    stl::array<Uint16, SHADER_VARIABLE_TYPE_NUM_TYPES + 1> m_CbvSrvUavOffsets = {};
+    stl::array<Uint16, SHADER_VARIABLE_TYPE_NUM_TYPES + 1> m_SamplersOffsets  = {};
 
     CComPtr<ID3D12Device>                       m_pd3d12Device;
     IObject&                                    m_Owner;

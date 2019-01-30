@@ -98,8 +98,8 @@ public:
     
 private:
 
-	vector< ShaderMacro > m_Macros;
-	set< std::string > m_DefinitionsPool;
+	stl::vector< ShaderMacro > m_Macros;
+	stl::set< std::string > m_DefinitionsPool;
     bool m_bIsFinalized = false;
 };
 

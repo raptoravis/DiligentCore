@@ -29,7 +29,7 @@
 
 #include "../../External/EASTL/include/EASTL/set.h"
 
-namespace Diligent
+namespace stl
 {
 
 using eastl::set;
@@ -41,7 +41,7 @@ using eastl::multiset;
 
 #include <set>
 
-namespace Diligent
+namespace stl
 {
 
 using std::set;

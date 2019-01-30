@@ -60,8 +60,8 @@ public:
 
     RenderDeviceD3D12Impl::PooledCommandContext Close(RefCntAutoPtr<DeviceContextD3D12Impl>& pDeferredCtx)
     {
-        pDeferredCtx  = move(m_pDeferredCtx);
-        return move(m_pCmdContext);
+        pDeferredCtx  = stl::move(m_pDeferredCtx);
+        return stl::move(m_pCmdContext);
     }
 
 private:

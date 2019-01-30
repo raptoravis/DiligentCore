@@ -179,7 +179,7 @@ class VulkanDynamicHeap
 public:
     VulkanDynamicHeap(VulkanDynamicMemoryManager& DynamicMemMgr, std::string HeapName, Uint32 PageSize) :
         m_GlobalDynamicMemMgr(DynamicMemMgr),
-        m_HeapName(move(HeapName)),
+        m_HeapName(stl::move(HeapName)),
         m_MasterBlockSize(PageSize)
     {}
 
@@ -209,7 +209,7 @@ private:
     VulkanDynamicMemoryManager& m_GlobalDynamicMemMgr;
     const std::string m_HeapName;
 
-    vector<MasterBlock> m_MasterBlocks;
+    stl::vector<MasterBlock> m_MasterBlocks;
 
     OffsetType m_CurrOffset = InvalidOffset;
     const Uint32 m_MasterBlockSize;

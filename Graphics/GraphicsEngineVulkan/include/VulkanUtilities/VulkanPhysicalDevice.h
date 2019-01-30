@@ -38,7 +38,7 @@ namespace VulkanUtilities
         VulkanPhysicalDevice& operator = (const VulkanPhysicalDevice&) = delete;
         VulkanPhysicalDevice& operator = (VulkanPhysicalDevice&&)      = delete;
 
-        static Diligent::unique_ptr<VulkanPhysicalDevice> Create(VkPhysicalDevice vkDevice);
+        static stl::unique_ptr<VulkanPhysicalDevice> Create(VkPhysicalDevice vkDevice);
 
         uint32_t         FindQueueFamily     (VkQueueFlags QueueFlags)                           const;
         VkPhysicalDevice GetVkDeviceHandle   ()                                                  const { return m_VkDevice; }
@@ -56,7 +56,7 @@ namespace VulkanUtilities
         VkPhysicalDeviceProperties           m_Properties           = {};
         VkPhysicalDeviceFeatures             m_Features             = {};
         VkPhysicalDeviceMemoryProperties     m_MemoryProperties     = {};
-        Diligent::vector<VkQueueFamilyProperties> m_QueueFamilyProperties;
-        Diligent::vector<VkExtensionProperties>   m_SupportedExtensions;
+        stl::vector<VkQueueFamilyProperties> m_QueueFamilyProperties;
+        stl::vector<VkExtensionProperties>   m_SupportedExtensions;
     };
 }

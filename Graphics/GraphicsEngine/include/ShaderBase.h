@@ -230,11 +230,11 @@ public:
     
 protected:
     /// Shader variable descriptions
-    vector<ShaderVariableDesc, STDAllocatorRawMem<ShaderVariableDesc> > m_VariablesDesc;
+    stl::vector<ShaderVariableDesc, STDAllocatorRawMem<ShaderVariableDesc> > m_VariablesDesc;
     /// String pool that is used to hold copies of variable names and static sampler names
-    vector<String, STDAllocatorRawMem<String> > m_StringPool;
+    stl::vector<String, STDAllocatorRawMem<String> > m_StringPool;
     /// Static sampler descriptions
-    vector<StaticSamplerDesc, STDAllocatorRawMem<StaticSamplerDesc> > m_StaticSamplers;
+    stl::vector<StaticSamplerDesc, STDAllocatorRawMem<StaticSamplerDesc> > m_StaticSamplers;
 };
 
 }

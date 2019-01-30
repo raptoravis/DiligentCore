@@ -129,12 +129,12 @@ class DescriptorPoolManager
 public:
     DescriptorPoolManager(RenderDeviceVkImpl&               DeviceVkImpl,
                           std::string                       PoolName,
-                          vector<VkDescriptorPoolSize>      PoolSizes,
+                          stl::vector<VkDescriptorPoolSize> PoolSizes,
                           uint32_t                          MaxSets,
                           bool                              AllowFreeing) noexcept:
         m_DeviceVkImpl(DeviceVkImpl),
-        m_PoolName    (move(PoolName)),
-        m_PoolSizes   (move(PoolSizes)),
+        m_PoolName    (stl::move(PoolName)),
+        m_PoolSizes   (stl::move(PoolSizes)),
         m_MaxSets     (MaxSets),
         m_AllowFreeing(AllowFreeing)
     {
@@ -164,12 +164,12 @@ protected:
     RenderDeviceVkImpl& m_DeviceVkImpl;
     const std::string   m_PoolName;
 
-    const vector<VkDescriptorPoolSize>      m_PoolSizes;
-    const uint32_t                          m_MaxSets;
-    const bool                              m_AllowFreeing;
+    const stl::vector<VkDescriptorPoolSize>     m_PoolSizes;
+    const uint32_t                              m_MaxSets;
+    const bool                                  m_AllowFreeing;
     
-    std::mutex                                          m_Mutex;
-    deque< VulkanUtilities::DescriptorPoolWrapper >     m_Pools;
+    std::mutex                                              m_Mutex;
+    stl::deque< VulkanUtilities::DescriptorPoolWrapper >    m_Pools;
 
 private:
     void FreePool(VulkanUtilities::DescriptorPoolWrapper&& Pool);
@@ -188,10 +188,10 @@ public:
     friend class DescriptorSetAllocation;
     DescriptorSetAllocator(RenderDeviceVkImpl&               DeviceVkImpl,
                            std::string                       PoolName,
-                           vector<VkDescriptorPoolSize>      PoolSizes,
+                           stl::vector<VkDescriptorPoolSize> PoolSizes,
                            uint32_t                          MaxSets,
                            bool                              AllowFreeing) noexcept:
-        DescriptorPoolManager(DeviceVkImpl, move(PoolName), move(PoolSizes), MaxSets, AllowFreeing)
+        DescriptorPoolManager(DeviceVkImpl, stl::move(PoolName), stl::move(PoolSizes), MaxSets, AllowFreeing)
     {
 #ifdef DEVELOPMENT
         m_AllocatedSetCounter = 0;
@@ -241,7 +241,7 @@ class DynamicDescriptorSetAllocator
 public:
     DynamicDescriptorSetAllocator(DescriptorPoolManager& PoolMgr, std::string Name) : 
         m_GlobalPoolMgr(PoolMgr),
-        m_Name         (move(Name))
+        m_Name         (stl::move(Name))
     {}
     ~DynamicDescriptorSetAllocator();
 
@@ -257,7 +257,7 @@ public:
 private:
     DescriptorPoolManager&                              m_GlobalPoolMgr;
     const std::string                                   m_Name;
-    vector<VulkanUtilities::DescriptorPoolWrapper>      m_AllocatedPools;
+    stl::vector<VulkanUtilities::DescriptorPoolWrapper> m_AllocatedPools;
     size_t                                              m_PeakPoolCount = 0;
 };
 

@@ -134,7 +134,7 @@ public:
                            ShaderResourceLayoutVk                       Layouts[],
                            std::shared_ptr<const SPIRVShaderResources>  pShaderResources[],
                            IMemoryAllocator&                            LayoutDataAllocator,
-                           vector<uint32_t>                             SPIRVs[],
+                           stl::vector<uint32_t>                        SPIRVs[],
                            class PipelineLayout&                        PipelineLayout);
 
     // sizeof(VkResource) == 24 (x64)
@@ -296,13 +296,13 @@ private:
 
     IObject&                                            m_Owner;
     const VulkanUtilities::VulkanLogicalDevice&         m_LogicalDevice;
-    unique_ptr<void, STDDeleterRawMem<void> >           m_ResourceBuffer;
+    stl::unique_ptr<void, STDDeleterRawMem<void> >           m_ResourceBuffer;
 
     // We must use shared_ptr to reference ShaderResources instance, because
     // there may be multiple objects referencing the same set of resources
     std::shared_ptr<const SPIRVShaderResources>         m_pResources;
 
-    array<Uint16, SHADER_VARIABLE_TYPE_NUM_TYPES+1>  m_NumResources = {};
+    stl::array<Uint16, SHADER_VARIABLE_TYPE_NUM_TYPES+1>  m_NumResources = {};
 };
 
 }

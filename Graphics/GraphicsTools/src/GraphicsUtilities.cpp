@@ -59,7 +59,7 @@ void GenerateCheckerBoardPatternInternal(Uint32 Width, Uint32 Height, TEXTURE_FO
             float horzWave = sin((static_cast<float>(x) + 0.5f) / static_cast<float>(Width)  * PI_F * static_cast<float>(HorzCells));
             float vertWave = sin((static_cast<float>(y) + 0.5f) / static_cast<float>(Height) * PI_F * static_cast<float>(VertCells));
             float val = horzWave * vertWave;
-            val = max( std::min( val*20.f, +1.f), -1.f );
+            val = stl::max( stl::min( val*20.f, +1.f), -1.f );
             val = val * 0.5f + 1.f;
             val = val * 0.5f + 0.25f;
             Uint8 *pDstTexel = pData + x * Uint32{FmtAttribs.NumComponents} * Uint32{FmtAttribs.ComponentSize} + y * StrideInBytes;

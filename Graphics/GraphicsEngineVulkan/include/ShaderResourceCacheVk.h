@@ -146,7 +146,7 @@ public:
         void AssignDescriptorSetAllocation(DescriptorSetAllocation&& Allocation)
         {
             VERIFY(m_NumResources > 0, "Descriptor set is empty");
-            m_DescriptorSetAllocation = move(Allocation);
+            m_DescriptorSetAllocation = stl::move(Allocation);
         }
 
         const Uint32 m_NumResources = 0;
@@ -177,7 +177,7 @@ public:
     template<bool VerifyOnly>
     void TransitionResources(DeviceContextVkImpl *pCtxVkImpl);
 
-    Uint32 GetDynamicBufferOffsets(DeviceContextVkImpl *pCtxVkImpl, vector<uint32_t>& Offsets)const;
+    Uint32 GetDynamicBufferOffsets(DeviceContextVkImpl *pCtxVkImpl, stl::vector<uint32_t>& Offsets)const;
 
 private:
 

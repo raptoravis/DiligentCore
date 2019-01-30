@@ -390,7 +390,7 @@ VkDescriptorImageInfo ShaderResourceCacheVk::Resource::GetSamplerDescriptorWrite
     return DescrImgInfo;
 }
 
-Uint32 ShaderResourceCacheVk::GetDynamicBufferOffsets(DeviceContextVkImpl *pCtxVkImpl, vector<uint32_t>& Offsets)const
+Uint32 ShaderResourceCacheVk::GetDynamicBufferOffsets(DeviceContextVkImpl *pCtxVkImpl, stl::vector<uint32_t>& Offsets)const
 {
     auto CtxId = pCtxVkImpl->GetContextId();
 

@@ -59,8 +59,8 @@ TextureCube_OGL::TextureCube_OGL( IReferenceCounters *pRefCounters,
     //    for (face in (+X, -X, +Y, -Y, +Z, -Z)) {
     //        glTexImage2D(face, i, internalformat, width, height, 0, format, type, NULL);
     //    }
-    //    width = max(1, (width / 2));
-    //    height = max(1, (height / 2));
+    //    width = stl::max(1, (width / 2));
+    //    height = stl::max(1, (height / 2));
     //}
     SetDefaultGLParameters();
 
@@ -73,8 +73,8 @@ TextureCube_OGL::TextureCube_OGL( IReferenceCounters *pRefCounters,
             {
                 for(Uint32 Mip = 0; Mip < m_Desc.MipLevels; ++Mip)
                 {
-                    Box DstBox{0, max(m_Desc.Width >>Mip, 1U),
-                               0, max(m_Desc.Height>>Mip, 1U)};
+                    Box DstBox{0, stl::max(m_Desc.Width >>Mip, 1U),
+                               0, stl::max(m_Desc.Height>>Mip, 1U)};
                     // UpdateData() is a virtual function. If we try to call it through vtbl from here,
                     // we will get into TextureBaseGL::UpdateData(), because instance of TextureCube_OGL
                     // is not fully constructed yet.
@@ -148,8 +148,8 @@ void TextureCube_OGL::UpdateData( GLContextState &ContextState, Uint32 MipLevel,
 
     if( TransferAttribs.IsCompressed )
     {
-        auto MipWidth  = max(m_Desc.Width  >> MipLevel, 1U);
-        auto MipHeight = max(m_Desc.Height >> MipLevel, 1U);
+        auto MipWidth  = stl::max(m_Desc.Width  >> MipLevel, 1U);
+        auto MipHeight = stl::max(m_Desc.Height >> MipLevel, 1U);
         VERIFY( (DstBox.MinX % 4) == 0 && (DstBox.MinY % 4) == 0 &&
                 ((DstBox.MaxX % 4) == 0 || DstBox.MaxX == MipWidth) && 
                 ((DstBox.MaxY % 4) == 0 || DstBox.MaxY == MipHeight), 
@@ -170,8 +170,8 @@ void TextureCube_OGL::UpdateData( GLContextState &ContextState, Uint32 MipLevel,
         // takes one of GL_TEXTURE_CUBE_MAP_POSITIVE_X ... GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
         auto UpdateRegionWidth  = DstBox.MaxX - DstBox.MinX;
         auto UpdateRegionHeight = DstBox.MaxY - DstBox.MinY;
-        UpdateRegionWidth  = min(UpdateRegionWidth,  MipWidth  - DstBox.MinX);
-        UpdateRegionHeight = min(UpdateRegionHeight, MipHeight - DstBox.MinY);
+        UpdateRegionWidth  = stl::min(UpdateRegionWidth,  MipWidth  - DstBox.MinX);
+        UpdateRegionHeight = stl::min(UpdateRegionHeight, MipHeight - DstBox.MinY);
         glCompressedTexSubImage2D(CubeMapFaceBindTarget, MipLevel, 
                         DstBox.MinX, 
                         DstBox.MinY, 

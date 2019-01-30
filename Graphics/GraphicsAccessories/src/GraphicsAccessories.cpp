@@ -834,12 +834,12 @@ Uint32 ComputeMipLevelsCount( Uint32 Width )
 
 Uint32 ComputeMipLevelsCount( Uint32 Width, Uint32 Height )
 {
-    return ComputeMipLevelsCount( max( Width, Height ) );
+    return ComputeMipLevelsCount( stl::max( Width, Height ) );
 }
 
 Uint32 ComputeMipLevelsCount( Uint32 Width, Uint32 Height, Uint32 Depth )
 {
-    return ComputeMipLevelsCount( max(max( Width, Height ), Depth) );
+    return ComputeMipLevelsCount( stl::max(stl::max( Width, Height ), Depth) );
 }
 
 bool VerifyResourceStates(RESOURCE_STATE State, bool IsTexture)

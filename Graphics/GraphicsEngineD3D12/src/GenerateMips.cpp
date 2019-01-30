@@ -126,10 +126,10 @@ namespace Diligent
         const auto &ViewDesc = pTexView->GetDesc();
         for (uint32_t TopMip = 0; TopMip < TexDesc.MipLevels - 1; )
         {
-            uint32_t SrcWidth  = max(TexDesc.Width  >> TopMip, 1u);
-            uint32_t SrcHeight = max(TexDesc.Height >> TopMip, 1u);
-            uint32_t DstWidth  = max(SrcWidth  >> 1, 1u);
-            uint32_t DstHeight = max(SrcHeight >> 1, 1u);
+            uint32_t SrcWidth  = stl::max(TexDesc.Width  >> TopMip, 1u);
+            uint32_t SrcHeight = stl::max(TexDesc.Height >> TopMip, 1u);
+            uint32_t DstWidth  = stl::max(SrcWidth  >> 1, 1u);
+            uint32_t DstHeight = stl::max(SrcHeight >> 1, 1u);
 
             // Determine if the first downsample is more than 2:1.  This happens whenever
             // the source width or height is odd.
@@ -186,7 +186,7 @@ namespace Diligent
             // So we must populate all 4 slots even though we may actually process less than 4 mip levels
             // Copy top mip level UAV descriptor handle to all unused slots
             for (Uint32 u = 0; u < MaxMipsHandledByCS; ++u)
-                SrcDescriptorRanges[1 + u] = pTexD3D12->GetMipLevelUAV(min(TopMip + u + 1, TexDesc.MipLevels - 1));
+                SrcDescriptorRanges[1 + u] = pTexD3D12->GetMipLevelUAV(stl::min(TopMip + u + 1, TexDesc.MipLevels - 1));
 
             pd3d12Device->CopyDescriptors(1, &DstDescriptorRange, &DstRangeSize, 1 + MaxMipsHandledByCS, SrcDescriptorRanges, SrcRangeSizes, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 

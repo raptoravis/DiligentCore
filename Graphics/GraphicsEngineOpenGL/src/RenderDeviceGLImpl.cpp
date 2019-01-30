@@ -468,7 +468,7 @@ void RenderDeviceGLImpl::FlagSupportedTexFormats()
 
     const int TestTextureDim = 32;
     const int MaxTexelSize = 16;
-    vector<Uint8> ZeroData(TestTextureDim * TestTextureDim * MaxTexelSize);
+    stl::vector<Uint8> ZeroData(TestTextureDim * TestTextureDim * MaxTexelSize);
     
     // Go through all formats and try to create small 2D texture to check if the format is supported
     for( auto FmtInfo = m_TextureFormatsInfo.begin(); FmtInfo != m_TextureFormatsInfo.end(); ++FmtInfo )

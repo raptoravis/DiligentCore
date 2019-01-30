@@ -35,7 +35,7 @@ BufferViewD3D12Impl::BufferViewD3D12Impl( IReferenceCounters*        pRefCounter
                                           DescriptorHeapAllocation&& HandleAlloc,
                                           bool                       bIsDefaultView ) :
     TBufferViewBase( pRefCounters, pDevice, ViewDesc, pBuffer, bIsDefaultView ),
-    m_DescriptorHandle( move(HandleAlloc) )
+    m_DescriptorHandle( stl::move(HandleAlloc) )
 {
 }
 

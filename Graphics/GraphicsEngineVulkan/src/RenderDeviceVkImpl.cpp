@@ -44,7 +44,7 @@ RenderDeviceVkImpl :: RenderDeviceVkImpl(IReferenceCounters*                    
                                          size_t                                                  CommandQueueCount,
                                          ICommandQueueVk**                                       CmdQueues, 
                                          std::shared_ptr<VulkanUtilities::VulkanInstance>        Instance,
-                                         unique_ptr<VulkanUtilities::VulkanPhysicalDevice>       PhysicalDevice,
+                                         stl::unique_ptr<VulkanUtilities::VulkanPhysicalDevice>  PhysicalDevice,
                                          std::shared_ptr<VulkanUtilities::VulkanLogicalDevice>   LogicalDevice,
                                          Uint32                                                  NumDeferredContexts) : 
     TRenderDeviceBase
@@ -65,8 +65,8 @@ RenderDeviceVkImpl :: RenderDeviceVkImpl(IReferenceCounters*                    
         sizeof(FenceVkImpl)
     },
     m_VulkanInstance    (Instance),
-    m_PhysicalDevice    (move(PhysicalDevice)),
-    m_LogicalVkDevice   (move(LogicalDevice)),
+    m_PhysicalDevice    (stl::move(PhysicalDevice)),
+    m_LogicalVkDevice   (stl::move(LogicalDevice)),
     m_EngineAttribs     (CreationAttribs),
     m_FramebufferCache  (*this),
     m_RenderPassCache   (*this),
@@ -74,7 +74,7 @@ RenderDeviceVkImpl :: RenderDeviceVkImpl(IReferenceCounters*                    
     {
         *this,
         "Main descriptor pool",
-        vector<VkDescriptorPoolSize>
+        stl::vector<VkDescriptorPoolSize>
         {
             {VK_DESCRIPTOR_TYPE_SAMPLER,                CreationAttribs.MainDescriptorPoolSize.NumSeparateSamplerDescriptors},
             {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, CreationAttribs.MainDescriptorPoolSize.NumCombinedSamplerDescriptors},
@@ -94,7 +94,7 @@ RenderDeviceVkImpl :: RenderDeviceVkImpl(IReferenceCounters*                    
     {
         *this,
         "Dynamic descriptor pool",
-        vector<VkDescriptorPoolSize>
+        stl::vector<VkDescriptorPoolSize>
         {
             {VK_DESCRIPTOR_TYPE_SAMPLER,                CreationAttribs.DynamicDescriptorPoolSize.NumSeparateSamplerDescriptors},
             {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, CreationAttribs.DynamicDescriptorPoolSize.NumCombinedSamplerDescriptors},
@@ -236,14 +236,14 @@ void RenderDeviceVkImpl::ExecuteAndDisposeTransientCmdBuff(Uint32 QueueIndex, Vk
             FenceValue = pCmdQueueVk->Submit(SubmitInfo);
         }
     );
-    m_TransientCmdPoolMgr.SafeReleaseCommandPool(move(CmdPool), QueueIndex, FenceValue);
+    m_TransientCmdPoolMgr.SafeReleaseCommandPool(stl::move(CmdPool), QueueIndex, FenceValue);
 }
 
 void RenderDeviceVkImpl::SubmitCommandBuffer(Uint32              QueueIndex, 
                                              const VkSubmitInfo& SubmitInfo, 
                                              Uint64&             SubmittedCmdBuffNumber,                      // Number of the submitted command buffer 
                                              Uint64&             SubmittedFenceValue,                         // Fence value associated with the submitted command buffer
-                                             vector<std::pair<Uint64, RefCntAutoPtr<IFence> > >* pFences // List of fences to signal
+                                             stl::vector<std::pair<Uint64, RefCntAutoPtr<IFence> > >* pFences // List of fences to signal
                                              )
 {
 	// Submit the command list to the queue
@@ -257,12 +257,12 @@ void RenderDeviceVkImpl::SubmitCommandBuffer(Uint32              QueueIndex,
             auto* pFenceVkImpl = val_fence.second.RawPtr<FenceVkImpl>();
             auto vkFence = pFenceVkImpl->GetVkFence();
             m_CommandQueues[QueueIndex].CmdQueue->SignalFence(vkFence);
-            pFenceVkImpl->AddPendingFence(move(vkFence), val_fence.first);
+            pFenceVkImpl->AddPendingFence(stl::move(vkFence), val_fence.first);
         }
     }
 }
 
-Uint64 RenderDeviceVkImpl::ExecuteCommandBuffer(Uint32 QueueIndex, const VkSubmitInfo& SubmitInfo, DeviceContextVkImpl* pImmediateCtx, vector<pair<Uint64, RefCntAutoPtr<IFence> > >* pSignalFences)
+Uint64 RenderDeviceVkImpl::ExecuteCommandBuffer(Uint32 QueueIndex, const VkSubmitInfo& SubmitInfo, DeviceContextVkImpl* pImmediateCtx, stl::vector<stl::pair<Uint64, RefCntAutoPtr<IFence> > >* pSignalFences)
 {
     // pImmediateCtx parameter is only used to make sure the command buffer is submitted from the immediate context
     // Stale objects MUST only be discarded when submitting cmd list from the immediate context
@@ -468,7 +468,7 @@ void RenderDeviceVkImpl::CreateTexture(const TextureDesc& TexDesc, VkImage vkImg
     CreateDeviceObject( "texture", TexDesc, ppTexture, 
         [&]()
         {
-            TextureVkImpl* pTextureVk = NEW_RC_OBJ(m_TexObjAllocator, "TextureVkImpl instance", TextureVkImpl)(m_TexViewObjAllocator, this, TexDesc, InitialState, move(vkImgHandle));
+            TextureVkImpl* pTextureVk = NEW_RC_OBJ(m_TexObjAllocator, "TextureVkImpl instance", TextureVkImpl)(m_TexViewObjAllocator, this, TexDesc, InitialState, stl::move(vkImgHandle));
             pTextureVk->QueryInterface( IID_TextureVk, reinterpret_cast<IObject**>(ppTexture) );
         }
     );

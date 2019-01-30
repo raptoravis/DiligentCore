@@ -37,7 +37,7 @@ TextureViewVkImpl::TextureViewVkImpl( IReferenceCounters*                 pRefCo
                                       VulkanUtilities::ImageViewWrapper&& ImgView,
                                       bool bIsDefaultView ) :
     TTextureViewBase( pRefCounters, pDevice, ViewDesc, pTexture, bIsDefaultView ),
-    m_ImageView(move(ImgView))
+    m_ImageView(stl::move(ImgView))
 {
 }
 
@@ -45,7 +45,7 @@ TextureViewVkImpl::~TextureViewVkImpl()
 {
     if(m_Desc.ViewType == TEXTURE_VIEW_DEPTH_STENCIL || m_Desc.ViewType == TEXTURE_VIEW_RENDER_TARGET)
         m_pDevice->GetFramebufferCache().OnDestroyImageView(m_ImageView);
-    m_pDevice->SafeReleaseDeviceObject(move(m_ImageView), m_pTexture->GetDesc().CommandQueueMask);
+    m_pDevice->SafeReleaseDeviceObject(stl::move(m_ImageView), m_pTexture->GetDesc().CommandQueueMask);
 }
 
 IMPLEMENT_QUERY_INTERFACE( TextureViewVkImpl, IID_TextureViewVk, TTextureViewBase )

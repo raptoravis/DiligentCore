@@ -93,8 +93,8 @@ public:
                                                           const TEXTURE_FORMAT                                     RTVFormats[], 
                                                           TEXTURE_FORMAT                                           DSVFormat,
                                                           Uint32                                                   SampleCount,
-                                                          array<VkAttachmentDescription, MaxRenderTargets+1>&      Attachments,
-                                                          array<VkAttachmentReference,   MaxRenderTargets+1>&      AttachmentReferences,
+                                                          stl::array<VkAttachmentDescription, MaxRenderTargets+1>& Attachments,
+                                                          stl::array<VkAttachmentReference,   MaxRenderTargets+1>& AttachmentReferences,
                                                           VkSubpassDescription&                                    SubpassDesc);
 
 
@@ -104,7 +104,7 @@ private:
     // SRB memory allocator must be declared before m_pDefaultShaderResBinding
     SRBMemoryAllocator m_SRBMemAllocator;
     
-    array<VulkanUtilities::ShaderModuleWrapper, MaxShadersInPipeline> m_ShaderModules;
+    stl::array<VulkanUtilities::ShaderModuleWrapper, MaxShadersInPipeline> m_ShaderModules;
 
     VkRenderPass m_RenderPass = VK_NULL_HANDLE; // Render passes are managed by the render device
     VulkanUtilities::PipelineWrapper m_Pipeline;

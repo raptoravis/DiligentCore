@@ -57,7 +57,7 @@ Texture3D_D3D11 :: Texture3D_D3D11(IReferenceCounters*        pRefCounters,
         MiscFlags
     };
 
-    vector<D3D11_SUBRESOURCE_DATA, STDAllocatorRawMem<D3D11_SUBRESOURCE_DATA>> D3D11InitData( STD_ALLOCATOR_RAW_MEM(D3D11_SUBRESOURCE_DATA, GetRawAllocator(), "Allocator for vector<D3D11_SUBRESOURCE_DATA>") );
+    stl::vector<D3D11_SUBRESOURCE_DATA, STDAllocatorRawMem<D3D11_SUBRESOURCE_DATA>> D3D11InitData( STD_ALLOCATOR_RAW_MEM(D3D11_SUBRESOURCE_DATA, GetRawAllocator(), "Allocator for vector<D3D11_SUBRESOURCE_DATA>") );
     PrepareD3D11InitData(InitData, Tex3DDesc.MipLevels, D3D11InitData);
 
     ID3D11Texture3D *ptex3D = nullptr;
@@ -110,7 +110,7 @@ public:
         return TexDesc;
     }
 private:
-    vector<char> ObjectName;
+    stl::vector<char> ObjectName;
 };
 
 }

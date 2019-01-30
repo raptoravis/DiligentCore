@@ -219,7 +219,7 @@ namespace Diligent
         OffsetType GetUsedSize()const { return m_UsedSize; }
 
     private:
-        deque< FrameHeadAttribs, STDAllocatorRawMem<FrameHeadAttribs> > m_CompletedFrameHeads;
+        stl::deque< FrameHeadAttribs, STDAllocatorRawMem<FrameHeadAttribs> > m_CompletedFrameHeads;
         OffsetType m_Tail          = 0;
         OffsetType m_Head          = 0;
         OffsetType m_MaxSize       = 0;

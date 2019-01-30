@@ -60,7 +60,7 @@ public:
     {
         CmdBuff               = m_vkCmdBuff;
         m_vkCmdBuff           = VK_NULL_HANDLE;
-        pDeferredCtx          = move(m_pDeferredCtx);
+        pDeferredCtx          = stl::move(m_pDeferredCtx);
     }
 
 private:

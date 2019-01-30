@@ -88,7 +88,7 @@ ID3D12GraphicsCommandList* CommandContext::Close(CComPtr<ID3D12CommandAllocator>
 	auto hr = m_pCommandList->Close();
     DEV_CHECK_ERR(SUCCEEDED(hr), "Failed to close the command list");
     
-    pAllocator = move(m_pCurrentAllocator);
+    pAllocator = stl::move(m_pCurrentAllocator);
     return m_pCommandList;
 }
 

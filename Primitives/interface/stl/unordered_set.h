@@ -29,7 +29,7 @@
 
 #include "../../External/EASTL/include/EASTL/hash_set.h"
 
-namespace Diligent
+namespace stl
 {
 
 template <typename  Key,
@@ -51,7 +51,7 @@ using unordered_multiset = eastl::hash_multiset<Key, Hash, Predicate, Allocator,
 
 #include <unordered_set>
 
-namespace Diligent
+namespace stl
 {
 
 template <typename  Key,

@@ -71,7 +71,7 @@ private:
     virtual void UpdateSwapChain(bool CreateNew)override final;
     void InitBuffersAndViews();
 
-    vector< RefCntAutoPtr<ITextureViewD3D12>, STDAllocatorRawMem<RefCntAutoPtr<ITextureViewD3D12>> > m_pBackBufferRTV;
+    stl::vector< RefCntAutoPtr<ITextureViewD3D12>, STDAllocatorRawMem<RefCntAutoPtr<ITextureViewD3D12>> > m_pBackBufferRTV;
     RefCntAutoPtr<ITextureViewD3D12> m_pDepthBufferDSV;
 };
 

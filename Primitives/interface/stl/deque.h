@@ -27,7 +27,7 @@
 
 #include "../../External/EASTL/include/EASTL/deque.h"
 
-namespace Diligent
+namespace stl
 {
 
 template <typename  T,
@@ -41,7 +41,7 @@ using deque = eastl::deque<T, Allocator, kDequeSubarraySize>;
 
 #include <deque>
 
-namespace Diligent
+namespace stl
 {
 
 template <typename   T,

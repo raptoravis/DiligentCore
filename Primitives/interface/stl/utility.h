@@ -27,7 +27,7 @@
 
 #include "../../External/EASTL/include/EASTL/utility.h"
 
-namespace Diligent
+namespace stl
 {
 
 using eastl::pair;
@@ -43,7 +43,7 @@ using eastl::swap;
 
 #include <utility>
 
-namespace Diligent
+namespace stl
 {
 
 using std::pair;

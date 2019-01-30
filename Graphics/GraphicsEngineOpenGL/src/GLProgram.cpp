@@ -36,9 +36,9 @@ namespace Diligent
     {}
     
     GLProgram::GLProgram( GLProgram&& Program ):
-        GLObjectWrappers::GLProgramObj(move(Program )                   ),
-        m_AllResources                (move(Program.m_AllResources)     ),
-        m_ConstantResources           (move(Program.m_ConstantResources))
+        GLObjectWrappers::GLProgramObj(stl::move(Program )                   ),
+        m_AllResources                (stl::move(Program.m_AllResources)     ),
+        m_ConstantResources           (stl::move(Program.m_ConstantResources))
     {}
 
     void GLProgram::InitResources(RenderDeviceGLImpl* pDeviceGLImpl, 

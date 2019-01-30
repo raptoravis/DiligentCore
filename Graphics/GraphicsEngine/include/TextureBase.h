@@ -184,13 +184,13 @@ protected:
 #endif
     // WARNING! We cannot use ITextureView here, because ITextureView has no virtual dtor!
     /// Default SRV addressing the entire texture
-    unique_ptr<TTextureViewImpl, STDDeleter<TTextureViewImpl, TTexViewObjAllocator>> m_pDefaultSRV;
+    stl::unique_ptr<TTextureViewImpl, STDDeleter<TTextureViewImpl, TTexViewObjAllocator>> m_pDefaultSRV;
     /// Default RTV addressing the most detailed mip level
-    unique_ptr<TTextureViewImpl, STDDeleter<TTextureViewImpl, TTexViewObjAllocator>> m_pDefaultRTV;
+    stl::unique_ptr<TTextureViewImpl, STDDeleter<TTextureViewImpl, TTexViewObjAllocator>> m_pDefaultRTV;
     /// Default DSV addressing the most detailed mip level
-    unique_ptr<TTextureViewImpl, STDDeleter<TTextureViewImpl, TTexViewObjAllocator>> m_pDefaultDSV;
+    stl::unique_ptr<TTextureViewImpl, STDDeleter<TTextureViewImpl, TTexViewObjAllocator>> m_pDefaultDSV;
     /// Default UAV addressing the entire texture
-    unique_ptr<TTextureViewImpl, STDDeleter<TTextureViewImpl, TTexViewObjAllocator>> m_pDefaultUAV;
+    stl::unique_ptr<TTextureViewImpl, STDDeleter<TTextureViewImpl, TTexViewObjAllocator>> m_pDefaultUAV;
 
     /// Implementation of ITexture::GetDefaultView().
     ITextureView* GetDefaultView( TEXTURE_VIEW_TYPE ViewType )override

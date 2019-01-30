@@ -463,7 +463,7 @@ void RootSignature::Finalize(ID3D12Device* pd3d12Device)
     rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
     
     auto TotalParams = m_RootParams.GetNumRootTables() + m_RootParams.GetNumRootViews();
-    vector<D3D12_ROOT_PARAMETER, STDAllocatorRawMem<D3D12_ROOT_PARAMETER> > D3D12Parameters( TotalParams, D3D12_ROOT_PARAMETER(), STD_ALLOCATOR_RAW_MEM(D3D12_ROOT_PARAMETER, GetRawAllocator(), "Allocator for vector<D3D12_ROOT_PARAMETER>") );
+    stl::vector<D3D12_ROOT_PARAMETER, STDAllocatorRawMem<D3D12_ROOT_PARAMETER> > D3D12Parameters( TotalParams, D3D12_ROOT_PARAMETER(), STD_ALLOCATOR_RAW_MEM(D3D12_ROOT_PARAMETER, GetRawAllocator(), "Allocator for vector<D3D12_ROOT_PARAMETER>") );
     for(Uint32 rt = 0; rt < m_RootParams.GetNumRootTables(); ++rt)
     {
         const auto& RootTable = m_RootParams.GetRootTable(rt);
@@ -488,7 +488,7 @@ void RootSignature::Finalize(ID3D12Device* pd3d12Device)
         TotalD3D12StaticSamplers += StSam.ArraySize;
     rootSignatureDesc.NumStaticSamplers = TotalD3D12StaticSamplers;
     rootSignatureDesc.pStaticSamplers = nullptr;
-    vector<D3D12_STATIC_SAMPLER_DESC, STDAllocatorRawMem<D3D12_STATIC_SAMPLER_DESC> > D3D12StaticSamplers( STD_ALLOCATOR_RAW_MEM(D3D12_STATIC_SAMPLER_DESC, GetRawAllocator(), "Allocator for vector<D3D12_STATIC_SAMPLER_DESC>") );
+    stl::vector<D3D12_STATIC_SAMPLER_DESC, STDAllocatorRawMem<D3D12_STATIC_SAMPLER_DESC> > D3D12StaticSamplers( STD_ALLOCATOR_RAW_MEM(D3D12_STATIC_SAMPLER_DESC, GetRawAllocator(), "Allocator for vector<D3D12_STATIC_SAMPLER_DESC>") );
     D3D12StaticSamplers.reserve(TotalD3D12StaticSamplers);
     if ( !m_StaticSamplers.empty() )
     {
@@ -520,7 +520,7 @@ void RootSignature::Finalize(ID3D12Device* pd3d12Device)
         rootSignatureDesc.pStaticSamplers = D3D12StaticSamplers.data();
         
         // Release static samplers array, we no longer need it
-        vector<StaticSamplerAttribs, STDAllocatorRawMem<StaticSamplerAttribs> > EmptySamplers( STD_ALLOCATOR_RAW_MEM(StaticSamplerAttribs, GetRawAllocator(), "Allocator for vector<StaticSamplerAttribs>") );
+        stl::vector<StaticSamplerAttribs, STDAllocatorRawMem<StaticSamplerAttribs> > EmptySamplers( STD_ALLOCATOR_RAW_MEM(StaticSamplerAttribs, GetRawAllocator(), "Allocator for vector<StaticSamplerAttribs>") );
         m_StaticSamplers.swap( EmptySamplers );
 
         VERIFY_EXPR(D3D12StaticSamplers.size() == TotalD3D12StaticSamplers);
@@ -552,12 +552,12 @@ size_t RootSignature::GetResourceCacheRequiredMemSize()const
     return ShaderResourceCacheD3D12::GetRequiredMemorySize(static_cast<Uint32>(CacheTableSizes.size()), CacheTableSizes.data());
 }
 
-vector<Uint32, STDAllocatorRawMem<Uint32> > RootSignature::GetCacheTableSizes()const
+stl::vector<Uint32, STDAllocatorRawMem<Uint32> > RootSignature::GetCacheTableSizes()const
 {
     // Get root table size for every root index
     // m_RootParams keeps root tables sorted by the array index, not the root index
     // Root views are treated as one-descriptor tables
-    vector<Uint32, STDAllocatorRawMem<Uint32> > CacheTableSizes(m_RootParams.GetNumRootTables() + m_RootParams.GetNumRootViews(), 0, STD_ALLOCATOR_RAW_MEM(Uint32, GetRawAllocator(), "Allocator for vector<Uint32>") );
+    stl::vector<Uint32, STDAllocatorRawMem<Uint32> > CacheTableSizes(m_RootParams.GetNumRootTables() + m_RootParams.GetNumRootViews(), 0, STD_ALLOCATOR_RAW_MEM(Uint32, GetRawAllocator(), "Allocator for vector<Uint32>") );
     for(Uint32 rt = 0; rt < m_RootParams.GetNumRootTables(); ++rt)
     {
         auto& RootParam = m_RootParams.GetRootTable(rt);
@@ -664,7 +664,7 @@ void RootSignature::InitResourceCache(RenderDeviceD3D12Impl*    pDeviceD3D12Impl
     VERIFY_EXPR(SrvCbvUavTblStartOffset == TotalSrvCbvUavDescriptors);
     VERIFY_EXPR(SamplerTblStartOffset == TotalSamplerDescriptors);
 
-    ResourceCache.SetDescriptorHeapSpace(move(CbcSrvUavHeapSpace), move(SamplerHeapSpace));
+    ResourceCache.SetDescriptorHeapSpace(stl::move(CbcSrvUavHeapSpace), stl::move(SamplerHeapSpace));
 }
 
 __forceinline

@@ -109,13 +109,13 @@ protected:
     // Must be the first member because its constructor initializes OpenGL
     GLContext m_GLContext; 
 
-    unordered_set<String> m_ExtensionStrings;
+    stl::unordered_set<String> m_ExtensionStrings;
 
     ThreadingTools::LockFlag m_VAOCacheLockFlag;
-    unordered_map<GLContext::NativeGLContextType, VAOCache> m_VAOCache;
+    stl::unordered_map<GLContext::NativeGLContextType, VAOCache> m_VAOCache;
 
     ThreadingTools::LockFlag m_FBOCacheLockFlag;
-    unordered_map<GLContext::NativeGLContextType, FBOCache> m_FBOCache;
+    stl::unordered_map<GLContext::NativeGLContextType, FBOCache> m_FBOCache;
 
     GPUInfo m_GPUInfo;
 

@@ -55,9 +55,9 @@ Texture3D_OGL::Texture3D_OGL( IReferenceCounters *pRefCounters,
     //for (i = 0; i < levels; i++)
     //{
     //    glTexImage3D(target, i, internalformat, width, height, depth, 0, format, type, NULL);
-    //    width = max(1, (width / 2));
-    //    height = max(1, (height / 2));
-    //    depth = max(1, (depth / 2));
+    //    width = stl::max(1, (width / 2));
+    //    height = stl::max(1, (height / 2));
+    //    depth = stl::max(1, (depth / 2));
     //
 
     SetDefaultGLParameters();
@@ -68,9 +68,9 @@ Texture3D_OGL::Texture3D_OGL( IReferenceCounters *pRefCounters,
         {
             for(Uint32 Mip = 0; Mip < m_Desc.MipLevels; ++Mip)
             {
-                Box DstBox{0, max(m_Desc.Width >>Mip, 1U),
-                           0, max(m_Desc.Height>>Mip, 1U), 
-                           0, max(m_Desc.Depth >>Mip, 1U)};
+                Box DstBox{0, stl::max(m_Desc.Width >>Mip, 1U),
+                           0, stl::max(m_Desc.Height>>Mip, 1U), 
+                           0, stl::max(m_Desc.Depth >>Mip, 1U)};
                 // UpdateData() is a virtual function. If we try to call it through vtbl from here,
                 // we will get into TextureBaseGL::UpdateData(), because instance of Texture3D_OGL
                 // is not fully constructed yet.

@@ -260,7 +260,7 @@ private:
         m_State.NumCommands = m_State.NumCommands != 0 ? m_State.NumCommands : 1;
         return *m_CurrCmdCtx;
     }
-    unique_ptr<CommandContext, STDDeleterRawMem<CommandContext> > m_CurrCmdCtx;
+    stl::unique_ptr<CommandContext, STDDeleterRawMem<CommandContext> > m_CurrCmdCtx;
 
     struct State
     {
@@ -294,7 +294,7 @@ private:
 
     FixedBlockMemoryAllocator m_CmdListAllocator;
 
-    vector<pair<Uint64, RefCntAutoPtr<IFence> > > m_PendingFences;
+    stl::vector<stl::pair<Uint64, RefCntAutoPtr<IFence> > > m_PendingFences;
 
     struct MappedTextureKey
     {
@@ -314,7 +314,7 @@ private:
             }
         };
     };
-    unordered_map<MappedTextureKey, TextureUploadSpace, MappedTextureKey::Hasher> m_MappedTextures;
+    stl::unordered_map<MappedTextureKey, TextureUploadSpace, MappedTextureKey::Hasher> m_MappedTextures;
 };
 
 }

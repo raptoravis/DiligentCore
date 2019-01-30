@@ -71,7 +71,7 @@ public:
         {
         public:
             SpecificStaleResource(ResourceType&& SpecificResource) :
-                m_SpecificResource(move(SpecificResource))
+                m_SpecificResource(stl::move(SpecificResource))
             {}
 
             SpecificStaleResource             (const SpecificStaleResource&) = delete;
@@ -92,7 +92,7 @@ public:
         {
         public:
             SpecificSharedStaleResource(ResourceType&& SpecificResource, Atomics::Long NumReferences) :
-                m_SpecificResource(move(SpecificResource))
+                m_SpecificResource(stl::move(SpecificResource))
             {
                 m_RefCounter = NumReferences;
             }
@@ -117,13 +117,13 @@ public:
 
         return DynamicStaleResourceWrapper{
             NumReferences == 1 ?
-                static_cast<StaleResourceBase*>( new SpecificStaleResource      {move(Resource)} ) :
-                static_cast<StaleResourceBase*>( new SpecificSharedStaleResource{move(Resource), NumReferences} )
+                static_cast<StaleResourceBase*>( new SpecificStaleResource      {stl::move(Resource)} ) :
+                static_cast<StaleResourceBase*>( new SpecificSharedStaleResource{stl::move(Resource), NumReferences} )
         };
     }
 
     DynamicStaleResourceWrapper(DynamicStaleResourceWrapper&& rhs) noexcept :
-        m_pStaleResource(move(rhs.m_pStaleResource))
+        m_pStaleResource(stl::move(rhs.m_pStaleResource))
     {
         rhs.m_pStaleResource = nullptr;
     }
@@ -229,7 +229,7 @@ public:
     template<typename ResourceType, typename = typename std::enable_if<std::is_object<ResourceType>::value>::type>
     static ResourceWrapperType CreateWrapper(ResourceType&& Resource, Atomics::Long NumReferences)
     {
-        return ResourceWrapperType::Create(move(Resource), NumReferences);
+        return ResourceWrapperType::Create(stl::move(Resource), NumReferences);
     }
 
     /// Moves a resource to the stale resources queue
@@ -247,7 +247,7 @@ public:
     void SafeReleaseResource(ResourceWrapperType&& Wrapper, Uint64 NextCommandListNumber)
     {
         std::lock_guard<std::mutex> LockGuard(m_StaleObjectsMutex);
-        m_StaleResources.emplace_back(NextCommandListNumber, move(Wrapper));
+        m_StaleResources.emplace_back(NextCommandListNumber, stl::move(Wrapper));
     }
 
     /// Moves a copy of the resource wrapper to the stale resources queue
@@ -265,7 +265,7 @@ public:
     template<typename ResourceType, typename = typename std::enable_if<std::is_object<ResourceType>::value>::type>
     void DiscardResource(ResourceType&& Resource, Uint64 FenceValue)
     {
-        DiscardResource(CreateWrapper(move(Resource), 1), FenceValue);
+        DiscardResource(CreateWrapper(stl::move(Resource), 1), FenceValue);
     }
 
     /// Adds a resource wrapper directly to the release queue
@@ -274,7 +274,7 @@ public:
     void DiscardResource(ResourceWrapperType&& Wrapper, Uint64 FenceValue)
     {
         std::lock_guard<std::mutex> ReleaseQueueLock(m_ReleaseQueueMutex);
-        m_ReleaseQueue.emplace_back(FenceValue, move(Wrapper) );
+        m_ReleaseQueue.emplace_back(FenceValue, stl::move(Wrapper) );
     }
 
     /// Adds a copy of the resource wrapper directly to the release queue
@@ -318,7 +318,7 @@ public:
             auto &FirstStaleObj = m_StaleResources.front();
             if (FirstStaleObj.first <= SubmittedCmdBuffNumber)
             {
-                m_ReleaseQueue.emplace_back(FenceValue, move(FirstStaleObj.second));
+                m_ReleaseQueue.emplace_back(FenceValue, stl::move(FirstStaleObj.second));
                 m_StaleResources.pop_front();
             }
             else 
@@ -361,11 +361,11 @@ public:
 private:
 
     std::mutex m_ReleaseQueueMutex;
-    using ReleaseQueueElemType = pair<Uint64, ResourceWrapperType>;
-    deque< ReleaseQueueElemType, STDAllocatorRawMem<ReleaseQueueElemType> > m_ReleaseQueue;
+    using ReleaseQueueElemType = stl::pair<Uint64, ResourceWrapperType>;
+    stl::deque< ReleaseQueueElemType, STDAllocatorRawMem<ReleaseQueueElemType> > m_ReleaseQueue;
 
     std::mutex m_StaleObjectsMutex;
-    deque< ReleaseQueueElemType, STDAllocatorRawMem<ReleaseQueueElemType> > m_StaleResources;
+    stl::deque< ReleaseQueueElemType, STDAllocatorRawMem<ReleaseQueueElemType> > m_StaleResources;
 };
 
 }

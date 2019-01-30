@@ -100,8 +100,8 @@ private:
     UniqueIdentifier m_GLPipelineId = -1;
     UniqueIdentifier m_VAOId = -1;
     UniqueIdentifier m_FBOId = -1;
-    vector< UniqueIdentifier > m_BoundTextures;
-    vector< UniqueIdentifier > m_BoundSamplers;
+    stl::vector< UniqueIdentifier > m_BoundTextures;
+    stl::vector< UniqueIdentifier > m_BoundSamplers;
     struct BoundImageInfo
     {
         UniqueIdentifier InterfaceID = -1;
@@ -137,7 +137,7 @@ private:
                     Format      == rhs.Format;
         }
     };
-    vector< BoundImageInfo > m_BoundImages;
+    stl::vector< BoundImageInfo > m_BoundImages;
 
     Uint32 m_PendingMemoryBarriers = 0;
 

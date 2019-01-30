@@ -127,9 +127,9 @@ private:
 
     friend class RenderDeviceGLImpl;
     ThreadingTools::LockFlag m_CacheLockFlag;
-    unordered_map<VAOCacheKey, GLObjectWrappers::GLVertexArrayObj, VAOCacheKeyHashFunc> m_Cache;
-    unordered_multimap<const IPipelineState*, VAOCacheKey> m_PSOToKey;
-    unordered_multimap<const IBuffer*, VAOCacheKey> m_BuffToKey;
+    stl::unordered_map<VAOCacheKey, GLObjectWrappers::GLVertexArrayObj, VAOCacheKeyHashFunc> m_Cache;
+    stl::unordered_multimap<const IPipelineState*, VAOCacheKey> m_PSOToKey;
+    stl::unordered_multimap<const IBuffer*, VAOCacheKey> m_BuffToKey;
 
     // Any draw command fails if no VAO is bound. We will use this empty
     // VAO for draw commands with null input layout, such as these that

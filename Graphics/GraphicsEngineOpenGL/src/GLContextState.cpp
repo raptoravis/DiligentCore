@@ -179,7 +179,7 @@ namespace Diligent
     }
 
     template<class ObjectType>
-    bool UpdateBoundObjectsArr( vector< UniqueIdentifier >& BoundObjectIDs, Uint32 Index, const ObjectType &NewObject, GLuint &NewGLHandle )
+    bool UpdateBoundObjectsArr( stl::vector< UniqueIdentifier >& BoundObjectIDs, Uint32 Index, const ObjectType &NewObject, GLuint &NewGLHandle )
     {
         if( Index >= BoundObjectIDs.size() )
             BoundObjectIDs.resize( Index + 1, -1 );

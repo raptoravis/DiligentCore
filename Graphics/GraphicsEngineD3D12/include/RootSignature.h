@@ -128,7 +128,7 @@ public:
             for (Uint32 r = 0; r < SrcTbl.NumDescriptorRanges; ++r)
             {
                 const auto &Range = SrcTbl.pDescriptorRanges[r];
-                dbgTableSize = max(dbgTableSize, Range.OffsetInDescriptorsFromTableStart + Range.NumDescriptors);
+                dbgTableSize = stl::max(dbgTableSize, Range.OffsetInDescriptorsFromTableStart + Range.NumDescriptors);
             }
             VERIFY(dbgTableSize == m_DescriptorTableSize, "Incorrect descriptor table size");
             
@@ -158,7 +158,7 @@ public:
 		range.BaseShaderRegister = Register;
 		range.RegisterSpace      = Space;
 		range.OffsetInDescriptorsFromTableStart = OffsetFromTableStart;
-        m_DescriptorTableSize = max(m_DescriptorTableSize, OffsetFromTableStart + Count);
+        m_DescriptorTableSize = stl::max(m_DescriptorTableSize, OffsetFromTableStart + Count);
 	}
 
     SHADER_VARIABLE_TYPE GetShaderVariableType()const{ return m_ShaderVarType; }
@@ -360,11 +360,11 @@ private:
     void dbgVerifyRootParameters()const;
 #endif
     
-    vector<Uint32, STDAllocatorRawMem<Uint32> > GetCacheTableSizes()const;
+    stl::vector<Uint32, STDAllocatorRawMem<Uint32> > GetCacheTableSizes()const;
 
-    array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES> m_TotalSrvCbvUavSlots = {};
-    array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES> m_TotalSamplerSlots   = {};
-    array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES> m_TotalRootViews      = {};
+    stl::array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES> m_TotalSrvCbvUavSlots = {};
+    stl::array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES> m_TotalSamplerSlots   = {};
+    stl::array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES> m_TotalRootViews      = {};
     
     CComPtr<ID3D12RootSignature> m_pd3d12RootSignature;
 
@@ -435,7 +435,7 @@ private:
                                        Uint32 RootTableToAddRanges = static_cast<Uint32>(-1));
 
         IMemoryAllocator &m_MemAllocator;
-        unique_ptr<void, STDDeleter<void, IMemoryAllocator>> m_pMemory;
+        stl::unique_ptr<void, STDDeleter<void, IMemoryAllocator>> m_pMemory;
         Uint32 m_NumRootTables         = 0;
         Uint32 m_NumRootViews          = 0;
         Uint32 m_TotalDescriptorRanges = 0;
@@ -449,9 +449,9 @@ private:
     // in m_RootParams (NOT the Root Index!), for every variable type 
     // (static, mutable, dynamic) and every shader type,
     // or -1, if the table is not yet assigned to the combination
-    array<Uint8, SHADER_VARIABLE_TYPE_NUM_TYPES * 6> m_SrvCbvUavRootTablesMap;
+    stl::array<Uint8, SHADER_VARIABLE_TYPE_NUM_TYPES * 6> m_SrvCbvUavRootTablesMap;
     // This array contains the same data for Sampler root table
-    array<Uint8, SHADER_VARIABLE_TYPE_NUM_TYPES * 6> m_SamplerRootTablesMap;
+    stl::array<Uint8, SHADER_VARIABLE_TYPE_NUM_TYPES * 6> m_SamplerRootTablesMap;
 
     RootParamsManager m_RootParams;
     
@@ -470,7 +470,7 @@ private:
         {}
     };
     // Note: sizeof(m_StaticSamplers) == 56 (MS compiler, release x64)
-    vector<StaticSamplerAttribs, STDAllocatorRawMem<StaticSamplerAttribs> > m_StaticSamplers;
+    stl::vector<StaticSamplerAttribs, STDAllocatorRawMem<StaticSamplerAttribs> > m_StaticSamplers;
 
     IMemoryAllocator &m_MemAllocator;
 

@@ -574,7 +574,7 @@ namespace VulkanUtilities
             FlagsString += VkAccessFlagBitToString( static_cast<VkAccessFlagBits>(Bit) );
             Flags = Flags & (Flags - 1);
         }
-        return Diligent::move(FlagsString);
+        return stl::move(FlagsString);
     }
 
     const char* VkObjectTypeToString(VkObjectType ObjectType)

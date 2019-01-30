@@ -82,9 +82,9 @@ private:
     };
     
     std::mutex m_Mutex;
-    unordered_map<FramebufferCacheKey, VulkanUtilities::FramebufferWrapper, FramebufferCacheKeyHash> m_Cache;
-    unordered_multimap<VkImageView, FramebufferCacheKey> m_ViewToKeyMap;
-    unordered_multimap<VkRenderPass, FramebufferCacheKey> m_RenderPassToKeyMap;
+    stl::unordered_map<FramebufferCacheKey, VulkanUtilities::FramebufferWrapper, FramebufferCacheKeyHash> m_Cache;
+    stl::unordered_multimap<VkImageView, FramebufferCacheKey> m_ViewToKeyMap;
+    stl::unordered_multimap<VkRenderPass, FramebufferCacheKey> m_RenderPassToKeyMap;
 };
 
 }

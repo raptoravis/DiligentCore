@@ -62,7 +62,7 @@ public:
     MasterBlockRingBufferBasedManager& operator= (const MasterBlockRingBufferBasedManager&)  = delete;
     MasterBlockRingBufferBasedManager& operator= (      MasterBlockRingBufferBasedManager&&) = delete;
 
-    void DiscardMasterBlocks(vector<MasterBlock>& /*Blocks*/, Uint64 FenceValue)
+    void DiscardMasterBlocks(stl::vector<MasterBlock>& /*Blocks*/, Uint64 FenceValue)
     {
         std::lock_guard<std::mutex> Lock(m_RingBufferMtx);
         m_RingBuffer.FinishCurrentFrame(FenceValue);
@@ -116,7 +116,7 @@ public:
     }
 
     template<typename RenderDeviceImplType>
-    void ReleaseMasterBlocks(vector<MasterBlock>& Blocks, RenderDeviceImplType& Device, Uint64 CmdQueueMask)
+    void ReleaseMasterBlocks(stl::vector<MasterBlock>& Blocks, RenderDeviceImplType& Device, Uint64 CmdQueueMask)
     {
         struct StaleMasterBlock
         {
@@ -124,7 +124,7 @@ public:
             MasterBlockListBasedManager* Mgr;
 
             StaleMasterBlock(MasterBlock&& _Block, MasterBlockListBasedManager* _Mgr)noexcept :
-                Block (move(_Block)),
+                Block (stl::move(_Block)),
                 Mgr   (_Mgr)
             {
             }
@@ -134,7 +134,7 @@ public:
             StaleMasterBlock& operator= (      StaleMasterBlock&&) = delete;
             
             StaleMasterBlock(StaleMasterBlock&& rhs)noexcept : 
-                Block (move(rhs.Block)),
+                Block (stl::move(rhs.Block)),
                 Mgr   (rhs.Mgr)
             {
                 rhs.Block = MasterBlock{};
@@ -149,13 +149,13 @@ public:
 #ifdef DEVELOPMENT
                     --Mgr->m_MasterBlockCounter;
 #endif
-                    Mgr->m_AllocationsMgr.Free(move(Block));
+                    Mgr->m_AllocationsMgr.Free(stl::move(Block));
                 }
             }
         };
         for(auto& Block : Blocks)
         {
-            Device.SafeReleaseDeviceObject(StaleMasterBlock{move(Block), this}, CmdQueueMask);
+            Device.SafeReleaseDeviceObject(StaleMasterBlock{stl::move(Block), this}, CmdQueueMask);
         }
     }
 

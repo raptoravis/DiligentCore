@@ -66,7 +66,7 @@ std::size_t FBOCache::FBOCacheKeyHashFunc::operator() ( const FBOCacheKey& Key )
 {
     if( Key.Hash == 0 )
     {
-        hash<TextureViewDesc> TexViewDescHasher;
+        stl::hash<TextureViewDesc> TexViewDescHasher;
         Key.Hash = 0;
         HashCombine( Key.Hash, Key.NumRenderTargets );
         for( Uint32 rt = 0; rt < Key.NumRenderTargets; ++rt )
@@ -125,7 +125,7 @@ const GLObjectWrappers::GLFrameBufferObj& FBOCache::GetFBO( Uint32 NumRenderTarg
     // Construct the key
     FBOCacheKey Key;
     VERIFY( NumRenderTargets < MaxRenderTargets, "Too many render targets being set" );
-    NumRenderTargets = min( NumRenderTargets, MaxRenderTargets );
+    NumRenderTargets = stl::min( NumRenderTargets, MaxRenderTargets );
     Key.NumRenderTargets = NumRenderTargets;
     for( Uint32 rt = 0; rt < NumRenderTargets; ++rt )
     {
@@ -268,15 +268,15 @@ const GLObjectWrappers::GLFrameBufferObj& FBOCache::GetFBO( Uint32 NumRenderTarg
             UNEXPECTED( "Framebuffer is incomplete" );
         }
 
-        auto NewElems = m_Cache.emplace( make_pair(Key, std::move(NewFBO)) );
+        auto NewElems = m_Cache.emplace( stl::make_pair(Key, stl::move(NewFBO)) );
         // New element must be actually inserted
         VERIFY( NewElems.second, "New element was not inserted" ); 
         if( Key.DSId  )
-            m_TexIdToKey.insert( make_pair(Key.DSId, Key) );
+            m_TexIdToKey.insert( stl::make_pair(Key.DSId, Key) );
         for( Uint32 rt = 0; rt < NumRenderTargets; ++rt )
         {
             if( Key.RTIds[rt] )
-                m_TexIdToKey.insert( make_pair(Key.RTIds[rt], Key) );
+                m_TexIdToKey.insert( stl::make_pair(Key.RTIds[rt], Key) );
         }
 
         return NewElems.first->second;

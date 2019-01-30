@@ -98,8 +98,8 @@ protected:
     VulkanUtilities::VulkanMemoryAllocation m_MemoryAllocation;
 
     // Texture views needed for mipmap generation
-    vector<unique_ptr<TextureViewVkImpl, STDDeleter<TextureViewVkImpl, FixedBlockMemoryAllocator> > > m_MipLevelSRV;
-    vector<unique_ptr<TextureViewVkImpl, STDDeleter<TextureViewVkImpl, FixedBlockMemoryAllocator> > > m_MipLevelUAV;
+    stl::vector<stl::unique_ptr<TextureViewVkImpl, STDDeleter<TextureViewVkImpl, FixedBlockMemoryAllocator> > > m_MipLevelSRV;
+    stl::vector<stl::unique_ptr<TextureViewVkImpl, STDDeleter<TextureViewVkImpl, FixedBlockMemoryAllocator> > > m_MipLevelUAV;
 };
 
 }

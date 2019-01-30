@@ -64,7 +64,7 @@ private:
 
     GLProgram m_GLProgram;
     ThreadingTools::LockFlag m_ProgPipelineLockFlag;
-    unordered_map<GLContext::NativeGLContextType, GLObjectWrappers::GLPipelineObj> m_GLProgPipelines;
+    stl::unordered_map<GLContext::NativeGLContextType, GLObjectWrappers::GLPipelineObj> m_GLProgPipelines;
 };
 
 }

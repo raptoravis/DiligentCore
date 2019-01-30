@@ -36,7 +36,7 @@ TextureViewD3D12Impl::TextureViewD3D12Impl( IReferenceCounters*        pRefCount
                                             DescriptorHeapAllocation&& HandleAlloc,
                                             bool                       bIsDefaultView ) :
     TTextureViewBase( pRefCounters, pDevice, ViewDesc, pTexture, bIsDefaultView ),
-    m_Descriptor(move(HandleAlloc))
+    m_Descriptor(stl::move(HandleAlloc))
 {
 }
 //

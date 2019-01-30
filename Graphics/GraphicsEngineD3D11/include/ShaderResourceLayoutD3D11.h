@@ -247,7 +247,7 @@ private:
     // ShaderD3D11Impl object, or ShaderResourceBindingD3D11Impl object
     ShaderResourceCacheD3D11* m_pResourceCache = nullptr;
 
-    unique_ptr<void, STDDeleterRawMem<void> > m_ResourceBuffer;
+    stl::unique_ptr<void, STDDeleterRawMem<void> > m_ResourceBuffer;
 
     // Offsets in bytes
     using OffsetType = Uint16;

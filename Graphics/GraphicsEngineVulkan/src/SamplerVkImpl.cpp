@@ -76,7 +76,7 @@ SamplerVkImpl::SamplerVkImpl(IReferenceCounters* pRefCounters, RenderDeviceVkImp
 
 SamplerVkImpl::~SamplerVkImpl()
 {
-    m_pDevice->SafeReleaseDeviceObject(move(m_VkSampler), m_CommandQueueMask);
+    m_pDevice->SafeReleaseDeviceObject(stl::move(m_VkSampler), m_CommandQueueMask);
 }
 
 IMPLEMENT_QUERY_INTERFACE( SamplerVkImpl, IID_SamplerVk, TSamplerBase )

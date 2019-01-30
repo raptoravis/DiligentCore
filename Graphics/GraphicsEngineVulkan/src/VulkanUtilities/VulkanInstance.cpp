@@ -90,7 +90,7 @@ namespace VulkanUtilities
             VERIFY_EXPR(ExtensionCount == m_Extensions.size());
         }
 
-        Diligent::vector<const char*> GlobalExtensions = 
+        stl::vector<const char*> GlobalExtensions = 
         { 
             VK_KHR_SURFACE_EXTENSION_NAME,
 
@@ -229,7 +229,7 @@ namespace VulkanUtilities
             uint32_t QueueFamilyCount = 0;
             vkGetPhysicalDeviceQueueFamilyProperties(Device, &QueueFamilyCount, nullptr);
             VERIFY_EXPR(QueueFamilyCount > 0);
-            Diligent::vector<VkQueueFamilyProperties> QueueFamilyProperties(QueueFamilyCount);
+            stl::vector<VkQueueFamilyProperties> QueueFamilyProperties(QueueFamilyCount);
             vkGetPhysicalDeviceQueueFamilyProperties(Device, &QueueFamilyCount, QueueFamilyProperties.data());
             VERIFY_EXPR(QueueFamilyCount == QueueFamilyProperties.size());
 

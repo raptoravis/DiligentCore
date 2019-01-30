@@ -66,7 +66,7 @@ public:
         RefCntAutoPtr<BufferD3D11Impl> pBuff;
         __forceinline void Set(RefCntAutoPtr<BufferD3D11Impl> &&_pBuff)
         {
-            pBuff = move(_pBuff);
+            pBuff = stl::move(_pBuff);
         }
     };
 
@@ -127,31 +127,31 @@ public:
     __forceinline void SetCB(Uint32 Slot, RefCntAutoPtr<BufferD3D11Impl>&& pBuffD3D11Impl)
     {
         auto *pd3d11Buff = pBuffD3D11Impl ? pBuffD3D11Impl->BufferD3D11Impl::GetD3D11Buffer() : nullptr;
-        SetD3D11ResourceInternal<CachedCB>(Slot, GetCBCount(), &ShaderResourceCacheD3D11::GetCBArrays, move(pBuffD3D11Impl), pd3d11Buff);
+        SetD3D11ResourceInternal<CachedCB>(Slot, GetCBCount(), &ShaderResourceCacheD3D11::GetCBArrays, stl::move(pBuffD3D11Impl), pd3d11Buff);
     }
 
     __forceinline void SetTexSRV(Uint32 Slot, RefCntAutoPtr<TextureViewD3D11Impl>&& pTexView)
     {
         auto pd3d11SRV = pTexView ? static_cast<ID3D11ShaderResourceView*>(pTexView->TextureViewD3D11Impl::GetD3D11View()) : nullptr;
-        SetD3D11ResourceInternal<CachedResource>(Slot, GetSRVCount(), &ShaderResourceCacheD3D11::GetSRVArrays, move(pTexView), pd3d11SRV);
+        SetD3D11ResourceInternal<CachedResource>(Slot, GetSRVCount(), &ShaderResourceCacheD3D11::GetSRVArrays, stl::move(pTexView), pd3d11SRV);
     }
 
     __forceinline void SetBufSRV(Uint32 Slot, RefCntAutoPtr<BufferViewD3D11Impl>&& pBuffView)
     {
         auto pd3d11SRV = pBuffView ? static_cast<ID3D11ShaderResourceView*>(pBuffView->BufferViewD3D11Impl::GetD3D11View()) : nullptr;
-        SetD3D11ResourceInternal<CachedResource>(Slot, GetSRVCount(), &ShaderResourceCacheD3D11::GetSRVArrays, move(pBuffView), pd3d11SRV);
+        SetD3D11ResourceInternal<CachedResource>(Slot, GetSRVCount(), &ShaderResourceCacheD3D11::GetSRVArrays, stl::move(pBuffView), pd3d11SRV);
     }
 
     __forceinline void SetTexUAV(Uint32 Slot, RefCntAutoPtr<TextureViewD3D11Impl>&& pTexView)
     {
         auto pd3d11UAV = pTexView ? static_cast<ID3D11UnorderedAccessView*>(pTexView->TextureViewD3D11Impl::GetD3D11View()) : nullptr;
-        SetD3D11ResourceInternal<CachedResource>(Slot, GetUAVCount(), &ShaderResourceCacheD3D11::GetUAVArrays, move(pTexView), pd3d11UAV);
+        SetD3D11ResourceInternal<CachedResource>(Slot, GetUAVCount(), &ShaderResourceCacheD3D11::GetUAVArrays, stl::move(pTexView), pd3d11UAV);
     }
 
     __forceinline void SetBufUAV(Uint32 Slot, RefCntAutoPtr<BufferViewD3D11Impl>&& pBuffView)
     {
         auto pd3d11UAV = pBuffView ? static_cast<ID3D11UnorderedAccessView*>(pBuffView->BufferViewD3D11Impl::GetD3D11View()) : nullptr;
-        SetD3D11ResourceInternal<CachedResource>(Slot, GetUAVCount(), &ShaderResourceCacheD3D11::GetUAVArrays, move(pBuffView), pd3d11UAV);
+        SetD3D11ResourceInternal<CachedResource>(Slot, GetUAVCount(), &ShaderResourceCacheD3D11::GetUAVArrays, stl::move(pBuffView), pd3d11UAV);
     }
 
     __forceinline void SetSampler(Uint32 Slot, SamplerD3D11Impl* pSampler)
@@ -303,7 +303,7 @@ private:
         TCachedResourceType* Resources;
         TD3D11ResourceType** d3d11ResArr;
         (this->*GetArrays)(Resources, d3d11ResArr);
-        Resources[Slot].Set(forward<TSrcResourceType>(pResource));
+        Resources[Slot].Set(stl::forward<TSrcResourceType>(pResource));
         d3d11ResArr[Slot] = pd3d11Resource;
     }
 

@@ -27,7 +27,7 @@
 
 #include "../../External/EASTL/include/EASTL/functional.h"
 
-namespace Diligent
+namespace stl
 {
 
 using eastl::hash;
@@ -44,7 +44,7 @@ using eastl::less_equal;
 
 #include <functional>
 
-namespace Diligent
+namespace stl
 {
 
 using std::hash;

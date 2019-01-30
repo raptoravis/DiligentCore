@@ -51,7 +51,7 @@ SamplerD3D12Impl::SamplerD3D12Impl(IReferenceCounters*    pRefCounters,
     };
 
     auto CPUDescriptorAlloc = pRenderDeviceD3D12->AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
-    m_Descriptor = move(CPUDescriptorAlloc);
+    m_Descriptor = stl::move(CPUDescriptorAlloc);
 	pD3D12Device->CreateSampler(&D3D12SamplerDesc, m_Descriptor.GetCpuHandle());
 }
 

@@ -764,7 +764,7 @@ namespace Diligent
     {
         const Uint32 MaxScissorRects = D3D12_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE;
         VERIFY( NumRects < MaxScissorRects, "Too many scissor rects are being set" );
-        NumRects = min( NumRects, MaxScissorRects );
+        NumRects = stl::min( NumRects, MaxScissorRects );
 
         TDeviceContextBase::SetScissorRects(NumRects, pRects, RTWidth, RTHeight);
 
@@ -788,7 +788,7 @@ namespace Diligent
         const Uint32 MaxD3D12RTs = D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT;
         Uint32 NumRenderTargets = m_NumBoundRenderTargets;
         VERIFY( NumRenderTargets <= MaxD3D12RTs, "D3D12 only allows 8 simultaneous render targets" );
-        NumRenderTargets = min( MaxD3D12RTs, NumRenderTargets );
+        NumRenderTargets = stl::min( MaxD3D12RTs, NumRenderTargets );
 
         ITextureViewD3D12* ppRTVs[MaxD3D12RTs]; // Do not initialize with zeroes!
         ITextureViewD3D12* pDSV = nullptr;
@@ -1194,7 +1194,7 @@ namespace Diligent
 #ifdef _DEBUG
         {
             const auto& FmtAttribs = GetTextureFormatAttribs(TexDesc.Format);
-            const Uint32 RowCount = max((Footpring.Footprint.Height/FmtAttribs.BlockHeight), 1u);
+            const Uint32 RowCount = stl::max((Footpring.Footprint.Height/FmtAttribs.BlockHeight), 1u);
             VERIFY(BufferSize >= Footpring.Footprint.RowPitch * RowCount * Footpring.Footprint.Depth, "Buffer is not large enough");
             VERIFY(Footpring.Footprint.Depth == 1 || static_cast<UINT>(SrcDepthStride) == Footpring.Footprint.RowPitch * RowCount, "Depth stride must be equal to the size of 2D plane");
         }
@@ -1217,7 +1217,7 @@ namespace Diligent
 
         if (StateTransitionRequired)
         {
-            swap(BarrierDesc.Transition.StateBefore, BarrierDesc.Transition.StateAfter);
+            stl::swap(BarrierDesc.Transition.StateBefore, BarrierDesc.Transition.StateAfter);
             pCmdList->ResourceBarrier(1, &BarrierDesc);
         }
     }
@@ -1363,10 +1363,10 @@ namespace Diligent
         Box FullExtentBox;
         if (pMapRegion == nullptr)
         {
-            FullExtentBox.MaxX = max(TexDesc.Width  >> MipLevel, 1u);
-            FullExtentBox.MaxY = max(TexDesc.Height >> MipLevel, 1u);
+            FullExtentBox.MaxX = stl::max(TexDesc.Width  >> MipLevel, 1u);
+            FullExtentBox.MaxY = stl::max(TexDesc.Height >> MipLevel, 1u);
             if (TexDesc.Type == RESOURCE_DIM_TEX_3D)
-                FullExtentBox.MaxZ = max(TexDesc.Depth >> MipLevel, 1u);
+                FullExtentBox.MaxZ = stl::max(TexDesc.Depth >> MipLevel, 1u);
             pMapRegion = &FullExtentBox;
         }
 
@@ -1376,7 +1376,7 @@ namespace Diligent
         MappedData.DepthStride = UploadSpace.DepthStride;
 
         auto Subres = D3D12CalcSubresource(MipLevel, ArraySlice, 0, TexDesc.MipLevels, TexDesc.ArraySize);
-        auto it = m_MappedTextures.emplace(MappedTextureKey{&TextureD3D12, Subres}, move(UploadSpace));
+        auto it = m_MappedTextures.emplace(MappedTextureKey{&TextureD3D12, Subres}, stl::move(UploadSpace));
         if(!it.second)
             LOG_ERROR_MESSAGE("Mip level ", MipLevel, ", slice ", ArraySlice, " of texture '", TexDesc.Name, "' has already been mapped");
     }

@@ -41,6 +41,6 @@ namespace Diligent
 
     private:
         struct InternalData;
-        unique_ptr<InternalData> m_pInternalData;
+        stl::unique_ptr<InternalData> m_pInternalData;
     };
 }

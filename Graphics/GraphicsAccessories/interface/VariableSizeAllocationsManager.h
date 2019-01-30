@@ -68,19 +68,19 @@ namespace Diligent
 
         // Type of the map that keeps memory blocks sorted by their offsets
         using TFreeBlocksByOffsetMap = 
-            map<OffsetType,    
-                FreeBlockInfo, 
-                less<OffsetType>, // Standard ordering
-                STDAllocatorRawMem<pair<const OffsetType,  FreeBlockInfo>> // Raw memory allocator
-                >;
+            stl::map<OffsetType,    
+                     FreeBlockInfo, 
+                     stl::less<OffsetType>, // Standard ordering
+                     STDAllocatorRawMem<stl::pair<const OffsetType,  FreeBlockInfo>> // Raw memory allocator
+                     >;
 
         // Type of the map that keeps memory blocks sorted by their sizes
         using TFreeBlocksBySizeMap = 
-            multimap<OffsetType, 
-                     TFreeBlocksByOffsetMap::iterator, 
-                     less<OffsetType>, // Standard ordering
-                     STDAllocatorRawMem<pair<const OffsetType, TFreeBlocksByOffsetMap::iterator>> // Raw memory allocator
-                     >;
+            stl::multimap<OffsetType, 
+                          TFreeBlocksByOffsetMap::iterator, 
+                          stl::less<OffsetType>, // Standard ordering
+                          STDAllocatorRawMem<stl::pair<const OffsetType, TFreeBlocksByOffsetMap::iterator>> // Raw memory allocator
+                          >;
 
         struct FreeBlockInfo
         {
@@ -128,8 +128,8 @@ namespace Diligent
         }
 
         VariableSizeAllocationsManager(VariableSizeAllocationsManager&& rhs)noexcept : 
-            m_FreeBlocksByOffset (move(rhs.m_FreeBlocksByOffset)),
-            m_FreeBlocksBySize   (move(rhs.m_FreeBlocksBySize)),
+            m_FreeBlocksByOffset (stl::move(rhs.m_FreeBlocksByOffset)),
+            m_FreeBlocksBySize   (stl::move(rhs.m_FreeBlocksBySize)),
             m_MaxSize            (rhs.m_MaxSize),
             m_FreeSize           (rhs.m_FreeSize),
             m_CurrAlignment      (rhs.m_CurrAlignment)
@@ -222,7 +222,7 @@ namespace Diligent
                 }
                 else
                 {
-                    m_CurrAlignment = min(m_CurrAlignment, Alignment);
+                    m_CurrAlignment = stl::min(m_CurrAlignment, Alignment);
                 }
             }
 

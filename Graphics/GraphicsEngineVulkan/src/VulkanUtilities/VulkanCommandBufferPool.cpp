@@ -34,7 +34,7 @@ namespace VulkanUtilities
     VulkanCommandBufferPool::VulkanCommandBufferPool(std::shared_ptr<const VulkanLogicalDevice> LogicalDevice,
                                                      uint32_t                                   queueFamilyIndex, 
                                                      VkCommandPoolCreateFlags                   flags) :
-        m_LogicalDevice(Diligent::move(LogicalDevice))
+        m_LogicalDevice(stl::move(LogicalDevice))
     {
         VkCommandPoolCreateInfo CmdPoolCI = {};
         CmdPoolCI.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -116,6 +116,6 @@ namespace VulkanUtilities
     {
         m_LogicalDevice.reset();
         m_CmdBuffers.clear();
-        return Diligent::move(m_CmdPool);
+        return stl::move(m_CmdPool);
     }
 }

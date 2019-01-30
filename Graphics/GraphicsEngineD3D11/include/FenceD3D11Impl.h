@@ -57,7 +57,7 @@ public:
 
     void AddPendingQuery(CComPtr<ID3D11DeviceContext> pCtx, CComPtr<ID3D11Query> pQuery, Uint64 Value)
     {
-        m_PendingQueries.emplace_back(move(pCtx), move(pQuery), Value);
+        m_PendingQueries.emplace_back(stl::move(pCtx), stl::move(pQuery), Value);
     }
 
 private:
@@ -68,12 +68,12 @@ private:
         Uint64                       Value;
 
         PendingFenceData(CComPtr<ID3D11DeviceContext> pCtx, CComPtr<ID3D11Query> pQuery, Uint64 _Value) : 
-            pd3d11Ctx  (move(pCtx)),
-            pd3d11Query(move(pQuery)),
+            pd3d11Ctx  (stl::move(pCtx)),
+            pd3d11Query(stl::move(pQuery)),
             Value      (_Value)
         {}
     };
-    deque< PendingFenceData > m_PendingQueries;
+    stl::deque< PendingFenceData > m_PendingQueries;
     volatile Uint64 m_LastCompletedFenceValue = 0;
 };
 

@@ -59,7 +59,7 @@ public:
     }
 
 private:
-    array<D3D12_PRIMITIVE_TOPOLOGY_TYPE, PRIMITIVE_TOPOLOGY_NUM_TOPOLOGIES> m_Map;
+    stl::array<D3D12_PRIMITIVE_TOPOLOGY_TYPE, PRIMITIVE_TOPOLOGY_NUM_TOPOLOGIES> m_Map;
 };
 
 PipelineStateD3D12Impl :: PipelineStateD3D12Impl(IReferenceCounters*      pRefCounters,
@@ -149,7 +149,7 @@ PipelineStateD3D12Impl :: PipelineStateD3D12Impl(IReferenceCounters*      pRefCo
         RasterizerStateDesc_To_D3D12_RASTERIZER_DESC(GraphicsPipeline.RasterizerDesc, d3d12PSODesc.RasterizerState);
         DepthStencilStateDesc_To_D3D12_DEPTH_STENCIL_DESC(GraphicsPipeline.DepthStencilDesc, d3d12PSODesc.DepthStencilState);
 
-        vector<D3D12_INPUT_ELEMENT_DESC, STDAllocatorRawMem<D3D12_INPUT_ELEMENT_DESC>> d312InputElements( STD_ALLOCATOR_RAW_MEM(D3D12_INPUT_ELEMENT_DESC, GetRawAllocator(), "Allocator for vector<D3D12_INPUT_ELEMENT_DESC>") );
+        stl::vector<D3D12_INPUT_ELEMENT_DESC, STDAllocatorRawMem<D3D12_INPUT_ELEMENT_DESC>> d312InputElements( STD_ALLOCATOR_RAW_MEM(D3D12_INPUT_ELEMENT_DESC, GetRawAllocator(), "Allocator for vector<D3D12_INPUT_ELEMENT_DESC>") );
         if (m_LayoutElements.size() > 0)
         {
             LayoutElements_To_D3D12_INPUT_ELEMENT_DESCs(m_LayoutElements, d312InputElements);
@@ -203,10 +203,10 @@ PipelineStateD3D12Impl :: PipelineStateD3D12Impl(IReferenceCounters*      pRefCo
 
     if(PipelineDesc.SRBAllocationGranularity > 1)
     {
-        array<size_t, MaxShadersInPipeline> ShaderVarMgrDataSizes = {};
+        stl::array<size_t, MaxShadersInPipeline> ShaderVarMgrDataSizes = {};
         for (Uint32 s = 0; s < m_NumShaders; ++s)
         {
-            array<SHADER_VARIABLE_TYPE, 2> AllowedVarTypes = { SHADER_VARIABLE_TYPE_MUTABLE, SHADER_VARIABLE_TYPE_DYNAMIC };
+            stl::array<SHADER_VARIABLE_TYPE, 2> AllowedVarTypes = { SHADER_VARIABLE_TYPE_MUTABLE, SHADER_VARIABLE_TYPE_DYNAMIC };
             Uint32 NumVariablesUnused = 0;
             ShaderVarMgrDataSizes[s] = ShaderVariableManagerD3D12::GetRequiredMemorySize(m_pShaderResourceLayouts[s], AllowedVarTypes.data(), static_cast<Uint32>(AllowedVarTypes.size()), NumVariablesUnused);
         }
@@ -228,7 +228,7 @@ PipelineStateD3D12Impl::~PipelineStateD3D12Impl()
     ShaderResLayoutAllocator.Free(m_pShaderResourceLayouts);
 
     // D3D12 object can only be destroyed when it is no longer used by the GPU
-    m_pDevice->SafeReleaseDeviceObject(move(m_pd3d12PSO), m_Desc.CommandQueueMask);
+    m_pDevice->SafeReleaseDeviceObject(stl::move(m_pd3d12PSO), m_Desc.CommandQueueMask);
 }
 
 IMPLEMENT_QUERY_INTERFACE( PipelineStateD3D12Impl, IID_PipelineStateD3D12, TPipelineStateBase )

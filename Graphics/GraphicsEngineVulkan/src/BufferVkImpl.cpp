@@ -68,7 +68,7 @@ BufferVkImpl :: BufferVkImpl(IReferenceCounters*        pRefCounters,
 
     const auto& LogicalDevice = pRenderDeviceVk->GetLogicalDevice();
     const auto& DeviceLimits = pRenderDeviceVk->GetPhysicalDevice().GetProperties().limits;
-    m_DynamicOffsetAlignment = max(Uint32{4}, static_cast<Uint32>(DeviceLimits.optimalBufferCopyOffsetAlignment));
+    m_DynamicOffsetAlignment = stl::max(Uint32{4}, static_cast<Uint32>(DeviceLimits.optimalBufferCopyOffsetAlignment));
 
     VkBufferCreateInfo VkBuffCI = {};
     VkBuffCI.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -99,8 +99,8 @@ BufferVkImpl :: BufferVkImpl(IReferenceCounters*        pRefCounters,
         // Each element of pDynamicOffsets of vkCmdBindDescriptorSets function which corresponds to a descriptor
         // binding with type VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC must be a multiple of
         // VkPhysicalDeviceLimits::minStorageBufferOffsetAlignment (13.2.5)
-        m_DynamicOffsetAlignment = max(m_DynamicOffsetAlignment, static_cast<Uint32>(DeviceLimits.minTexelBufferOffsetAlignment));
-        m_DynamicOffsetAlignment = max(m_DynamicOffsetAlignment, static_cast<Uint32>(DeviceLimits.minStorageBufferOffsetAlignment));
+        m_DynamicOffsetAlignment = stl::max(m_DynamicOffsetAlignment, static_cast<Uint32>(DeviceLimits.minTexelBufferOffsetAlignment));
+        m_DynamicOffsetAlignment = stl::max(m_DynamicOffsetAlignment, static_cast<Uint32>(DeviceLimits.minStorageBufferOffsetAlignment));
     }
     if (m_Desc.BindFlags & BIND_SHADER_RESOURCE)
     {
@@ -109,8 +109,8 @@ BufferVkImpl :: BufferVkImpl(IReferenceCounters*        pRefCounters,
         // VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER and VK_BUFFER_USAGE_STORAGE_BUFFER_BIT flags
         VkBuffCI.usage |= VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
 
-        m_DynamicOffsetAlignment = max(m_DynamicOffsetAlignment, static_cast<Uint32>(DeviceLimits.minTexelBufferOffsetAlignment));
-        m_DynamicOffsetAlignment = max(m_DynamicOffsetAlignment, static_cast<Uint32>(DeviceLimits.minStorageBufferOffsetAlignment));
+        m_DynamicOffsetAlignment = stl::max(m_DynamicOffsetAlignment, static_cast<Uint32>(DeviceLimits.minTexelBufferOffsetAlignment));
+        m_DynamicOffsetAlignment = stl::max(m_DynamicOffsetAlignment, static_cast<Uint32>(DeviceLimits.minStorageBufferOffsetAlignment));
     }
     if (m_Desc.BindFlags & BIND_VERTEX_BUFFER)
         VkBuffCI.usage |= VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
@@ -125,7 +125,7 @@ BufferVkImpl :: BufferVkImpl(IReferenceCounters*        pRefCounters,
         // Each element of pDynamicOffsets parameter of vkCmdBindDescriptorSets function which corresponds to a descriptor
         // binding with type VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC must be a multiple of 
         // VkPhysicalDeviceLimits::minUniformBufferOffsetAlignment (13.2.5)
-        m_DynamicOffsetAlignment = max(m_DynamicOffsetAlignment, static_cast<Uint32>(DeviceLimits.minUniformBufferOffsetAlignment));
+        m_DynamicOffsetAlignment = stl::max(m_DynamicOffsetAlignment, static_cast<Uint32>(DeviceLimits.minUniformBufferOffsetAlignment));
     }
 
     if(m_Desc.Usage == USAGE_DYNAMIC)
@@ -237,7 +237,7 @@ BufferVkImpl :: BufferVkImpl(IReferenceCounters*        pRefCounters,
             vkCmdCopyBuffer(vkCmdBuff, StagingBuffer, m_VulkanBuffer, 1, &BuffCopy);
 
             Uint32 QueueIndex = 0;
-	        pRenderDeviceVk->ExecuteAndDisposeTransientCmdBuff(QueueIndex, vkCmdBuff, move(CmdPool));
+	        pRenderDeviceVk->ExecuteAndDisposeTransientCmdBuff(QueueIndex, vkCmdBuff, stl::move(CmdPool));
 
 
             // After command buffer is submitted, safe-release staging resources. This strategy
@@ -264,8 +264,8 @@ BufferVkImpl :: BufferVkImpl(IReferenceCounters*        pRefCounters,
             //              |            |                                                |   - {F+1, StagingBuffer} -> Release Queue 
             //              |            |                                                | 
 
-            pRenderDeviceVk->SafeReleaseDeviceObject(move(StagingBuffer),           Uint64{1} << Uint64{QueueIndex});
-            pRenderDeviceVk->SafeReleaseDeviceObject(move(StagingMemoryAllocation), Uint64{1} << Uint64{QueueIndex});
+            pRenderDeviceVk->SafeReleaseDeviceObject(stl::move(StagingBuffer),           Uint64{1} << Uint64{QueueIndex});
+            pRenderDeviceVk->SafeReleaseDeviceObject(stl::move(StagingMemoryAllocation), Uint64{1} << Uint64{QueueIndex});
         }
 
         SetState(InitialState);
@@ -292,9 +292,9 @@ BufferVkImpl :: ~BufferVkImpl()
 {
     // Vk object can only be destroyed when it is no longer used by the GPU
     if(m_VulkanBuffer != VK_NULL_HANDLE)
-        m_pDevice->SafeReleaseDeviceObject(move(m_VulkanBuffer), m_Desc.CommandQueueMask);
+        m_pDevice->SafeReleaseDeviceObject(stl::move(m_VulkanBuffer), m_Desc.CommandQueueMask);
     if(m_MemoryAllocation.Page != nullptr)
-        m_pDevice->SafeReleaseDeviceObject(move(m_MemoryAllocation), m_Desc.CommandQueueMask);
+        m_pDevice->SafeReleaseDeviceObject(stl::move(m_MemoryAllocation), m_Desc.CommandQueueMask);
 }
 
 IMPLEMENT_QUERY_INTERFACE( BufferVkImpl, IID_BufferVk, TBufferBase )
@@ -318,7 +318,7 @@ void BufferVkImpl::CreateViewInternal( const BufferViewDesc& OrigViewDesc, IBuff
         {
             auto View = CreateView(ViewDesc);
             *ppView = NEW_RC_OBJ(BuffViewAllocator, "BufferViewVkImpl instance", BufferViewVkImpl, bIsDefaultView ? this : nullptr)
-                                (GetDevice(), ViewDesc, this, move(View), bIsDefaultView );
+                                (GetDevice(), ViewDesc, this, stl::move(View), bIsDefaultView );
         }
 
         if( !bIsDefaultView && *ppView )

@@ -118,14 +118,14 @@ void RenderDeviceD3D12Impl::DisposeCommandContext(PooledCommandContext&& Ctx)
 	CComPtr<ID3D12CommandAllocator> pAllocator; 
     Ctx->Close(pAllocator);
     // Since allocator has not been used, we cmd list manager can put it directly into the free allocator list
-    m_CmdListManager.FreeAllocator(move(pAllocator));
-    FreeCommandContext(move(Ctx));
+    m_CmdListManager.FreeAllocator(stl::move(pAllocator));
+    FreeCommandContext(stl::move(Ctx));
 }
 
 void RenderDeviceD3D12Impl::FreeCommandContext(PooledCommandContext&& Ctx)
 {
 	std::lock_guard<std::mutex> LockGuard(m_ContextPoolMutex);
-    m_ContextPool.emplace_back(move(Ctx));
+    m_ContextPool.emplace_back(stl::move(Ctx));
 #ifdef DEVELOPMENT
     Atomics::AtomicDecrement(m_AllocatedCtxCounter);
 #endif
@@ -143,11 +143,11 @@ void RenderDeviceD3D12Impl::CloseAndExecuteTransientCommandContext(Uint32 Comman
             FenceValue = pCmdQueue->Submit(pCmdList);
         }
     );
-	m_CmdListManager.ReleaseAllocator(move(pAllocator), CommandQueueIndex, FenceValue);
+	m_CmdListManager.ReleaseAllocator(stl::move(pAllocator), CommandQueueIndex, FenceValue);
     FreeCommandContext(move(Ctx));
 }
 
-Uint64 RenderDeviceD3D12Impl::CloseAndExecuteCommandContext(Uint32 QueueIndex, PooledCommandContext&& Ctx, bool DiscardStaleObjects, vector<pair<Uint64, RefCntAutoPtr<IFence> > >* pSignalFences)
+Uint64 RenderDeviceD3D12Impl::CloseAndExecuteCommandContext(Uint32 QueueIndex, PooledCommandContext&& Ctx, bool DiscardStaleObjects, stl::vector<stl::pair<Uint64, RefCntAutoPtr<IFence> > >* pSignalFences)
 {
     CComPtr<ID3D12CommandAllocator> pAllocator;
     ID3D12GraphicsCommandList* pCmdList = Ctx->Close(pAllocator);
@@ -185,7 +185,7 @@ Uint64 RenderDeviceD3D12Impl::CloseAndExecuteCommandContext(Uint32 QueueIndex, P
         }
     }
 
-	m_CmdListManager.ReleaseAllocator(move(pAllocator), QueueIndex, FenceValue);
+	m_CmdListManager.ReleaseAllocator(stl::move(pAllocator), QueueIndex, FenceValue);
     FreeCommandContext(move(Ctx));
 
     PurgeReleaseQueue(QueueIndex);

@@ -30,7 +30,7 @@
 
 #include "../../External/EASTL/include/EASTL/hash_map.h"
 
-namespace Diligent
+namespace stl
 {
 
 template <typename  Key,
@@ -55,7 +55,7 @@ using unordered_multimap = eastl::hash_multimap<Key, T, Hash, Predicate, Allocat
 
 #include <unordered_map>
 
-namespace Diligent
+namespace stl
 {
 
 template <typename  Key,

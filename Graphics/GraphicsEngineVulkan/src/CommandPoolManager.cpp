@@ -34,7 +34,7 @@ CommandPoolManager::CommandPoolManager(RenderDeviceVkImpl&      DeviceVkImpl,
                                        uint32_t                 queueFamilyIndex, 
                                        VkCommandPoolCreateFlags flags)noexcept:
     m_DeviceVkImpl    (DeviceVkImpl),
-    m_Name            (move(Name)),
+    m_Name            (stl::move(Name)),
     m_QueueFamilyIndex(queueFamilyIndex),
     m_CmdPoolFlags    (flags),
     m_CmdPools        (STD_ALLOCATOR_RAW_MEM(VulkanUtilities::CommandPoolWrapper, GetRawAllocator(), "Allocator for deque<VulkanUtilities::CommandPoolWrapper>"))
@@ -51,7 +51,7 @@ VulkanUtilities::CommandPoolWrapper CommandPoolManager::AllocateCommandPool(cons
     VulkanUtilities::CommandPoolWrapper CmdPool;
     if(!m_CmdPools.empty())
     {
-        CmdPool = move(m_CmdPools.front());
+        CmdPool = stl::move(m_CmdPools.front());
         m_CmdPools.pop_front();
     }
 
@@ -72,7 +72,7 @@ VulkanUtilities::CommandPoolWrapper CommandPoolManager::AllocateCommandPool(cons
 #ifdef DEVELOPMENT
     ++m_AllocatedPoolCounter;
 #endif
-    return move(CmdPool);
+    return stl::move(CmdPool);
 }
 
 void CommandPoolManager::SafeReleaseCommandPool(VulkanUtilities::CommandPoolWrapper&& CmdPool, Uint32 CmdQueueIndex, Uint64 FenceValue)
@@ -82,7 +82,7 @@ void CommandPoolManager::SafeReleaseCommandPool(VulkanUtilities::CommandPoolWrap
     public:
         CommandPoolDeleter(CommandPoolManager& _CmdPoolMgr, VulkanUtilities::CommandPoolWrapper&& _Pool) :
             CmdPoolMgr(&_CmdPoolMgr),
-            Pool      (move(_Pool))
+            Pool      (stl::move(_Pool))
         {
             VERIFY_EXPR(Pool != VK_NULL_HANDLE);
         }
@@ -93,7 +93,7 @@ void CommandPoolManager::SafeReleaseCommandPool(VulkanUtilities::CommandPoolWrap
 
         CommandPoolDeleter(CommandPoolDeleter&& rhs) : 
             CmdPoolMgr(rhs.CmdPoolMgr),
-            Pool      (move(rhs.Pool))
+            Pool      (stl::move(rhs.Pool))
         {
             rhs.CmdPoolMgr = nullptr;
         }
@@ -103,7 +103,7 @@ void CommandPoolManager::SafeReleaseCommandPool(VulkanUtilities::CommandPoolWrap
         {
             if (CmdPoolMgr!=nullptr)
             {
-                CmdPoolMgr->FreeCommandPool(move(Pool));
+                CmdPoolMgr->FreeCommandPool(stl::move(Pool));
             }
         }
     private:
@@ -113,7 +113,7 @@ void CommandPoolManager::SafeReleaseCommandPool(VulkanUtilities::CommandPoolWrap
 
     // Discard command pool directly to the release queue since we know exactly which queue it was submitted to 
     // as well as the associated FenceValue
-    m_DeviceVkImpl.GetReleaseQueue(CmdQueueIndex).DiscardResource(CommandPoolDeleter{*this, move(CmdPool)}, FenceValue);
+    m_DeviceVkImpl.GetReleaseQueue(CmdQueueIndex).DiscardResource(CommandPoolDeleter{*this, stl::move(CmdPool)}, FenceValue);
 }
 
 void CommandPoolManager::FreeCommandPool(VulkanUtilities::CommandPoolWrapper&& CmdPool)
@@ -122,7 +122,7 @@ void CommandPoolManager::FreeCommandPool(VulkanUtilities::CommandPoolWrapper&& C
 #ifdef DEVELOPMENT
     --m_AllocatedPoolCounter;
 #endif
-    m_CmdPools.emplace_back(move(CmdPool));
+    m_CmdPools.emplace_back(stl::move(CmdPool));
 }
 
 void CommandPoolManager::DestroyPools()

@@ -90,7 +90,7 @@ VkFramebuffer FramebufferCache::GetFramebuffer(const FramebufferCacheKey& Key, u
         auto Framebuffer = m_DeviceVk.GetLogicalDevice().CreateFramebuffer(FramebufferCI);
         VkFramebuffer fb = Framebuffer;
 
-        auto new_it = m_Cache.insert(make_pair(Key, move(Framebuffer)));
+        auto new_it = m_Cache.insert(stl::make_pair(Key, stl::move(Framebuffer)));
         VERIFY(new_it.second, "New framebuffer must be inserted into the map"); (void)new_it;
 
         m_RenderPassToKeyMap.emplace(Key.Pass, Key);
@@ -126,7 +126,7 @@ void FramebufferCache::OnDestroyImageView(VkImageView ImgView)
         // The framebuffer is deleted whenever any of the image views is deleted
         if (fb_it != m_Cache.end())
         {
-            m_DeviceVk.SafeReleaseDeviceObject(move(fb_it->second), it->second.CommandQueueMask);
+            m_DeviceVk.SafeReleaseDeviceObject(stl::move(fb_it->second), it->second.CommandQueueMask);
             m_Cache.erase(fb_it);
         }
     }
@@ -147,7 +147,7 @@ void FramebufferCache::OnDestroyRenderPass(VkRenderPass Pass)
         // The framebuffer is deleted whenever any of the image views or render pass is destroyed
         if (fb_it != m_Cache.end())
         {
-            m_DeviceVk.SafeReleaseDeviceObject(move(fb_it->second), it->second.CommandQueueMask);
+            m_DeviceVk.SafeReleaseDeviceObject(stl::move(fb_it->second), it->second.CommandQueueMask);
             m_Cache.erase(fb_it);
         }
     }

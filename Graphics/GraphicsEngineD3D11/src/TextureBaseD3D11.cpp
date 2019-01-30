@@ -121,9 +121,9 @@ void TextureBaseD3D11::CreateViewInternal( const struct TextureViewDesc &ViewDes
     }
 }
 
-void TextureBaseD3D11 :: PrepareD3D11InitData(const TextureData&                                                           InitData,
-                                              Uint32                                                                       NumSubresources, 
-                                              vector<D3D11_SUBRESOURCE_DATA, STDAllocatorRawMem<D3D11_SUBRESOURCE_DATA> >& D3D11InitData)
+void TextureBaseD3D11 :: PrepareD3D11InitData(const TextureData&                                                               InitData,
+                                              Uint32                                                                            NumSubresources, 
+                                              stl::vector<D3D11_SUBRESOURCE_DATA, STDAllocatorRawMem<D3D11_SUBRESOURCE_DATA> >& D3D11InitData)
 {
     if( InitData.pSubResources )
     {

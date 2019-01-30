@@ -228,7 +228,7 @@ public:
     }
 
 private:
-    unordered_map<GLenum, TEXTURE_FORMAT> m_FormatMap;
+    stl::unordered_map<GLenum, TEXTURE_FORMAT> m_FormatMap;
 };
 
 TEXTURE_FORMAT GLInternalTexFormatToTexFormat(GLenum GlFormat)

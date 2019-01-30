@@ -70,7 +70,7 @@ private:
     const VkCommandPoolCreateFlags  m_CmdPoolFlags;
 
     std::mutex                      m_Mutex;
-    deque< VulkanUtilities::CommandPoolWrapper, STDAllocatorRawMem<VulkanUtilities::CommandPoolWrapper> > m_CmdPools;
+    stl::deque< VulkanUtilities::CommandPoolWrapper, STDAllocatorRawMem<VulkanUtilities::CommandPoolWrapper> > m_CmdPools;
 
 #ifdef DEVELOPMENT
     std::atomic_int32_t m_AllocatedPoolCounter;

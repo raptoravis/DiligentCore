@@ -63,7 +63,7 @@ namespace VulkanUtilities
         CommandPoolWrapper m_CmdPool;
 
         std::mutex m_Mutex;
-        Diligent::deque< VkCommandBuffer > m_CmdBuffers;
+        stl::deque< VkCommandBuffer > m_CmdBuffers;
 #ifdef DEVELOPMENT
         std::atomic_int32_t m_BuffCounter;
 #endif

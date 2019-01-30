@@ -51,14 +51,14 @@ namespace Diligent
         void CreateSRB(IShaderResourceBinding** ppSRB);
 
     private:
-        array<RefCntAutoPtr<IPipelineState>, 4>  CreatePSOs(TEXTURE_FORMAT Fmt);
-        array<RefCntAutoPtr<IPipelineState>, 4>& FindPSOs  (TEXTURE_FORMAT Fmt);
+        stl::array<RefCntAutoPtr<IPipelineState>, 4>  CreatePSOs(TEXTURE_FORMAT Fmt);
+        stl::array<RefCntAutoPtr<IPipelineState>, 4>& FindPSOs  (TEXTURE_FORMAT Fmt);
 
         RenderDeviceVkImpl& m_DeviceVkImpl;
 
         std::mutex m_PSOMutex;
-	    unordered_map< TEXTURE_FORMAT, std::array<RefCntAutoPtr<IPipelineState>, 4> > m_PSOHash;
-        static void GetGlImageFormat(const TextureFormatAttribs& FmtAttribs, array<char, 16>& GlFmt);
+	    stl::unordered_map< TEXTURE_FORMAT, std::array<RefCntAutoPtr<IPipelineState>, 4> > m_PSOHash;
+        static void GetGlImageFormat(const TextureFormatAttribs& FmtAttribs, stl::array<char, 16>& GlFmt);
         RefCntAutoPtr<IBuffer> m_ConstantsCB;
     };
 }

@@ -29,10 +29,10 @@
 
 namespace VulkanUtilities
 {
-    Diligent::unique_ptr<VulkanPhysicalDevice> VulkanPhysicalDevice::Create(VkPhysicalDevice vkDevice)
+    stl::unique_ptr<VulkanPhysicalDevice> VulkanPhysicalDevice::Create(VkPhysicalDevice vkDevice)
     {
         auto *PhysicalDevice = new VulkanPhysicalDevice(vkDevice);
-        return Diligent::unique_ptr<VulkanPhysicalDevice>(PhysicalDevice);
+        return stl::unique_ptr<VulkanPhysicalDevice>(PhysicalDevice);
     }
 
     VulkanPhysicalDevice::VulkanPhysicalDevice(VkPhysicalDevice vkDevice) :

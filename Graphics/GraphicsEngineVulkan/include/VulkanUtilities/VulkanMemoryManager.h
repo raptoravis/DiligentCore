@@ -100,8 +100,8 @@ public:
 
     VulkanMemoryPage(VulkanMemoryPage&& rhs)noexcept :
         m_ParentMemoryMgr (rhs.m_ParentMemoryMgr),
-        m_AllocationMgr   (Diligent::move(rhs.m_AllocationMgr)),
-        m_VkMemory        (Diligent::move(rhs.m_VkMemory)),
+        m_AllocationMgr   (stl::move(rhs.m_AllocationMgr)),
+        m_VkMemory        (stl::move(rhs.m_VkMemory)),
         m_CPUMemory       (rhs.m_CPUMemory)
     {
         rhs.m_CPUMemory = nullptr;
@@ -145,7 +145,7 @@ public:
                         VkDeviceSize                 HostVisiblePageSize,
                         VkDeviceSize                 DeviceLocalReserveSize,
                         VkDeviceSize                 HostVisibleReserveSize) : 
-        m_MgrName            (Diligent::move(MgrName)),
+        m_MgrName            (stl::move(MgrName)),
         m_LogicalDevice      (LogicalDevice),
         m_PhysicalDevice     (PhysicalDevice),
         m_Allocator          (Allocator),
@@ -159,11 +159,11 @@ public:
     // constructor is not labeled with noexcept, which makes all
     // std containers use copy instead of move
     VulkanMemoryManager(VulkanMemoryManager&& rhs)noexcept : 
-        m_MgrName         (Diligent::move(rhs.m_MgrName)),
+        m_MgrName         (stl::move(rhs.m_MgrName)),
         m_LogicalDevice   (rhs.m_LogicalDevice),
         m_PhysicalDevice  (rhs.m_PhysicalDevice),
         m_Allocator       (rhs.m_Allocator),
-        m_Pages           (Diligent::move(rhs.m_Pages)),
+        m_Pages           (stl::move(rhs.m_Pages)),
     
         m_DeviceLocalPageSize    (rhs.m_DeviceLocalPageSize),
         m_HostVisiblePageSize    (rhs.m_HostVisiblePageSize),
@@ -203,7 +203,7 @@ protected:
     Diligent::IMemoryAllocator& m_Allocator;
 
     std::mutex m_PagesMtx;
-    Diligent::unordered_multimap<uint32_t, VulkanMemoryPage> m_Pages;
+    stl::unordered_multimap<uint32_t, VulkanMemoryPage> m_Pages;
     
     const VkDeviceSize m_DeviceLocalPageSize;
     const VkDeviceSize m_HostVisiblePageSize;
@@ -213,10 +213,10 @@ protected:
     void OnFreeAllocation(VkDeviceSize Size, bool IsHostVisble);
 
     // 0 == Device local, 1 == Host-visible
-    Diligent::array<std::atomic_int64_t, 2> m_CurrUsedSize = {};
-    Diligent::array<VkDeviceSize, 2> m_PeakUsedSize = {};
-    Diligent::array<VkDeviceSize, 2> m_CurrAllocatedSize = {};
-    Diligent::array<VkDeviceSize, 2> m_PeakAllocatedSize = {};
+    stl::array<std::atomic_int64_t, 2> m_CurrUsedSize = {};
+    stl::array<VkDeviceSize, 2> m_PeakUsedSize = {};
+    stl::array<VkDeviceSize, 2> m_CurrAllocatedSize = {};
+    stl::array<VkDeviceSize, 2> m_PeakAllocatedSize = {};
 
     // If adding new member, do not forget to update move ctor
 };

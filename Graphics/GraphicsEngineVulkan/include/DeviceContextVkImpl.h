@@ -336,14 +336,14 @@ private:
     FixedBlockMemoryAllocator m_CmdListAllocator;
 
     // Semaphores are not owned by the command context
-    vector<VkSemaphore>           m_WaitSemaphores;
-    vector<VkPipelineStageFlags>  m_WaitDstStageMasks;
-    vector<VkSemaphore>           m_SignalSemaphores;
+    stl::vector<VkSemaphore>           m_WaitSemaphores;
+    stl::vector<VkPipelineStageFlags>  m_WaitDstStageMasks;
+    stl::vector<VkSemaphore>           m_SignalSemaphores;
 
     // List of fences to signal next time the command context is flushed
-    vector<pair<Uint64, RefCntAutoPtr<IFence> > > m_PendingFences;
+    stl::vector<stl::pair<Uint64, RefCntAutoPtr<IFence> > > m_PendingFences;
 
-    unordered_map<BufferVkImpl*, VulkanUploadAllocation> m_UploadAllocations;
+    stl::unordered_map<BufferVkImpl*, VulkanUploadAllocation> m_UploadAllocations;
 
     struct MappedTextureKey
     {
@@ -370,7 +370,7 @@ private:
         BufferToTextureCopyInfo CopyInfo;
         VulkanDynamicAllocation Allocation;
     };
-    unordered_map<MappedTextureKey, MappedTexture, MappedTextureKey::Hasher> m_MappedTextures;
+    stl::unordered_map<MappedTextureKey, MappedTexture, MappedTextureKey::Hasher> m_MappedTextures;
 
     VulkanUtilities::VulkanCommandBufferPool m_CmdPool;
     VulkanUploadHeap                         m_UploadHeap;

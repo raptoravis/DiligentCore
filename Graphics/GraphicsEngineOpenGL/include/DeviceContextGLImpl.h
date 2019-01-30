@@ -170,8 +170,8 @@ protected:
 private:
     Uint32 m_CommitedResourcesTentativeBarriers;
 
-    vector<class TextureBaseGL*> m_BoundWritableTextures;
-    vector<class BufferGLImpl*> m_BoundWritableBuffers;
+    stl::vector<class TextureBaseGL*> m_BoundWritableTextures;
+    stl::vector<class BufferGLImpl*> m_BoundWritableBuffers;
 
     bool m_bVAOIsUpToDate = false;
     GLObjectWrappers::GLFrameBufferObj m_DefaultFBO;

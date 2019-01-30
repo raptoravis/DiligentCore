@@ -63,7 +63,7 @@ public:
                         size_t                  CommandQueueCount,
                         ICommandQueueVk**       pCmdQueues, 
                         std::shared_ptr<VulkanUtilities::VulkanInstance>        Instance,
-                        unique_ptr<VulkanUtilities::VulkanPhysicalDevice>       PhysicalDevice,
+                        stl::unique_ptr<VulkanUtilities::VulkanPhysicalDevice>  PhysicalDevice,
                         std::shared_ptr<VulkanUtilities::VulkanLogicalDevice>   LogicalDevice,
                         Uint32                  NumDeferredContexts );
     ~RenderDeviceVkImpl();
@@ -94,7 +94,7 @@ public:
 	void IdleGPU();
     // pImmediateCtx parameter is only used to make sure the command buffer is submitted from the immediate context
     // The method returns fence value associated with the submitted command buffer
-    Uint64 ExecuteCommandBuffer(Uint32 QueueIndex, const VkSubmitInfo &SubmitInfo, class DeviceContextVkImpl* pImmediateCtx, vector<pair<Uint64, RefCntAutoPtr<IFence> > >* pSignalFences);
+    Uint64 ExecuteCommandBuffer(Uint32 QueueIndex, const VkSubmitInfo &SubmitInfo, class DeviceContextVkImpl* pImmediateCtx, stl::vector<stl::pair<Uint64, RefCntAutoPtr<IFence> > >* pSignalFences);
 
     void AllocateTransientCmdPool(VulkanUtilities::CommandPoolWrapper& CmdPool, VkCommandBuffer& vkCmdBuff, const Char* DebugPoolName = nullptr);
     void ExecuteAndDisposeTransientCmdBuff(Uint32 QueueIndex, VkCommandBuffer vkCmdBuff, VulkanUtilities::CommandPoolWrapper&& CmdPool);
@@ -130,10 +130,10 @@ private:
     // Parameters:
     //      * SubmittedCmdBuffNumber - submitted command buffer number
     //      * SubmittedFenceValue    - fence value associated with the submitted command buffer
-    void SubmitCommandBuffer(Uint32 QueueIndex, const VkSubmitInfo& SubmitInfo, Uint64& SubmittedCmdBuffNumber, Uint64& SubmittedFenceValue, vector<pair<Uint64, RefCntAutoPtr<IFence> > >* pFences);
+    void SubmitCommandBuffer(Uint32 QueueIndex, const VkSubmitInfo& SubmitInfo, Uint64& SubmittedCmdBuffNumber, Uint64& SubmittedFenceValue, stl::vector<stl::pair<Uint64, RefCntAutoPtr<IFence> > >* pFences);
 
     std::shared_ptr<VulkanUtilities::VulkanInstance>        m_VulkanInstance;
-    unique_ptr<VulkanUtilities::VulkanPhysicalDevice>       m_PhysicalDevice;
+    stl::unique_ptr<VulkanUtilities::VulkanPhysicalDevice>  m_PhysicalDevice;
     std::shared_ptr<VulkanUtilities::VulkanLogicalDevice>   m_LogicalVkDevice;
 
     EngineVkAttribs m_EngineAttribs;

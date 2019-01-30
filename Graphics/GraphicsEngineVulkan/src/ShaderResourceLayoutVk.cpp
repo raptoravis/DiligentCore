@@ -63,7 +63,7 @@ void ShaderResourceLayoutVk::AllocateMemory(std::shared_ptr<const SPIRVShaderRes
     VERIFY_EXPR(!m_pResources);
     VERIFY_EXPR(pSrcResources);
 
-    m_pResources = move(pSrcResources);
+    m_pResources = stl::move(pSrcResources);
 
     Uint32 AllowedTypeBits = GetAllowedTypeBits(AllowedVarTypes, NumAllowedTypes); (void)AllowedTypeBits;
 
@@ -92,7 +92,7 @@ void ShaderResourceLayoutVk::AllocateMemory(std::shared_ptr<const SPIRVShaderRes
         return;
 
     auto* pRawMem = ALLOCATE(Allocator, "Raw memory buffer for shader resource layout resources", MemSize);
-    m_ResourceBuffer = unique_ptr<void, STDDeleterRawMem<void> >(pRawMem, Allocator);
+    m_ResourceBuffer = stl::unique_ptr<void, STDDeleterRawMem<void> >(pRawMem, Allocator);
 }
 
 void ShaderResourceLayoutVk::InitializeStaticResourceLayout(std::shared_ptr<const SPIRVShaderResources> pSrcResources,
@@ -100,9 +100,9 @@ void ShaderResourceLayoutVk::InitializeStaticResourceLayout(std::shared_ptr<cons
                                                             ShaderResourceCacheVk&                      StaticResourceCache)
 {
     auto AllowedVarType = SHADER_VARIABLE_TYPE_STATIC;
-    AllocateMemory(move(pSrcResources), LayoutDataAllocator, &AllowedVarType, 1);
+    AllocateMemory(stl::move(pSrcResources), LayoutDataAllocator, &AllowedVarType, 1);
 
-    array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES> CurrResInd = {};
+    stl::array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES> CurrResInd = {};
     Uint32 StaticResCacheSize = 0;
 
     m_pResources->ProcessResources(
@@ -141,7 +141,7 @@ void ShaderResourceLayoutVk::Initialize(Uint32 NumShaders,
                                         ShaderResourceLayoutVk                       Layouts[],
                                         std::shared_ptr<const SPIRVShaderResources>  pShaderResources[],
                                         IMemoryAllocator&                            LayoutDataAllocator,
-                                        vector<uint32_t>                             SPIRVs[],
+                                        stl::vector<uint32_t>                        SPIRVs[],
                                         class PipelineLayout&                        PipelineLayout)
 {
     SHADER_VARIABLE_TYPE* AllowedVarTypes = nullptr;
@@ -150,13 +150,13 @@ void ShaderResourceLayoutVk::Initialize(Uint32 NumShaders,
 
     for (Uint32 s=0; s < NumShaders; ++s)
     {
-        Layouts[s].AllocateMemory(move(pShaderResources[s]), LayoutDataAllocator, AllowedVarTypes, NumAllowedTypes);
+        Layouts[s].AllocateMemory(stl::move(pShaderResources[s]), LayoutDataAllocator, AllowedVarTypes, NumAllowedTypes);
     }
     
     VERIFY_EXPR(NumShaders <= MaxShadersInPipeline);
-    array<array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES>, MaxShadersInPipeline> CurrResInd = {};
+    stl::array<stl::array<Uint32, SHADER_VARIABLE_TYPE_NUM_TYPES>, MaxShadersInPipeline> CurrResInd = {};
 #ifdef _DEBUG
-    unordered_map<Uint32, pair<Uint32, Uint32>> dbgBindings_CacheOffsets;
+    stl::unordered_map<Uint32, stl::pair<Uint32, Uint32>> dbgBindings_CacheOffsets;
 #endif
 
     auto AddResource = [&](Uint32                            ShaderInd,
@@ -187,7 +187,7 @@ void ShaderResourceLayoutVk::Initialize(Uint32 NumShaders,
             VERIFY(Binding     > Binding_OffsetIt->second.first,  "Binding for descriptor set ", DescriptorSet, " is not strictly monotonic");
             VERIFY(CacheOffset > Binding_OffsetIt->second.second, "Cache offset for descriptor set ", DescriptorSet, " is not strictly monotonic");
         }
-        dbgBindings_CacheOffsets[DescriptorSet] = make_pair(Binding, CacheOffset);
+        dbgBindings_CacheOffsets[DescriptorSet] = stl::make_pair(Binding, CacheOffset);
 #endif
 
         auto& ResInd = CurrResInd[ShaderInd][Attribs.VarType];
@@ -836,10 +836,10 @@ void ShaderResourceLayoutVk::CommitDynamicResources(const ShaderResourceCacheVk&
 #endif
 
     // Do not zero-initiaize arrays!
-    array<VkDescriptorImageInfo,  ImgUpdateBatchSize>          DescrImgInfoArr;
-    array<VkDescriptorBufferInfo, BuffUpdateBatchSize>         DescrBuffInfoArr;
-    array<VkBufferView,           TexelBuffUpdateBatchSize>    DescrBuffViewArr;
-    array<VkWriteDescriptorSet,   WriteDescriptorSetBatchSize> WriteDescrSetArr;
+    stl::array<VkDescriptorImageInfo,  ImgUpdateBatchSize>          DescrImgInfoArr;
+    stl::array<VkDescriptorBufferInfo, BuffUpdateBatchSize>         DescrBuffInfoArr;
+    stl::array<VkBufferView,           TexelBuffUpdateBatchSize>    DescrBuffViewArr;
+    stl::array<VkWriteDescriptorSet,   WriteDescriptorSetBatchSize> WriteDescrSetArr;
 
     Uint32 ResNum = 0, ArrElem = 0;
     auto DescrImgIt  = DescrImgInfoArr.begin();

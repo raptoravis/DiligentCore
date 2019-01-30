@@ -27,7 +27,7 @@
 
 #include "../../External/EASTL/include/EASTL/unique_ptr.h"
 
-namespace Diligent
+namespace stl
 {
 
 using eastl::unique_ptr;
@@ -39,7 +39,7 @@ using eastl::unique_ptr;
 
 #include <memory>
 
-namespace Diligent
+namespace stl
 {
 
 using std::unique_ptr;

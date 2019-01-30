@@ -40,14 +40,14 @@ VkFormat TypeToVkFormat(VALUE_TYPE ValType, Uint32 NumComponents, Bool bIsNormal
 
 VkPipelineRasterizationStateCreateInfo RasterizerStateDesc_To_VkRasterizationStateCI(const RasterizerStateDesc &RasterizerDesc);
 VkPipelineDepthStencilStateCreateInfo  DepthStencilStateDesc_To_VkDepthStencilStateCI(const DepthStencilStateDesc &DepthStencilDesc);
-void BlendStateDesc_To_VkBlendStateCI(const BlendStateDesc&                         BSDesc, 
-                                      VkPipelineColorBlendStateCreateInfo&          ColorBlendStateCI,
-                                      vector<VkPipelineColorBlendAttachmentState>&  ColorBlendAttachments);
+void BlendStateDesc_To_VkBlendStateCI(const BlendStateDesc&                              BSDesc, 
+                                      VkPipelineColorBlendStateCreateInfo&               ColorBlendStateCI,
+                                      stl::vector<VkPipelineColorBlendAttachmentState>&  ColorBlendAttachments);
 
 void InputLayoutDesc_To_VkVertexInputStateCI(const InputLayoutDesc&                                             LayoutDesc, 
                                              VkPipelineVertexInputStateCreateInfo&                              VertexInputStateCI,
-                                             array<VkVertexInputBindingDescription, iMaxLayoutElements>&        BindingDescriptions,
-                                             array<VkVertexInputAttributeDescription, iMaxLayoutElements>&      AttributeDescription);
+                                             stl::array<VkVertexInputBindingDescription, iMaxLayoutElements>&   BindingDescriptions,
+                                             stl::array<VkVertexInputAttributeDescription, iMaxLayoutElements>& AttributeDescription);
 
 void PrimitiveTopology_To_VkPrimitiveTopologyAndPatchCPCount(PRIMITIVE_TOPOLOGY   PrimTopology, 
                                                              VkPrimitiveTopology& VkPrimTopology, 

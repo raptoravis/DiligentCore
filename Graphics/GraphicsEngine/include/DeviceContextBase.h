@@ -277,7 +277,7 @@ protected:
     {
         MAP_TYPE MapType;
     };
-    unordered_map<IBuffer*, DbgMappedBufferInfo> m_DbgMappedBuffers;
+    stl::unordered_map<IBuffer*, DbgMappedBufferInfo> m_DbgMappedBuffers;
 #endif
 };
 
@@ -316,7 +316,7 @@ inline void DeviceContextBase<BaseInterface,ImplementationTraits> ::
             m_VertexStreams[s] = VertexStreamInfo<BufferImplType>{};
         m_NumVertexStreams = 0;
     }
-    m_NumVertexStreams = max(m_NumVertexStreams, StartSlot + NumBuffersSet );
+    m_NumVertexStreams = stl::max(m_NumVertexStreams, StartSlot + NumBuffersSet );
     
     for( Uint32 Buff = 0; Buff < NumBuffersSet; ++Buff )
     {
@@ -448,7 +448,7 @@ inline void DeviceContextBase<BaseInterface,ImplementationTraits> ::
     }
 
     VERIFY(NumViewports < MaxViewports, "Number of viewports (", NumViewports, ") exceeds the limit (", MaxViewports, ")");
-    m_NumViewports = min(MaxViewports, NumViewports);
+    m_NumViewports = stl::min(MaxViewports, NumViewports);
     
     Viewport DefaultVP( 0, 0, static_cast<float>(RTWidth), static_cast<float>(RTHeight) );
     // If no viewports are specified, use default viewport
@@ -488,7 +488,7 @@ inline void DeviceContextBase<BaseInterface,ImplementationTraits> ::
     }
 
     VERIFY(NumRects < MaxViewports, "Number of scissor rects (", NumRects, ") exceeds the limit (", MaxViewports, ")");
-    m_NumScissorRects = min(MaxViewports, NumRects);
+    m_NumScissorRects = stl::min(MaxViewports, NumRects);
 
     for( Uint32 sr = 0; sr < m_NumScissorRects; ++sr )
     {
@@ -554,18 +554,18 @@ inline bool DeviceContextBase<BaseInterface,ImplementationTraits> ::
             {
                 auto* pTex = pRTView->GetTexture();
                 const auto &TexDesc = pTex->GetDesc();
-                m_FramebufferWidth  = max(TexDesc.Width  >> RTVDesc.MostDetailedMip, 1U);
-                m_FramebufferHeight = max(TexDesc.Height >> RTVDesc.MostDetailedMip, 1U);
+                m_FramebufferWidth  = stl::max(TexDesc.Width  >> RTVDesc.MostDetailedMip, 1U);
+                m_FramebufferHeight = stl::max(TexDesc.Height >> RTVDesc.MostDetailedMip, 1U);
                 m_FramebufferSlices = RTVDesc.NumArraySlices;
             }
             else
             {
 #ifdef DEVELOPMENT
                 const auto &TexDesc = pRTView->GetTexture()->GetDesc();
-                if (m_FramebufferWidth != max(TexDesc.Width  >> RTVDesc.MostDetailedMip, 1U))
-                    LOG_ERROR("Render target width (", max(TexDesc.Width  >> RTVDesc.MostDetailedMip, 1U), ") specified by RTV '", RTVDesc.Name, "' is inconsistent with the width of previously bound render targets (", m_FramebufferWidth, ")");
-                if (m_FramebufferHeight != max(TexDesc.Height >> RTVDesc.MostDetailedMip, 1U))
-                    LOG_ERROR("Render target height (", max(TexDesc.Height >> RTVDesc.MostDetailedMip, 1U), ") specified by RTV '", RTVDesc.Name, "' is inconsistent with the height of previously bound render targets (", m_FramebufferHeight, ")");
+                if (m_FramebufferWidth != stl::max(TexDesc.Width  >> RTVDesc.MostDetailedMip, 1U))
+                    LOG_ERROR("Render target width (", stl::max(TexDesc.Width  >> RTVDesc.MostDetailedMip, 1U), ") specified by RTV '", RTVDesc.Name, "' is inconsistent with the width of previously bound render targets (", m_FramebufferWidth, ")");
+                if (m_FramebufferHeight != stl::max(TexDesc.Height >> RTVDesc.MostDetailedMip, 1U))
+                    LOG_ERROR("Render target height (", stl::max(TexDesc.Height >> RTVDesc.MostDetailedMip, 1U), ") specified by RTV '", RTVDesc.Name, "' is inconsistent with the height of previously bound render targets (", m_FramebufferHeight, ")");
                 if (m_FramebufferSlices != RTVDesc.NumArraySlices)
                     LOG_ERROR("Number of slices (", RTVDesc.NumArraySlices, ") specified by RTV '", RTVDesc.Name, "' is inconsistent with the number of slices in previously bound render targets (", m_FramebufferSlices, ")");
 #endif
@@ -595,18 +595,18 @@ inline bool DeviceContextBase<BaseInterface,ImplementationTraits> ::
         {
             auto* pTex = pDepthStencil->GetTexture();
             const auto &TexDesc = pTex->GetDesc();
-            m_FramebufferWidth  = max(TexDesc.Width  >> DSVDesc.MostDetailedMip, 1U);
-            m_FramebufferHeight = max(TexDesc.Height >> DSVDesc.MostDetailedMip, 1U);
+            m_FramebufferWidth  = stl::max(TexDesc.Width  >> DSVDesc.MostDetailedMip, 1U);
+            m_FramebufferHeight = stl::max(TexDesc.Height >> DSVDesc.MostDetailedMip, 1U);
             m_FramebufferSlices = DSVDesc.NumArraySlices;
         }
         else
         {
 #ifdef DEVELOPMENT
             const auto &TexDesc = pDepthStencil->GetTexture()->GetDesc();
-            if (m_FramebufferWidth  != max(TexDesc.Width  >> DSVDesc.MostDetailedMip, 1U))
-                LOG_ERROR("Depth-stencil target width (", max(TexDesc.Width >> DSVDesc.MostDetailedMip, 1U), ") specified by DSV '", DSVDesc.Name, "' is inconsistent with the width of previously bound render targets (", m_FramebufferWidth, ")");
-            if (m_FramebufferHeight != max(TexDesc.Height >> DSVDesc.MostDetailedMip, 1U))
-                LOG_ERROR("Depth-stencil target height (", max(TexDesc.Height >> DSVDesc.MostDetailedMip, 1U), ") specified by DSV '", DSVDesc.Name, "' is inconsistent with the height of previously bound render targets (", m_FramebufferHeight, ")");
+            if (m_FramebufferWidth  != stl::max(TexDesc.Width  >> DSVDesc.MostDetailedMip, 1U))
+                LOG_ERROR("Depth-stencil target width (", stl::max(TexDesc.Width >> DSVDesc.MostDetailedMip, 1U), ") specified by DSV '", DSVDesc.Name, "' is inconsistent with the width of previously bound render targets (", m_FramebufferWidth, ")");
+            if (m_FramebufferHeight != stl::max(TexDesc.Height >> DSVDesc.MostDetailedMip, 1U))
+                LOG_ERROR("Depth-stencil target height (", stl::max(TexDesc.Height >> DSVDesc.MostDetailedMip, 1U), ") specified by DSV '", DSVDesc.Name, "' is inconsistent with the height of previously bound render targets (", m_FramebufferHeight, ")");
             if (m_FramebufferSlices != DSVDesc.NumArraySlices)
                 LOG_ERROR("Number of slices (", DSVDesc.NumArraySlices, ") specified by DSV '", DSVDesc.Name, "' is inconsistent with the number of slices in previously bound render targets (", m_FramebufferSlices, ")");
 #endif

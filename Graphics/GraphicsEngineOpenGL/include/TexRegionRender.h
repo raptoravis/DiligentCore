@@ -56,7 +56,7 @@ private:
     Uint32 m_NumRenderTargets = 0;
     ITextureView *m_pOrigRTVs[MaxRenderTargets] = {};
     RefCntAutoPtr<ITextureView> m_pOrigDSV;
-    vector<Viewport> m_OrigViewports;
+    stl::vector<Viewport> m_OrigViewports;
 };
 
 }

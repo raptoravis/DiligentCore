@@ -129,8 +129,8 @@ void BlendStateDesc_To_D3D12_BLEND_DESC(const BlendStateDesc& BSDesc, D3D12_BLEN
     }
 }
 
-void LayoutElements_To_D3D12_INPUT_ELEMENT_DESCs(const vector<LayoutElement, STDAllocatorRawMem<LayoutElement>> &LayoutElements, 
-                                                 vector<D3D12_INPUT_ELEMENT_DESC, STDAllocatorRawMem<D3D12_INPUT_ELEMENT_DESC> > &d3d12InputElements)
+void LayoutElements_To_D3D12_INPUT_ELEMENT_DESCs(const stl::vector<LayoutElement, STDAllocatorRawMem<LayoutElement>>&                   LayoutElements, 
+                                                 stl::vector<D3D12_INPUT_ELEMENT_DESC, STDAllocatorRawMem<D3D12_INPUT_ELEMENT_DESC> >&  d3d12InputElements)
 {
     LayoutElements_To_D3D_INPUT_ELEMENT_DESCs<D3D12_INPUT_ELEMENT_DESC>(LayoutElements, d3d12InputElements);
 }
@@ -357,7 +357,7 @@ public:
 
 private:
     static constexpr Uint32 MaxFlagBitPos = 15;
-    array<D3D12_RESOURCE_STATES, MaxFlagBitPos + 1> FlagBitPosToResStateMap;
+    stl::array<D3D12_RESOURCE_STATES, MaxFlagBitPos + 1> FlagBitPosToResStateMap;
 };
 
 D3D12_RESOURCE_STATES ResourceStateFlagsToD3D12ResourceStates(RESOURCE_STATE StateFlags)
@@ -424,7 +424,7 @@ public:
 
 private:
     static constexpr Uint32 MaxFlagBitPos = 13;
-    array<RESOURCE_STATE, MaxFlagBitPos + 1> FlagBitPosToResStateMap;
+    stl::array<RESOURCE_STATE, MaxFlagBitPos + 1> FlagBitPosToResStateMap;
 };
 
 RESOURCE_STATE D3D12ResourceStatesToResourceStateFlags(D3D12_RESOURCE_STATES StateFlags)

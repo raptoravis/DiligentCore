@@ -96,7 +96,7 @@ private:
     friend class DeviceContextD3D12Impl;
     // Array of dynamic allocations for every device context
     // sizeof(D3D12DynamicAllocation) == 40 (x64)
-    vector<D3D12DynamicAllocation,  STDAllocatorRawMem<D3D12DynamicAllocation> > m_DynamicData;
+    stl::vector<D3D12DynamicAllocation,  STDAllocatorRawMem<D3D12DynamicAllocation> > m_DynamicData;
 };
 
 }

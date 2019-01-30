@@ -118,6 +118,17 @@ struct STDAllocator
         return reinterpret_cast<T*>( m_Allocator.Allocate(count * sizeof(T), m_dvpDescription, m_dvpFileName, m_dvpLineNumber ) );
     }
 
+    T* allocate(std::size_t count, std::size_t alignment, std::size_t offset, int flags)
+    {
+        return allocate(count);
+    }
+
+    T* allocate(std::size_t count, int flags)
+    {
+        return allocate(count);
+    }
+
+
     pointer       address(reference r)       { return &r; }
     const_pointer address(const_reference r) { return &r; }
 

@@ -116,8 +116,8 @@ private:
         UploadPageInfo(VulkanUtilities::VulkanMemoryAllocation&& _MemAllocation, 
                        VulkanUtilities::BufferWrapper&&          _Buffer,
                        Uint8*                                    _CPUAddress) :
-            MemAllocation(move(_MemAllocation)),
-            Buffer       (move(_Buffer)),
+            MemAllocation(stl::move(_MemAllocation)),
+            Buffer       (stl::move(_Buffer)),
             CPUAddress   (_CPUAddress)
         {
         }
@@ -125,7 +125,7 @@ private:
         VulkanUtilities::BufferWrapper          Buffer;
         Uint8* const                            CPUAddress = nullptr;
     };
-    vector<UploadPageInfo> m_Pages;
+    stl::vector<UploadPageInfo> m_Pages;
 
     struct CurrPageInfo
     {

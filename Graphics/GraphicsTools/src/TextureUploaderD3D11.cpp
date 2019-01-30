@@ -163,11 +163,11 @@ namespace Diligent
         }
 
         std::mutex m_PendingOperationsMtx;
-        vector< PendingBufferOperation > m_PendingOperations;
-        vector< PendingBufferOperation > m_InWorkOperations;
+        stl::vector< PendingBufferOperation > m_PendingOperations;
+        stl::vector< PendingBufferOperation > m_InWorkOperations;
 
         std::mutex m_UploadBuffCacheMtx;
-        unordered_map< UploadBufferDesc, deque< RefCntAutoPtr<UploadBufferD3D11> > > m_UploadBufferCache;
+        stl::unordered_map< UploadBufferDesc, stl::deque< RefCntAutoPtr<UploadBufferD3D11> > > m_UploadBufferCache;
     };
 
     TextureUploaderD3D11::TextureUploaderD3D11(IReferenceCounters *pRefCounters, IRenderDevice *pDevice, const TextureUploaderDesc Desc) :
@@ -216,7 +216,7 @@ namespace Diligent
                             {
                                 std::lock_guard<std::mutex> CacheLock(m_pInternalData->m_UploadBuffCacheMtx);
                                 auto &Cache = m_pInternalData->m_UploadBufferCache;
-                                Cache[pBuffer->GetDesc()].emplace_back( move(pBuffer) );
+                                Cache[pBuffer->GetDesc()].emplace_back( stl::move(pBuffer) );
                             }
                         }
                         else

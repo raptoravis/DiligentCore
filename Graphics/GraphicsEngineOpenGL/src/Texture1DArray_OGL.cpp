@@ -55,7 +55,7 @@ Texture1DArray_OGL::Texture1DArray_OGL( IReferenceCounters *pRefCounters,
     //for (i = 0; i < levels; i++)
     //{
     //    glTexImage2D(target, i, internalformat, width, height, 0, format, type, NULL);
-    //    width = max(1, (width / 2));
+    //    width = stl::max(1, (width / 2));
     //}
 
     SetDefaultGLParameters();
@@ -68,7 +68,7 @@ Texture1DArray_OGL::Texture1DArray_OGL( IReferenceCounters *pRefCounters,
             {
                 for(Uint32 Mip = 0; Mip < m_Desc.MipLevels; ++Mip)
                 {
-                    Box DstBox{0, max(m_Desc.Width>>Mip, 1U),
+                    Box DstBox{0, stl::max(m_Desc.Width>>Mip, 1U),
                                0, 1 };
                     // UpdateData() is a virtual function. If we try to call it through vtbl from here,
                     // we will get into TextureBaseGL::UpdateData(), because instance of Texture1DArray_OGL

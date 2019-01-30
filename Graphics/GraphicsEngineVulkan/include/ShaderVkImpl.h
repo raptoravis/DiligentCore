@@ -73,7 +73,7 @@ public:
         return m_StaticVarsMgr.GetVariable(Index);
     }
 
-    virtual const vector<uint32_t>& GetSPIRV()const override final
+    virtual const stl::vector<uint32_t>& GetSPIRV()const override final
     {
         return m_SPIRV;
     }
@@ -99,7 +99,7 @@ private:
     ShaderVariableManagerVk m_StaticVarsMgr;
 
     std::string           m_EntryPoint;
-    vector<uint32_t>      m_SPIRV;
+    stl::vector<uint32_t> m_SPIRV;
 };
 
 }

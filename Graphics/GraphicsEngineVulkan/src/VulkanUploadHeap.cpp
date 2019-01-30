@@ -34,7 +34,7 @@ VulkanUploadHeap::VulkanUploadHeap(RenderDeviceVkImpl& RenderDevice,
                                    std::string         HeapName,
                                    VkDeviceSize        PageSize) :
     m_RenderDevice (RenderDevice),
-    m_HeapName     (move(HeapName)),
+    m_HeapName     (stl::move(HeapName)),
     m_PageSize     (PageSize)
 {
 }
@@ -80,7 +80,7 @@ VulkanUploadHeap::UploadPageInfo VulkanUploadHeap::CreateNewPage(VkDeviceSize Si
     DEV_CHECK_ERR(err == VK_SUCCESS, "Failed to bind buffer memory"); (void)err;
     auto CPUAddress = reinterpret_cast<Uint8*>(MemAllocation.Page->GetCPUMemory()) + AlignedOffset;
 
-    return UploadPageInfo{move(MemAllocation), move(NewBuffer), CPUAddress};
+    return UploadPageInfo{stl::move(MemAllocation), stl::move(NewBuffer), CPUAddress};
 }
 
 VulkanUploadAllocation VulkanUploadHeap::Allocate(size_t SizeInBytes, size_t Alignment)
@@ -98,7 +98,7 @@ VulkanUploadAllocation VulkanUploadHeap::Allocate(size_t SizeInBytes, size_t Ali
         VERIFY(Alignment < SizeInBytes, "Alignment must be smaller than the page size");
         Allocation.AlignedOffset = 0;
         m_CurrAllocatedSize      += NewPage.MemAllocation.Size;
-        m_Pages.emplace_back(move(NewPage));
+        m_Pages.emplace_back(stl::move(NewPage));
     }
     else
     {
@@ -109,7 +109,7 @@ VulkanUploadAllocation VulkanUploadHeap::Allocate(size_t SizeInBytes, size_t Ali
             auto NewPage = CreateNewPage(m_PageSize);
             m_CurrPage.Reset(NewPage, m_PageSize);
             m_CurrAllocatedSize += NewPage.MemAllocation.Size;
-            m_Pages.emplace_back(move(NewPage));
+            m_Pages.emplace_back(stl::move(NewPage));
             VERIFY_EXPR((m_CurrPage.CurrOffset & (Alignment-1)) == 0);
             AlignmentOffset = 0;
         }
@@ -123,8 +123,8 @@ VulkanUploadAllocation VulkanUploadHeap::Allocate(size_t SizeInBytes, size_t Ali
         m_CurrPage.Advance(SizeInBytes);
     }
     m_CurrFrameSize += SizeInBytes; // Count unaligned size
-    m_PeakFrameSize     = max(m_CurrFrameSize, m_PeakFrameSize);
-    m_PeakAllocatedSize = max(m_CurrAllocatedSize, m_PeakAllocatedSize);
+    m_PeakFrameSize     = stl::max(m_CurrFrameSize, m_PeakFrameSize);
+    m_PeakAllocatedSize = stl::max(m_CurrAllocatedSize, m_PeakAllocatedSize);
 
     VERIFY_EXPR((Allocation.AlignedOffset & (Alignment-1)) == 0);
     return Allocation;
@@ -136,8 +136,8 @@ void VulkanUploadHeap::ReleaseAllocatedPages(Uint64 CmdQueueMask)
     // queue rightaway when RenderDeviceVkImpl::FlushStaleResources() is called by the DeviceContextVkImpl::FinishFrame()
     for (auto& Page : m_Pages)
     {
-        m_RenderDevice.SafeReleaseDeviceObject(move(Page.MemAllocation), CmdQueueMask);
-        m_RenderDevice.SafeReleaseDeviceObject(move(Page.Buffer),        CmdQueueMask);
+        m_RenderDevice.SafeReleaseDeviceObject(stl::move(Page.MemAllocation), CmdQueueMask);
+        m_RenderDevice.SafeReleaseDeviceObject(stl::move(Page.Buffer),        CmdQueueMask);
     }
 
     m_Pages.clear();

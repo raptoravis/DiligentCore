@@ -30,7 +30,7 @@
 
 #include "../../External/EASTL/include/EASTL/map.h"
 
-namespace Diligent
+namespace stl
 {
 
 using eastl::map;
@@ -42,7 +42,7 @@ using eastl::multimap;
 
 #include <map>
 
-namespace Diligent
+namespace stl
 {
 
 using std::map;

@@ -27,7 +27,7 @@
 
 #include "../../External/EASTL/include/EASTL/vector.h"
 
-namespace Diligent
+namespace stl
 {
 
 using eastl::vector;
@@ -38,7 +38,7 @@ using eastl::vector;
 
 #include <vector>
 
-namespace Diligent
+namespace stl
 {
 
 using std::vector;

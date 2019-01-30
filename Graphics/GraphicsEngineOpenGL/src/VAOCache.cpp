@@ -112,7 +112,7 @@ const GLObjectWrappers::GLVertexArrayObj& VAOCache::GetVAO( IPipelineState *pPSO
                 VERIFY(BuffSlot >= MaxBufferSlots, "Incorrect input slot");
                 continue;
             }
-            auto MaxUsedSlot = max(Key.NumUsedSlots, BuffSlot + 1);
+            auto MaxUsedSlot = stl::max(Key.NumUsedSlots, BuffSlot + 1);
             for (Uint32 s = Key.NumUsedSlots; s < MaxUsedSlot; ++s)
                 Key.Streams[s] = VAOCacheKey::StreamAttribs{};
             Key.NumUsedSlots = MaxUsedSlot;
@@ -216,15 +216,15 @@ const GLObjectWrappers::GLVertexArrayObj& VAOCache::GetVAO( IPipelineState *pPSO
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, pIndBufferOGL->m_GlBuffer);
         }
             
-        auto NewElems = m_Cache.emplace( make_pair(Key, std::move(NewVAO)) );
+        auto NewElems = m_Cache.emplace( stl::make_pair(Key, stl::move(NewVAO)) );
         // New element must be actually inserted
         VERIFY( NewElems.second, "New element was not inserted into the cache" ); 
-        m_PSOToKey.insert( make_pair(Key.pPSO, Key) );
+        m_PSOToKey.insert( stl::make_pair(Key.pPSO, Key) );
         for(Uint32 Slot = 0; Slot < Key.NumUsedSlots; ++Slot)
         {
             auto *pCurrBuff = Key.Streams[Slot].pBuffer;
             if( pCurrBuff )
-                m_BuffToKey.insert( make_pair(pCurrBuff, Key) );
+                m_BuffToKey.insert( stl::make_pair(pCurrBuff, Key) );
         }
 
         return NewElems.first->second;

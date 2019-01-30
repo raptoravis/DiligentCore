@@ -142,11 +142,11 @@ namespace Diligent
                 DstMip(dstMip)
             {}
         };
-        vector< PendingBufferOperation > m_PendingOperations;
-        vector< PendingBufferOperation > m_InWorkOperations;
+        stl::vector< PendingBufferOperation > m_PendingOperations;
+        stl::vector< PendingBufferOperation > m_InWorkOperations;
 
         std::mutex m_UploadBuffCacheMtx;
-        unordered_map< UploadBufferDesc, deque< pair<Uint64, RefCntAutoPtr<UploadBufferD3D12> > > > m_UploadBufferCache;
+        stl::unordered_map< UploadBufferDesc, stl::deque< stl::pair<Uint64, RefCntAutoPtr<UploadBufferD3D12> > > > m_UploadBufferCache;
     };
 
     TextureUploaderD3D12::TextureUploaderD3D12(IReferenceCounters *pRefCounters, IRenderDevice *pDevice, const TextureUploaderDesc Desc) :

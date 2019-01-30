@@ -27,7 +27,7 @@
 
 #include "../../External/EASTL/include/EASTL/array.h"
 
-namespace Diligent
+namespace stl
 {
 
 using eastl::array;
@@ -39,7 +39,7 @@ using eastl::array;
 
 #include <array>
 
-namespace Diligent
+namespace stl
 {
 
 using std::array;

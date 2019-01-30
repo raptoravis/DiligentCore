@@ -43,8 +43,8 @@ VkRenderPassCreateInfo PipelineStateVkImpl::GetRenderPassCreateInfo(
         const TEXTURE_FORMAT                                     RTVFormats[], 
         TEXTURE_FORMAT                                           DSVFormat,
         Uint32                                                   SampleCount,
-        array<VkAttachmentDescription, MaxRenderTargets+1>&      Attachments,
-        array<VkAttachmentReference,   MaxRenderTargets+1>&      AttachmentReferences,
+        stl::array<VkAttachmentDescription, MaxRenderTargets+1>& Attachments,
+        stl::array<VkAttachmentReference,   MaxRenderTargets+1>& AttachmentReferences,
         VkSubpassDescription&                                    SubpassDesc)
 {
     VERIFY_EXPR(NumRenderTargets <= MaxRenderTargets);
@@ -129,9 +129,9 @@ VkRenderPassCreateInfo PipelineStateVkImpl::GetRenderPassCreateInfo(
     return RenderPassCI;
 }
 
-static vector<uint32_t> StripReflection(const vector<uint32_t>& OriginalSPIRV)
+static stl::vector<uint32_t> StripReflection(const stl::vector<uint32_t>& OriginalSPIRV)
 {
-    vector<uint32_t> StrippedSPIRV;
+    stl::vector<uint32_t> StrippedSPIRV;
     spvtools::Optimizer SpirvOptimizer(SPV_ENV_VULKAN_1_0);
     // Decorations defined in SPV_GOOGLE_hlsl_functionality1 are the only instructions
     // removed by strip-reflect-info pass. SPIRV offsets become INVALID after this operation.
@@ -155,8 +155,8 @@ PipelineStateVkImpl :: PipelineStateVkImpl(IReferenceCounters*      pRefCounters
 
     // Initialize shader resource layouts
     auto& ShaderResLayoutAllocator = GetRawAllocator();
-    array<std::shared_ptr<const SPIRVShaderResources>, MaxShadersInPipeline> ShaderResources;
-    array<std::vector<uint32_t>,                       MaxShadersInPipeline> ShaderSPIRVs;
+    stl::array<std::shared_ptr<const SPIRVShaderResources>, MaxShadersInPipeline> ShaderResources;
+    stl::array<std::vector<uint32_t>,                       MaxShadersInPipeline> ShaderSPIRVs;
     auto* pResLayoutRawMem = ALLOCATE(ShaderResLayoutAllocator, "Raw memory for ShaderResourceLayoutVk", sizeof(ShaderResourceLayoutVk) * m_NumShaders);
     m_ShaderResourceLayouts = reinterpret_cast<ShaderResourceLayoutVk*>(pResLayoutRawMem);
     for (Uint32 s=0; s < m_NumShaders; ++s)
@@ -171,10 +171,10 @@ PipelineStateVkImpl :: PipelineStateVkImpl(IReferenceCounters*      pRefCounters
 
     if (PipelineDesc.SRBAllocationGranularity > 1)
     {
-        array<size_t, MaxShadersInPipeline> ShaderVariableDataSizes = {};
+        stl::array<size_t, MaxShadersInPipeline> ShaderVariableDataSizes = {};
         for (Uint32 s = 0; s < m_NumShaders; ++s)
         {
-            array<SHADER_VARIABLE_TYPE, 2> AllowedVarTypes = { {SHADER_VARIABLE_TYPE_MUTABLE, SHADER_VARIABLE_TYPE_DYNAMIC} };
+            stl::array<SHADER_VARIABLE_TYPE, 2> AllowedVarTypes = { {SHADER_VARIABLE_TYPE_MUTABLE, SHADER_VARIABLE_TYPE_DYNAMIC} };
             Uint32 UnusedNumVars = 0;
             ShaderVariableDataSizes[s] = ShaderVariableManagerVk::GetRequiredMemorySize(m_ShaderResourceLayouts[s], AllowedVarTypes.data(), static_cast<Uint32>(AllowedVarTypes.size()), UnusedNumVars);
         }
@@ -187,7 +187,7 @@ PipelineStateVkImpl :: PipelineStateVkImpl(IReferenceCounters*      pRefCounters
     }
 
     // Create shader modules and initialize shader stages
-    array<VkPipelineShaderStageCreateInfo, MaxShadersInPipeline> ShaderStages = {};
+    stl::array<VkPipelineShaderStageCreateInfo, MaxShadersInPipeline> ShaderStages = {};
     for (Uint32 s = 0; s < m_NumShaders; ++s)
     {
         auto* pShaderVk = GetShader<const ShaderVkImpl>(s);
@@ -285,8 +285,8 @@ PipelineStateVkImpl :: PipelineStateVkImpl(IReferenceCounters*      pRefCounters
         PipelineCI.layout = m_PipelineLayout.GetVkPipelineLayout();
         
         VkPipelineVertexInputStateCreateInfo VertexInputStateCI = {};
-        array<VkVertexInputBindingDescription, iMaxLayoutElements> BindingDescriptions;
-        array<VkVertexInputAttributeDescription, iMaxLayoutElements> AttributeDescription;
+        stl::array<VkVertexInputBindingDescription, iMaxLayoutElements> BindingDescriptions;
+        stl::array<VkVertexInputAttributeDescription, iMaxLayoutElements> AttributeDescription;
         InputLayoutDesc_To_VkVertexInputStateCI(GraphicsPipeline.InputLayout, VertexInputStateCI, BindingDescriptions, AttributeDescription);
         PipelineCI.pVertexInputState = &VertexInputStateCI;
 
@@ -360,7 +360,7 @@ PipelineStateVkImpl :: PipelineStateVkImpl(IReferenceCounters*      pRefCounters
             DepthStencilStateDesc_To_VkDepthStencilStateCI(GraphicsPipeline.DepthStencilDesc);
         PipelineCI.pDepthStencilState = &DepthStencilStateCI;
 
-        vector<VkPipelineColorBlendAttachmentState> ColorBlendAttachmentStates(m_Desc.GraphicsPipeline.NumRenderTargets);
+        stl::vector<VkPipelineColorBlendAttachmentState> ColorBlendAttachmentStates(m_Desc.GraphicsPipeline.NumRenderTargets);
         VkPipelineColorBlendStateCreateInfo BlendStateCI = {};
         BlendStateCI.pAttachments = !ColorBlendAttachmentStates.empty() ? ColorBlendAttachmentStates.data() : nullptr;
         BlendStateCI.attachmentCount = m_Desc.GraphicsPipeline.NumRenderTargets; //  must equal the colorAttachmentCount for the subpass 
@@ -373,7 +373,7 @@ PipelineStateVkImpl :: PipelineStateVkImpl(IReferenceCounters*      pRefCounters
         DynamicStateCI.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
         DynamicStateCI.pNext = nullptr;
         DynamicStateCI.flags = 0; // reserved for future use
-        vector<VkDynamicState> DynamicStates = 
+        stl::vector<VkDynamicState> DynamicStates = 
         { 
             VK_DYNAMIC_STATE_VIEWPORT,// pViewports state in VkPipelineViewportStateCreateInfo will be ignored and must be 
                                       // set dynamically with vkCmdSetViewport before any draw commands. The number of viewports 
@@ -427,14 +427,14 @@ PipelineStateVkImpl :: PipelineStateVkImpl(IReferenceCounters*      pRefCounters
 
 PipelineStateVkImpl::~PipelineStateVkImpl()
 {
-    m_pDevice->SafeReleaseDeviceObject(move(m_Pipeline), m_Desc.CommandQueueMask);
+    m_pDevice->SafeReleaseDeviceObject(stl::move(m_Pipeline), m_Desc.CommandQueueMask);
     m_PipelineLayout.Release(m_pDevice, m_Desc.CommandQueueMask);
 
     for (auto& ShaderModule : m_ShaderModules)
     {
         if (ShaderModule != VK_NULL_HANDLE)
         {
-            m_pDevice->SafeReleaseDeviceObject(move(ShaderModule), m_Desc.CommandQueueMask);
+            m_pDevice->SafeReleaseDeviceObject(stl::move(ShaderModule), m_Desc.CommandQueueMask);
         }
     }
 

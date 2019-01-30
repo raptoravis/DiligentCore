@@ -49,6 +49,6 @@ namespace VulkanUtilities
     private:
         // Shared pointer to logical device must be declared before fences
         std::shared_ptr<const VulkanLogicalDevice> m_LogicalDevice;
-        Diligent::vector<FenceWrapper>                  m_Fences;
+        stl::vector<FenceWrapper>                  m_Fences;
     };
 }

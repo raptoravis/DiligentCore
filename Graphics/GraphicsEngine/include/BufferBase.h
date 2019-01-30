@@ -166,10 +166,10 @@ protected:
     RESOURCE_STATE m_State = RESOURCE_STATE_UNKNOWN;
 
     /// Default UAV addressing the entire buffer
-    unique_ptr<BufferViewImplType, STDDeleter<BufferViewImplType, TBuffViewObjAllocator> > m_pDefaultUAV;
+    stl::unique_ptr<BufferViewImplType, STDDeleter<BufferViewImplType, TBuffViewObjAllocator> > m_pDefaultUAV;
 
     /// Default SRV addressing the entire buffer
-    unique_ptr<BufferViewImplType, STDDeleter<BufferViewImplType, TBuffViewObjAllocator> > m_pDefaultSRV;
+    stl::unique_ptr<BufferViewImplType, STDDeleter<BufferViewImplType, TBuffViewObjAllocator> > m_pDefaultSRV;
 };
 
 

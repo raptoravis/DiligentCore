@@ -314,11 +314,11 @@ namespace Diligent
 
             Uint32 NumRenderTargets = m_NumBoundRenderTargets;
             VERIFY(NumRenderTargets < MaxRenderTargets, "Too many render targets (", NumRenderTargets, ") are being set");
-            NumRenderTargets = min(NumRenderTargets, MaxRenderTargets);
+            NumRenderTargets = stl::min(NumRenderTargets, MaxRenderTargets);
 
             const auto& CtxCaps = m_ContextState.GetContextCaps();
             VERIFY(NumRenderTargets < static_cast<Uint32>(CtxCaps.m_iMaxDrawBuffers), "This device only supports ", CtxCaps.m_iMaxDrawBuffers, " draw buffers, but ", NumRenderTargets, " are being set");
-            NumRenderTargets = min(NumRenderTargets, static_cast<Uint32>(CtxCaps.m_iMaxDrawBuffers));
+            NumRenderTargets = stl::min(NumRenderTargets, static_cast<Uint32>(CtxCaps.m_iMaxDrawBuffers));
 
             ITextureView* pBoundRTVs[MaxRenderTargets] = {};
             for (Uint32 rt = 0; rt < NumRenderTargets; ++rt)
@@ -1012,7 +1012,7 @@ namespace Diligent
         );
         CHECK_GL_ERROR( "Failed to create gl fence" );
         auto* pFenceGLImpl = ValidatedCast<FenceGLImpl>(pFence);
-        pFenceGLImpl->AddPendingFence(move(GLFence), Value);
+        pFenceGLImpl->AddPendingFence(stl::move(GLFence), Value);
     };
 
     bool DeviceContextGLImpl::UpdateCurrentGLContext()

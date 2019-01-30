@@ -46,7 +46,7 @@ namespace Diligent
         }
 
         ResMappingHashKey(ResMappingHashKey&& rhs) : 
-            StrKey(move(rhs.StrKey)),
+            StrKey(stl::move(rhs.StrKey)),
             ArrayIndex(rhs.ArrayIndex)
         {}
 
@@ -65,26 +65,21 @@ namespace Diligent
             return Hash;
         }
 
+        struct Hasher
+        {
+            size_t operator()( const ResMappingHashKey& Key ) const
+            {
+                return Key.GetHash();
+            }                  
+        };
 
         ResMappingHashKey             ( const ResMappingHashKey& ) = delete;
         ResMappingHashKey& operator = ( const ResMappingHashKey& ) = delete;
         ResMappingHashKey& operator = ( ResMappingHashKey&& )      = delete;
 
         HashMapStringKey StrKey;
-        Uint32 ArrayIndex;
-        mutable size_t Hash = 0;
-    };
-}
-
-namespace std
-{
-    template<>
-    struct hash<Diligent::ResMappingHashKey>
-    {
-        size_t operator()( const Diligent::ResMappingHashKey& Key ) const
-        {
-            return Key.GetHash();
-        }                  
+        Uint32           ArrayIndex = 0;
+        mutable size_t   Hash       = 0;
     };
 }
 
@@ -129,7 +124,7 @@ namespace Diligent
         ThreadingTools::LockHelper Lock();
 
         ThreadingTools::LockFlag m_LockFlag;
-        using HashTableElem = pair<const ResMappingHashKey, RefCntAutoPtr<IDeviceObject> > ;
-        unordered_map< ResMappingHashKey, RefCntAutoPtr<IDeviceObject>, hash<ResMappingHashKey>, equal_to<ResMappingHashKey>, STDAllocatorRawMem<HashTableElem>  > m_HashTable;
+        using HashTableElem = stl::pair<const ResMappingHashKey, RefCntAutoPtr<IDeviceObject> > ;
+        stl::unordered_map< ResMappingHashKey, RefCntAutoPtr<IDeviceObject>, ResMappingHashKey::Hasher, stl::equal_to<ResMappingHashKey>, STDAllocatorRawMem<HashTableElem>  > m_HashTable;
     };
 }
