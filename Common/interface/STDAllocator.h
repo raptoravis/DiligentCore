@@ -118,21 +118,22 @@ struct STDAllocator
         return reinterpret_cast<T*>( m_Allocator.Allocate(count * sizeof(T), m_dvpDescription, m_dvpFileName, m_dvpLineNumber ) );
     }
 
-    T* allocate(std::size_t count, std::size_t alignment, std::size_t offset, int flags)
+#if DILIGENT_USE_EASTL
+    void* allocate(std::size_t count, std::size_t alignment, std::size_t offset, int flags = 0)
     {
-        return allocate(count);
+#ifndef DEVELOPMENT
+        static constexpr const char* m_dvpDescription = "<Unavailable in release build>";
+        static constexpr const char* m_dvpFileName    = "<Unavailable in release build>";
+        static constexpr Int32       m_dvpLineNumber  = -1;
+#endif
+        return m_Allocator.Allocate(count * sizeof(T), alignment, offset, flags, m_dvpDescription, m_dvpFileName, m_dvpLineNumber);
     }
 
-    T* allocate(std::size_t count, std::size_t alignment, std::size_t offset)
+    void* allocate(std::size_t count, int flags)
     {
-        return allocate(count, alignment, offset, 0);
+        return allocate(count, 0, 0, flags);
     }
-
-    T* allocate(std::size_t count, int flags)
-    {
-        return allocate(count);
-    }
-
+#endif
 
     pointer       address(reference r)       { return &r; }
     const_pointer address(const_reference r) { return &r; }

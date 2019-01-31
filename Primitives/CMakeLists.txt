@@ -57,6 +57,10 @@ if(${DILIGENT_USE_EASTL})
         ../External/EASTL/include
         ../External/EASTL/test/packages/EABase/include/Common
     )
+    target_link_libraries(Primitives 
+    PUBLIC
+        EASTL
+    )
 endif()
 
 source_group("interface" FILES ${INTERFACE})

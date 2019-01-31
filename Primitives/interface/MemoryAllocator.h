@@ -36,7 +36,19 @@ class IMemoryAllocator
 {
 public:
     /// Allocates block of memory
-    virtual void* Allocate( size_t Size, const Char* dbgDescription, const char* dbgFileName, const Int32 dbgLineNumber) = 0;
+    virtual void* Allocate( size_t      Size,
+                            const Char* dbgDescription,
+                            const char* dbgFileName,
+                            const Int32 dbgLineNumber) = 0;
+
+    /// Allocates block of memory with specified alignment and offset. This method is used by EASTL.
+    virtual void* Allocate( size_t      Size,
+                            size_t      Alignment,
+                            size_t      Offset,
+                            int         EASTLFlags,
+                            const Char* dbgDescription,
+                            const char* dbgFileName,
+                            const Int32 dbgLineNumber) = 0;
 
     /// Releases memory
     virtual void Free(void *Ptr) = 0;

@@ -109,4 +109,16 @@ namespace Diligent
             UNEXPECTED("Address not found in the allocations list - double freeing memory?");
         }
     }
+
+    void* FixedBlockMemoryAllocator::Allocate( size_t      Size,
+                                               size_t      Alignment,
+                                               size_t      Offset,
+                                               int         EASTLFlags,
+                                               const Char* dbgDescription,
+                                               const char* dbgFileName,
+                                               const Int32 dbgLineNumber)
+    {
+        UNEXPECTED("This method should not be used");
+        return Allocate(Size, dbgDescription, dbgFileName, dbgLineNumber);
+    }
 }

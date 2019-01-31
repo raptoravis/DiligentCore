@@ -58,6 +58,14 @@ public:
     /// Allocates block of memory
     virtual void* Allocate( size_t Size, const Char* dbgDescription, const char* dbgFileName, const  Int32 dbgLineNumber)override final;
 
+    virtual void* Allocate( size_t      Size,
+                            size_t      Alignment,
+                            size_t      Offset,
+                            int         EASTLFlags,
+                            const Char* dbgDescription,
+                            const char* dbgFileName,
+                            const Int32 dbgLineNumber)override final;
+
     /// Releases memory
     virtual void Free(void *Ptr)override final;
     

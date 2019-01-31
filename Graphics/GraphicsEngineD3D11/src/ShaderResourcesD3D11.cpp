@@ -98,7 +98,7 @@ ShaderResourcesD3D11::ShaderResourcesD3D11(RenderDeviceD3D11Impl* pDeviceD3D11Im
                     {
                         RefCntAutoPtr<ISampler> pSampler;
                         pDeviceD3D11Impl->CreateSampler(StaticSamplerDesc.Desc, &pSampler);
-                        m_StaticSamplers.emplace_back(SamplerAttribs, stl::move(pSampler));
+                        m_StaticSamplers.emplace_back(&SamplerAttribs, stl::move(pSampler));
                         break;
                     }
                 }
@@ -149,12 +149,12 @@ void ShaderResourcesD3D11::SetStaticSamplers(ShaderResourceCacheD3D11& ResourceC
     auto NumCachedSamplers = ResourceCache.GetSamplerCount();
     for (const auto& SS : m_StaticSamplers)
     {
-        const auto& SamAttribs = SS.first;
-        VERIFY_EXPR(SamAttribs.IsStaticSampler());
+        const auto* SamAttribs = SS.first;
+        VERIFY_EXPR(SamAttribs->IsStaticSampler());
         auto* pSamplerD3D11Impl = const_cast<SamplerD3D11Impl*>(SS.second.RawPtr<SamplerD3D11Impl>());
         // Limiting EndBindPoint is required when initializing static samplers in a Shader's static cache
-        auto EndBindPoint = stl::min( static_cast<Uint32>(SamAttribs.BindPoint) + SamAttribs.BindCount, NumCachedSamplers);
-        for(Uint32 BindPoint = SamAttribs.BindPoint; BindPoint < EndBindPoint; ++BindPoint )
+        auto EndBindPoint = stl::min( static_cast<Uint32>(SamAttribs->BindPoint) + SamAttribs->BindCount, NumCachedSamplers);
+        for(Uint32 BindPoint = SamAttribs->BindPoint; BindPoint < EndBindPoint; ++BindPoint )
             ResourceCache.SetSampler(BindPoint, pSamplerD3D11Impl);
     }
 }

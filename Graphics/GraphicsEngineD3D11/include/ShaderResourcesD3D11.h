@@ -135,7 +135,7 @@ private:
     // reference shader name without the need to copy it
     const Char* const m_ShaderName;
 
-    using StaticSamplerAttribs = stl::pair<const D3DShaderResourceAttribs&, RefCntAutoPtr<ISampler>>;
+    using StaticSamplerAttribs = stl::pair<const D3DShaderResourceAttribs* const, RefCntAutoPtr<ISampler>>;
     using StaticSamplerVector = stl::vector<StaticSamplerAttribs, STDAllocatorRawMem<StaticSamplerAttribs>>;
     void InitStaticSamplers(StaticSamplerVector&& StaticSamplers);
 

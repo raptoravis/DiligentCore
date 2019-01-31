@@ -22,6 +22,11 @@
  */
 
 #include "pch.h"
+
+#if DILIGENT_USE_EASTL
+#include "../../External/EASTL/include/EASTL/allocator.h"
+#endif
+
 #include "DefaultRawMemoryAllocator.h"
 
 namespace Diligent
@@ -33,19 +38,47 @@ namespace Diligent
 
     void* DefaultRawMemoryAllocator::Allocate( size_t Size, const Char* dbgDescription, const char* dbgFileName, const  Int32 dbgLineNumber)
     {
-#ifdef _DEBUG
-        return new Uint8[Size+16]+16;
+#if DILIGENT_USE_EASTL
+        return eastl::GetDefaultAllocator()->allocate(Size);
 #else
+
+#   ifdef _DEBUG
+        return new Uint8[Size+16]+16;
+#   else
         return new Uint8[Size];
+#   endif
+
+#endif
+    }
+
+    void* DefaultRawMemoryAllocator::Allocate( size_t      Size,
+                                               size_t      Alignment,
+                                               size_t      Offset,
+                                               int         EASTLFlags,
+                                               const Char* dbgDescription,
+                                               const char* dbgFileName,
+                                               const Int32 dbgLineNumber )
+    {
+#if DILIGENT_USE_EASTL
+        if(Alignment != 0 || Offset != 0)
+            return eastl::GetDefaultAllocator()->allocate(Size, Alignment, Offset, EASTLFlags);
+        else
+            return eastl::GetDefaultAllocator()->allocate(Size, EASTLFlags);
+#else
+        return Allocate(Size, dbgDescription, dbgFileName, dbgLineNumber);
 #endif
     }
 
     void DefaultRawMemoryAllocator::Free(void *Ptr)
     {
-#ifdef _DEBUG
-        delete[] (reinterpret_cast<Uint8*>(Ptr)-16);
+#if DILIGENT_USE_EASTL
+     eastl::GetDefaultAllocator()->deallocate(Ptr, 0);
 #else
+#   ifdef _DEBUG
+        delete[] (reinterpret_cast<Uint8*>(Ptr)-16);
+#   else
         delete[] reinterpret_cast<Uint8*>(Ptr);
+#   endif
 #endif
     }
 
@@ -54,4 +87,14 @@ namespace Diligent
         static DefaultRawMemoryAllocator Allocator;
         return Allocator;
     }
+}
+
+void* operator new[](size_t size, const char* pName, int flags, unsigned debugFlags, const char* file, int line)
+{
+    return new char[size];//eastl::GetDefaultAllocator()->allocate(size);
+}
+
+void* operator new[](size_t size, size_t alignment, size_t alignmentOffset, const char* pName, int flags, unsigned debugFlags, const char* file, int line)
+{
+    return new char[size];//seastl::GetDefaultAllocator()->allocate(size, alignment, alignmentOffset);
 }
