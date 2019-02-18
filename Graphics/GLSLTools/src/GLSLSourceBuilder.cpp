@@ -106,11 +106,11 @@ String BuildGLSLSourceString(const ShaderCreationAttribs& CreationAttribs,
         "precision highp sampler2D;\n"
         "precision highp sampler3D;\n"
         "precision highp samplerCube;\n"
-        "precision highp samplerCubeShadow;\n"
+        //"precision highp samplerCubeShadow;\n"
 
-        "precision highp sampler2DShadow;\n"
+        //"precision highp sampler2DShadow;\n"
         "precision highp sampler2DArray;\n"
-        "precision highp sampler2DArrayShadow;\n"
+        //"precision highp sampler2DArrayShadow;\n"
 
         "precision highp isampler2D;\n"
         "precision highp isampler3D;\n"
