@@ -401,7 +401,7 @@ namespace Diligent
             for( auto& ProgVar : ResArr)                                \
             {                                                           \
                 /* HashMapStringKey will make a copy of the string*/    \
-                auto it = m_VariableHash.insert( std::make_pair( Diligent::HashMapStringKey(ProgVar.Name), CGLShaderVariable(Owner, ProgVar, static_cast<Uint32>(m_VariablesByIndex.size())) ) ); \
+                auto it = m_VariableHash.insert( std::make_pair( Diligent::HashMapStringKey(ProgVar.Name), GLShaderVariable(Owner, ProgVar, static_cast<Uint32>(m_VariablesByIndex.size())) ) ); \
                 VERIFY_EXPR(it.second);                                 \
                 m_VariablesByIndex.push_back(&it.first->second);        \
             }                                                           \

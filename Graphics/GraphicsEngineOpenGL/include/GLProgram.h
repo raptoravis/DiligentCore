@@ -33,17 +33,17 @@ namespace Diligent
         GLProgram( bool CreateObject );
         GLProgram( GLProgram&& Program );
 
-        void InitResources(RenderDeviceGLImpl* pDeviceGLImpl, 
-                           SHADER_VARIABLE_TYPE DefaultVariableType, 
-                           const ShaderVariableDesc *VariableDesc, 
-                           Uint32 NumVars, 
-                           const StaticSamplerDesc *StaticSamplers,
-                           Uint32 NumStaticSamplers,
-                           IObject &Owner);
+        void InitResources(RenderDeviceGLImpl*        pDeviceGLImpl, 
+                           SHADER_VARIABLE_TYPE       DefaultVariableType, 
+                           const ShaderVariableDesc*  VariableDesc, 
+                           Uint32                     NumVars, 
+                           const StaticSamplerDesc*   StaticSamplers,
+                           Uint32                     NumStaticSamplers,
+                           IObject&                   Owner);
 
-        void BindConstantResources(IResourceMapping *pResourceMapping, Uint32 Flags);
+        void BindConstantResources(IResourceMapping* pResourceMapping, Uint32 Flags);
 
-        const GLProgramResources& GetAllResources()const{return m_AllResources;}
+        const GLProgramResources& GetAllResources()     const{return m_AllResources;}
               GLProgramResources& GetConstantResources()     {return m_ConstantResources;}
         const GLProgramResources& GetConstantResources()const{return m_ConstantResources;}
         

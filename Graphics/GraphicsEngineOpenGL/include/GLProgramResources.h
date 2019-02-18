@@ -69,7 +69,7 @@ namespace Diligent
                 VERIFY_EXPR(_ArraySize >= 1);
             }
 
-            bool IsCompatibleWith(const GLProgramVariableBase &Var)const
+            bool IsCompatibleWith(const GLProgramVariableBase& Var)const
             {
                 return VarType           == Var.VarType && 
                        pResources.size() == Var.pResources.size();
@@ -197,15 +197,15 @@ namespace Diligent
         std::vector<StorageBlockInfo>& GetStorageBlocks(){ return m_StorageBlocks; }
 
 
-        struct CGLShaderVariable : ShaderVariableBase
+        struct GLShaderVariable : ShaderVariableBase
         {
-            CGLShaderVariable(IObject& Owner, GLProgramResources::GLProgramVariableBase& ProgVar, Uint32 _Index) :
+            GLShaderVariable(IObject& Owner, GLProgramResources::GLProgramVariableBase& ProgVar, Uint32 _Index) :
                 ShaderVariableBase(Owner),
                 ProgramVar        (ProgVar),
                 VariableIndex     (_Index)
             {}
 
-            virtual void Set(IDeviceObject *pObject)override final
+            virtual void Set(IDeviceObject* pObject)override final
             {
                 ProgramVar.pResources[0] = pObject;
             }
@@ -253,7 +253,7 @@ namespace Diligent
             return Index < m_VariablesByIndex.size() ? m_VariablesByIndex[Index] : nullptr;
         }
 
-        const std::unordered_map<HashMapStringKey, CGLShaderVariable, HashMapStringKey::Hasher>& GetVariables(){return m_VariableHash;}
+        const std::unordered_map<HashMapStringKey, GLShaderVariable, HashMapStringKey::Hasher>& GetVariables(){return m_VariableHash;}
         
         Uint32 GetVariableCount()const
         {
@@ -272,8 +272,8 @@ namespace Diligent
         std::vector<StorageBlockInfo>  m_StorageBlocks;
         
         /// Hash map to look up shader variables by name.
-        std::unordered_map<HashMapStringKey, CGLShaderVariable, HashMapStringKey::Hasher> m_VariableHash;
-        std::vector<CGLShaderVariable*>                                                   m_VariablesByIndex;
+        std::unordered_map<HashMapStringKey, GLShaderVariable, HashMapStringKey::Hasher> m_VariableHash;
+        std::vector<GLShaderVariable*>                                                   m_VariablesByIndex;
         // When adding new member DO NOT FORGET TO UPDATE GLProgramResources( GLProgramResources&& ProgramResources )!!!
     };
 }

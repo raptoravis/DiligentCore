@@ -142,8 +142,16 @@ namespace Diligent
                 pDeviceGL->CreatePipelineState( PSODesc, &m_pPSO[Dim*3 + Fmt], 
 										        true // We must indicate the PSO is an internal device object
 									           );
-
-                FragmetShader->GetShaderVariable( "cbConstants" )->Set( m_pConstantBuffer );
+                if (pDeviceGL->GetDeviceCaps().bSeparableProgramSupported)
+                    FragmetShader->GetShaderVariable( "cbConstants" )->Set( m_pConstantBuffer );
+                else
+                {
+                    auto& Prog = m_pPSO[Dim*3 + Fmt].RawPtr<PipelineStateGLImpl>()->GetGLProgram();
+                    auto& ConstRes = Prog.GetConstantResources();
+                    auto& UBs = ConstRes.GetUniformBlocks();
+                    VERIFY_EXPR(UBs[0].Name == "cbConstants");
+                    UBs[0].pResources[0] = m_pConstantBuffer;
+                }
             }
         }
     }
