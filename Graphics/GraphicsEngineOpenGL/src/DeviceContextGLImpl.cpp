@@ -355,14 +355,17 @@ namespace Diligent
 
         const auto &DeviceCaps = pRenderDeviceGL->GetDeviceCaps();
         auto &Prog = m_pPipelineState->GetGLProgram();
-        auto &Pipeline = m_pPipelineState->GetGLProgramPipeline( m_ContextState.GetCurrentGLContext() );
+        auto ProgramPipelineSupported = DeviceCaps.bSeparableProgramSupported;
+        GLObjectWrappers::GLPipelineObj NullPipeline(false);
+        auto &Pipeline = ProgramPipelineSupported ?
+            m_pPipelineState->GetGLProgramPipeline( m_ContextState.GetCurrentGLContext() ) : 
+            NullPipeline;
         VERIFY( Prog ^ Pipeline, "Only one of program or pipeline can be specified" );
         if( !(Prog || Pipeline) )
         {
             LOG_ERROR_MESSAGE("No program/program pipeline is set for the draw call");
             return;
         }
-        auto ProgramPipelineSupported = DeviceCaps.bSeparableProgramSupported;
 
         // WARNING: glUseProgram() overrides glBindProgramPipeline(). That is, if you have a program in use and
         // a program pipeline bound, all rendering will use the program that is in use, not the pipeline programs!!!
