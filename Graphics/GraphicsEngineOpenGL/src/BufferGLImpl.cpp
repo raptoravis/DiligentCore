@@ -33,14 +33,6 @@
 namespace Diligent
 {
 
-static bool GetUseMapWriteDiscardBugWA(RenderDeviceGLImpl *pDeviceGL)
-{
-    // On Intel GPUs, mapping buffer with GL_MAP_UNSYNCHRONIZED_BIT does not
-    // work as expected. To workaround this issue, use glBufferData() to
-    // orphan previous buffer storage https://www.opengl.org/wiki/Buffer_Object_Streaming
-    return pDeviceGL->GetGPUInfo().Vendor == GPU_VENDOR::INTEL;
-}
-
 static GLenum GetBufferBindTarget(const BufferDesc& Desc)
 {
     GLenum Target = GL_ARRAY_BUFFER;
@@ -70,7 +62,7 @@ static GLenum GetBufferBindTarget(const BufferDesc& Desc)
 BufferGLImpl::BufferGLImpl(IReferenceCounters*          pRefCounters, 
                            FixedBlockMemoryAllocator&   BuffViewObjMemAllocator, 
                            RenderDeviceGLImpl*          pDeviceGL, 
-                           DeviceContextGLImpl*         pCtxGL,
+                           GLContextState&              GLState,
                            const BufferDesc&            BuffDesc, 
                            const BufferData*            pBuffData /*= nullptr*/,
                            bool                         bIsDeviceInternal) : 
@@ -82,25 +74,19 @@ BufferGLImpl::BufferGLImpl(IReferenceCounters*          pRefCounters,
         BuffDesc,
         bIsDeviceInternal
     },
-    m_GlBuffer                {true                                 }, // Create buffer immediately
-    m_uiMapTarget             {0                                    },
-    m_GLUsageHint             {UsageToGLUsage(BuffDesc.Usage)       },
-    m_bUseMapWriteDiscardBugWA{GetUseMapWriteDiscardBugWA(pDeviceGL)}
+    m_GlBuffer                {true                          }, // Create buffer immediately
+    m_BindTarget              {GetBufferBindTarget(BuffDesc) },
+    m_GLUsageHint             {UsageToGLUsage(BuffDesc.Usage)}
 {
     if( BuffDesc.Usage == USAGE_STATIC && (pBuffData == nullptr || pBuffData->pData == nullptr) )
         LOG_ERROR_AND_THROW("Static buffer must be initialized with data at creation time");
 
-    auto Target = GetBufferBindTarget(BuffDesc);
-
-    if (Target == GL_ARRAY_BUFFER || Target == GL_ELEMENT_ARRAY_BUFFER)
-    {
-        // We must unbind VAO because otherwise we will break the bindings
-        pCtxGL->ResetVAO();
-    }
-
     // TODO: find out if it affects performance if the buffer is originally bound to one target
     // and then bound to another (such as first to GL_ARRAY_BUFFER and then to GL_UNIFORM_BUFFER)
-    glBindBuffer(Target, m_GlBuffer);
+
+    // We must unbind VAO because otherwise we will break the bindings
+    constexpr bool ResetVAO = true;
+    GLState.BindBuffer(m_BindTarget, m_GlBuffer, ResetVAO);
     VERIFY(pBuffData == nullptr || pBuffData->pData == nullptr || pBuffData->DataSize >= BuffDesc.uiSizeInBytes, "Data pointer is null or data size is not consistent with buffer size" );
     GLsizeiptr DataSize = BuffDesc.uiSizeInBytes;
  	const GLvoid *pData = nullptr;
@@ -148,23 +134,22 @@ BufferGLImpl::BufferGLImpl(IReferenceCounters*          pRefCounters,
 
     // All buffer bind targets (GL_ARRAY_BUFFER, GL_ELEMENT_ARRAY_BUFFER etc.) relate to the same 
     // kind of objects. As a result they are all equivalent from a transfer point of view.
-    glBufferData(Target, DataSize, pData, m_GLUsageHint);
+    glBufferData(m_BindTarget, DataSize, pData, m_GLUsageHint);
     CHECK_GL_ERROR_AND_THROW("glBufferData() failed");
-    glBindBuffer(Target, 0);
+    GLState.BindBuffer(m_BindTarget, GLObjectWrappers::GLBufferObj::Null(), ResetVAO);
 }
  
-static BufferDesc GetBufferDescFromGLHandle(DeviceContextGLImpl* pCtxGL, BufferDesc BuffDesc, GLuint BufferHandle)
+static BufferDesc GetBufferDescFromGLHandle(GLContextState& GLState, BufferDesc BuffDesc, GLuint BufferHandle)
 {
     // NOTE: the operations in this function are merely for debug purposes.
     // If binding a buffer to a target does not work, these operations can be skipped
     GLenum BindTarget = GetBufferBindTarget(BuffDesc);
 
-    if (BindTarget == GL_ARRAY_BUFFER || BindTarget == GL_ELEMENT_ARRAY_BUFFER)
-    {
-        // We must unbind VAO because otherwise we will break the bindings
-        pCtxGL->ResetVAO();
-    }
+    // We must unbind VAO because otherwise we will break the bindings
+    constexpr bool ResetVAO = true;
+    GLState.BindBuffer(BindTarget, GLObjectWrappers::GLBufferObj::Null(), ResetVAO);
 
+    // Note that any glBindBufferBase, glBindBufferRange etc. also bind the buffer to the generic buffer binding point.
     glBindBuffer(BindTarget, BufferHandle);
     CHECK_GL_ERROR("Failed to bind GL buffer to ", BindTarget, " target");
 
@@ -186,7 +171,7 @@ static BufferDesc GetBufferDescFromGLHandle(DeviceContextGLImpl* pCtxGL, BufferD
 BufferGLImpl::BufferGLImpl(IReferenceCounters*          pRefCounters,
                            FixedBlockMemoryAllocator&   BuffViewObjMemAllocator,
                            RenderDeviceGLImpl*          pDeviceGL,
-                           DeviceContextGLImpl*         pCtxGL,
+                           GLContextState&              CtxState,
                            const BufferDesc&            BuffDesc,
                            GLuint                       GLHandle,
                            bool                         bIsDeviceInternal) :
@@ -195,14 +180,13 @@ BufferGLImpl::BufferGLImpl(IReferenceCounters*          pRefCounters,
         pRefCounters,
         BuffViewObjMemAllocator,
         pDeviceGL,
-        GetBufferDescFromGLHandle(pCtxGL, BuffDesc, GLHandle),
+        GetBufferDescFromGLHandle(CtxState, BuffDesc, GLHandle),
         bIsDeviceInternal
     },
     // Attach to external buffer handle
     m_GlBuffer                {true, GLObjectWrappers::GLBufferObjCreateReleaseHelper(GLHandle)},
-    m_uiMapTarget             {0                                    },
-    m_GLUsageHint             {UsageToGLUsage(BuffDesc.Usage)       },
-    m_bUseMapWriteDiscardBugWA{GetUseMapWriteDiscardBugWA(pDeviceGL)}
+    m_BindTarget              {GetBufferBindTarget(m_Desc)   },
+    m_GLUsageHint             {UsageToGLUsage(BuffDesc.Usage)}
 {
 }
 
@@ -213,24 +197,23 @@ BufferGLImpl::~BufferGLImpl()
 
 IMPLEMENT_QUERY_INTERFACE(BufferGLImpl, IID_BufferGL, TBufferBase)
 
-void BufferGLImpl :: UpdateData(DeviceContextGLImpl* pCtxGL, Uint32 Offset, Uint32 Size, const PVoid pData)
+void BufferGLImpl :: UpdateData(GLContextState& CtxState, Uint32 Offset, Uint32 Size, const PVoid pData)
 {
-    // We must unbind VAO because otherwise we will break the bindings
-    pCtxGL->ResetVAO();
-
     BufferMemoryBarrier(
         GL_BUFFER_UPDATE_BARRIER_BIT,// Reads or writes to buffer objects via any OpenGL API functions that allow 
                                      // modifying their contents will reflect data written by shaders prior to the barrier. 
                                      // Additionally, writes via these commands issued after the barrier will wait on 
                                      // the completion of any shader writes to the same memory initiated prior to the barrier.
-        pCtxGL->GetContextState());
+        CtxState);
     
-    glBindBuffer(GL_ARRAY_BUFFER, m_GlBuffer);
+    // We must unbind VAO because otherwise we will break the bindings
+    constexpr bool ResetVAO = true;
+    CtxState.BindBuffer(GL_ARRAY_BUFFER, m_GlBuffer, ResetVAO);
     // All buffer bind targets (GL_ARRAY_BUFFER, GL_ELEMENT_ARRAY_BUFFER etc.) relate to the same 
     // kind of objects. As a result they are all equivalent from a transfer point of view.
     glBufferSubData(GL_ARRAY_BUFFER, Offset, Size, pData);
     CHECK_GL_ERROR("glBufferSubData() failed");
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    CtxState.BindBuffer(GL_ARRAY_BUFFER, GLObjectWrappers::GLBufferObj::Null(), ResetVAO);
 }
 
 
@@ -251,26 +234,26 @@ void BufferGLImpl :: CopyData(GLContextState& CtxState, BufferGLImpl& SrcBufferG
     // Neither target is used for anything else by OpenGL, and so you can safely bind buffers to them for 
     // the purposes of copying or staging data without disturbing OpenGL state or needing to keep track of 
     // what was bound to the target before your copy.
-    glBindBuffer(GL_COPY_WRITE_BUFFER, m_GlBuffer);
-    glBindBuffer(GL_COPY_READ_BUFFER, SrcBufferGL.m_GlBuffer);
+    constexpr bool ResetVAO = false; // No need to reset VAO for READ/WRITE targets
+    CtxState.BindBuffer(GL_COPY_WRITE_BUFFER, m_GlBuffer, ResetVAO);
+    CtxState.BindBuffer(GL_COPY_READ_BUFFER, SrcBufferGL.m_GlBuffer, ResetVAO);
     glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, SrcOffset, DstOffset, Size);
     CHECK_GL_ERROR("glCopyBufferSubData() failed");
-    glBindBuffer(GL_COPY_READ_BUFFER, 0);
-    glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
+    CtxState.BindBuffer(GL_COPY_READ_BUFFER, GLObjectWrappers::GLBufferObj::Null(), ResetVAO);
+    CtxState.BindBuffer(GL_COPY_WRITE_BUFFER, GLObjectWrappers::GLBufferObj::Null(), ResetVAO);
 }
 
 void BufferGLImpl :: Map(GLContextState& CtxState, MAP_TYPE MapType, Uint32 MapFlags, PVoid &pMappedData)
 {
-    VERIFY( m_uiMapTarget == 0, "Buffer is already mapped");
-
     BufferMemoryBarrier(
         GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT,// Access by the client to persistent mapped regions of buffer 
                                             // objects will reflect data written by shaders prior to the barrier. 
                                             // Note that this may cause additional synchronization operations.
         CtxState);
 
-    m_uiMapTarget = ( MapType == MAP_READ ) ? GL_COPY_READ_BUFFER : GL_COPY_WRITE_BUFFER;
-    glBindBuffer(m_uiMapTarget, m_GlBuffer);
+    // We must unbind VAO because otherwise we will break the bindings
+    constexpr bool ResetVAO = true;
+    CtxState.BindBuffer(m_BindTarget, m_GlBuffer, ResetVAO);
 
     // !!!WARNING!!! GL_MAP_UNSYNCHRONIZED_BIT is not the same thing as MAP_FLAG_DO_NOT_WAIT.
     // If GL_MAP_UNSYNCHRONIZED_BIT flag is set, OpenGL will not attempt to synchronize operations 
@@ -289,32 +272,14 @@ void BufferGLImpl :: Map(GLContextState& CtxState, MAP_TYPE MapType, Uint32 MapF
         
             if (MapFlags & MAP_FLAG_DISCARD)
             {
-                if (m_bUseMapWriteDiscardBugWA)
-                {
-                    // On Intel GPU, mapping buffer with GL_MAP_UNSYNCHRONIZED_BIT does not
-                    // work as expected. To workaround this issue, use glBufferData() to
-                    // orphan previous buffer storage https://www.opengl.org/wiki/Buffer_Object_Streaming
+                // Use GL_MAP_INVALIDATE_BUFFER_BIT flag to discard previous buffer contents
 
-                    // It is important to specify the exact same buffer size and usage to allow the 
-                    // implementation to simply reallocate storage for that buffer object under-the-hood.
-                    // Since NULL is passed, if there wasn't a need for synchronization to begin with, 
-                    // this can be reduced to a no-op.
-                    glBufferData(m_uiMapTarget, m_Desc.uiSizeInBytes, nullptr, m_GLUsageHint);
-                    CHECK_GL_ERROR("glBufferData() failed");
-                    Access |= GL_MAP_WRITE_BIT;
-                }
-                else
-                {
-                    // Use GL_MAP_INVALIDATE_BUFFER_BIT flag to discard previous buffer contents
-
-                    // If GL_MAP_INVALIDATE_BUFFER_BIT is specified, the entire contents of the buffer may 
-                    // be discarded and considered invalid, regardless of the specified range. Any data 
-                    // lying outside the mapped range of the buffer object becomes undefined,as does any 
-                    // data within the range but not subsequently written by the application.This flag may 
-                    // not be used with GL_MAP_READ_BIT.
-
-                    Access |= GL_MAP_INVALIDATE_BUFFER_BIT;
-                }
+                // If GL_MAP_INVALIDATE_BUFFER_BIT is specified, the entire contents of the buffer may 
+                // be discarded and considered invalid, regardless of the specified range. Any data 
+                // lying outside the mapped range of the buffer object becomes undefined, as does any 
+                // data within the range but not subsequently written by the application.This flag may 
+                // not be used with GL_MAP_READ_BIT.
+                Access |= GL_MAP_INVALIDATE_BUFFER_BIT;
             }
 
             if (MapFlags & MAP_FLAG_DO_NOT_SYNCHRONIZE)
@@ -334,16 +299,16 @@ void BufferGLImpl :: Map(GLContextState& CtxState, MAP_TYPE MapType, Uint32 MapF
         default: UNEXPECTED( "Unknown map type" );
     }
 
-    pMappedData = glMapBufferRange(m_uiMapTarget, 0, m_Desc.uiSizeInBytes,  Access);
+    pMappedData = glMapBufferRange(m_BindTarget, 0, m_Desc.uiSizeInBytes,  Access);
     CHECK_GL_ERROR("glMapBufferRange() failed");
     VERIFY( pMappedData, "Map failed" );
-    glBindBuffer(m_uiMapTarget, 0);
 }
 
-void BufferGLImpl::Unmap()
+void BufferGLImpl::Unmap(GLContextState& CtxState)
 {
-    glBindBuffer(m_uiMapTarget, m_GlBuffer);
-    auto Result = glUnmapBuffer(m_uiMapTarget);
+    constexpr bool ResetVAO = true;
+    CtxState.BindBuffer(m_BindTarget, m_GlBuffer, ResetVAO);
+    auto Result = glUnmapBuffer(m_BindTarget);
     // glUnmapBuffer() returns TRUE unless data values in the buffer's data store have
     // become corrupted during the period that the buffer was mapped. Such corruption
     // can be the result of a screen resolution change or other window system - dependent
@@ -353,8 +318,6 @@ void BufferGLImpl::Unmap()
     // has occurred, glUnmapBuffer() returns FALSE, and the contents of the buffer's
     // data store become undefined.
     VERIFY( Result != GL_FALSE, "Failed to unmap buffer. The data may have been corrupted" ); (void)Result;
-    glBindBuffer(m_uiMapTarget, 0);
-    m_uiMapTarget = 0;
 }
 
 void BufferGLImpl::BufferMemoryBarrier( Uint32 RequiredBarriers, GLContextState &GLContextState )
