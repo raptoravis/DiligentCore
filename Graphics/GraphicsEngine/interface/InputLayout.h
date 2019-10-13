@@ -70,6 +70,8 @@ struct LayoutElement
     /// they all must specify the same stride or use AutoStride value.
     Uint32 Stride           = AutoStride;
 
+	char* SemanticName		= 0;
+
     /// Input frequency
     enum FREQUENCY : Int32
     {

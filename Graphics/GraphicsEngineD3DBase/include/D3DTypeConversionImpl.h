@@ -379,7 +379,13 @@ namespace Diligent
         {
             const auto &CurrElem = InputLayout.LayoutElements[iElem];
             auto &D3DElem = D3DInputElements[iElem];
-            D3DElem.SemanticName = "ATTRIB";
+
+			if (CurrElem.SemanticName) {
+				D3DElem.SemanticName = CurrElem.SemanticName;
+			}
+			else {
+				D3DElem.SemanticName = "ATTRIB";
+			}
             D3DElem.SemanticIndex = CurrElem.InputIndex;
             D3DElem.AlignedByteOffset = CurrElem.RelativeOffset;
             D3DElem.InputSlot = CurrElem.BufferSlot;
