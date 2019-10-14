@@ -752,7 +752,7 @@ namespace Diligent
         auto* pd3d11InputLayout = m_pPipelineState->GetD3D11InputLayout();
         if (pd3d11InputLayout != nullptr && !m_bCommittedD3D11VBsUpToDate)
         {
-            DEV_CHECK_ERR( m_NumVertexStreams >= m_pPipelineState->GetNumBufferSlotsUsed(), "Currently bound pipeline state '", m_pPipelineState->GetDesc().Name, "' expects ", m_pPipelineState->GetNumBufferSlotsUsed(), " input buffer slots, but only ", m_NumVertexStreams, " is bound");
+            //DEV_CHECK_ERR( m_NumVertexStreams >= m_pPipelineState->GetNumBufferSlotsUsed(), "Currently bound pipeline state '", m_pPipelineState->GetDesc().Name, "' expects ", m_pPipelineState->GetNumBufferSlotsUsed(), " input buffer slots, but only ", m_NumVertexStreams, " is bound");
             CommitD3D11VertexBuffers(m_pPipelineState);
         }
 
