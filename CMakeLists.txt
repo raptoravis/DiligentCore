@@ -211,8 +211,8 @@ if(MSVC)
     target_compile_definitions(Diligent-BuildSettings INTERFACE "$<$<CONFIG:DEBUG>:${DEBUG_MACROS}>")
 else()
 
-    set(DEBUG_MACROS _DEBUG DEBUG DEVELOPMENT)
-    set(RELEASE_MACROS NDEBUG)
+    set(DEBUG_MACROS _DEBUG DEBUG DEVELOPMENT __forceinline=inline)
+    set(RELEASE_MACROS NDEBUG __forceinline=inline) # Todo: use __attribute__((always_inline)), but it needs to be defined in a header file
 
     foreach(DBG_CONFIG ${DEBUG_CONFIGURATIONS})
         target_compile_definitions(Diligent-BuildSettings INTERFACE "$<$<CONFIG:${DBG_CONFIG}>:${DEBUG_MACROS}>")
@@ -266,6 +266,12 @@ if(PLATFORM_WIN32 OR PLATFORM_UNIVERSAL_WINDOWS OR PLATFORM_LINUX OR PLATFORM_MA
     option(INSTALL_DILIGENT_CORE "Enable engine core installation" ON)
 else()
     set(INSTALL_DILIGENT_CORE OFF)
+endif()
+
+if(MSVC)
+    option(DILIGENT_INSTALL_PDB "Install PDB files" OFF)
+else()
+    set(DILIGENT_INSTALL_PDB OFF)
 endif()
 
 if(NOT DILIGENT_CORE_INSTALL_DIR)
