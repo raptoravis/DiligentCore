@@ -1,5 +1,23 @@
 ## Current Progress
 
+### API Changes
+
+* Added `DRAW_FLAG_RESOURCE_BUFFERS_INTACT` flag (API Version 240036)
+* Added `HLSLVersion`, `GLSLVersion` and `GLESSLVersion` to `ShaderCreateInfo` struct (API Version 240035)
+* Renamed `EngineD3D11DebugFlags` to `D3D11_DEBUG_FLAGS` (API Version 240034)
+* Split up `Draw` command into `Draw`, `DrawIndexed`, `DrawIndirect` and `DrawIndexedIndirect`.
+  Split up `DispatchCompute` command into `DispatchCompute` and `DispatchComputeInidrect` (API Version 240033).
+* Enabled bindless resources
+* Removed `SHADER_PROFILE` enum (API Version 240032)
+* Added `DIRECT3D_FEATURE_LEVEL` and `DIRECT3D_FEATURE_LEVEL MinimumFeatureLevel` member to 
+  `EngineD3D11CreateInfo` and `EngineD3D12CreateInfo` structs (API Version 240032)
+* Updated `IEngineFactoryD3D11::EnumerateHardwareAdapters`, `IEngineFactoryD3D11::EnumerateDisplayModes`,
+  `IEngineFactoryD3D12::EnumerateHardwareAdapters`, `IEngineFactoryD3D12::EnumerateDisplayModes` 
+  to take minimum feature level. (API Version 240032)
+* Added `bBindlessSupported` member to `DeviceCaps` struct. (API Version 240032)
+
+## v2.4.c
+
 * Enabled Vulkan on iOS
 
 ### API Changes

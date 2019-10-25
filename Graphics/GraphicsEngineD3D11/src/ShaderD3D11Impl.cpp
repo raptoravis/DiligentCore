@@ -30,6 +30,53 @@
 namespace Diligent
 {
 
+static const std::string HLSLVersionToShaderModelString(const ShaderCreateInfo::ShaderVersion& Version, Uint8 MaxMajorRevision, Uint8 MaxMinorRevision)
+{
+    std::string ModelStr;
+    if (Version.Major > MaxMajorRevision || Version.Major == MaxMajorRevision && Version.Minor > MaxMinorRevision)
+    {
+        ModelStr = std::to_string(Uint32{MaxMajorRevision}) + '_' + std::to_string(Uint32{MaxMinorRevision});
+        LOG_ERROR_MESSAGE("Shader model ", Uint32{Version.Major}, "_", Uint32{Version.Minor}, " is not supported by this device. "
+                          "Maximum supported model: ", ModelStr, ". Attempting to use ", ModelStr, '.');
+    }
+    else
+    {
+        ModelStr = std::to_string(Uint32{Version.Major}) + '_' + std::to_string(Uint32{Version.Minor});
+    }
+    return ModelStr;
+}
+
+static const std::string GetD3D11ShaderModel(ID3D11Device* pd3d11Device, const ShaderCreateInfo::ShaderVersion& HLSLVersion)
+{
+    auto d3dDeviceFeatureLevel = pd3d11Device->GetFeatureLevel();
+    switch(d3dDeviceFeatureLevel)
+    {
+        // Direct3D11 only supports shader model 5.0 even if the device feature level is
+        // above 11.0 (for example, 11.1 or 12.0).
+        // https://docs.microsoft.com/en-us/windows/win32/direct3d11/overviews-direct3d-11-devices-downlevel-intro#overview-for-each-feature-level
+#if defined(_WIN32_WINNT_WIN10) && (_WIN32_WINNT >=_WIN32_WINNT_WIN10)
+        case D3D_FEATURE_LEVEL_12_1:
+        case D3D_FEATURE_LEVEL_12_0:
+#endif
+        case D3D_FEATURE_LEVEL_11_1:
+        case D3D_FEATURE_LEVEL_11_0:
+            return (HLSLVersion.Major == 0 && HLSLVersion.Minor == 0) ?
+                    std::string{"5_0"} : HLSLVersionToShaderModelString(HLSLVersion, 5, 0);
+
+        case D3D_FEATURE_LEVEL_10_1:
+            return (HLSLVersion.Major == 0 && HLSLVersion.Minor == 0) ? 
+                    std::string{"4_1"} : HLSLVersionToShaderModelString(HLSLVersion, 4, 1);
+
+        case D3D_FEATURE_LEVEL_10_0:
+            return (HLSLVersion.Major == 0 && HLSLVersion.Minor == 0) ? 
+                    std::string{"4_0"} : HLSLVersionToShaderModelString(HLSLVersion, 4, 0);
+
+        default:
+            UNEXPECTED("Unexpected D3D feature level ", static_cast<Uint32>(d3dDeviceFeatureLevel));
+            return "4_0";
+    }
+}
+
 ShaderD3D11Impl::ShaderD3D11Impl(IReferenceCounters*          pRefCounters,
                                  RenderDeviceD3D11Impl*       pRenderDeviceD3D11,
                                  const ShaderCreateInfo&      ShaderCI) : 
@@ -39,7 +86,7 @@ ShaderD3D11Impl::ShaderD3D11Impl(IReferenceCounters*          pRefCounters,
         pRenderDeviceD3D11,
         ShaderCI.Desc
     },
-    ShaderD3DBase{ShaderCI}
+    ShaderD3DBase{ShaderCI, GetD3D11ShaderModel(pRenderDeviceD3D11->GetD3D11Device(), ShaderCI.HLSLVersion).c_str()}
 {
     auto *pDeviceD3D11 = pRenderDeviceD3D11->GetD3D11Device();
     switch (ShaderCI.Desc.ShaderType)

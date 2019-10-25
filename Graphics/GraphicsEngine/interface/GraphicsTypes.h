@@ -1308,17 +1308,45 @@ namespace Diligent
     /// Debug flags that can be specified when creating Direct3D11-based engine implementation.
     ///
     /// \sa CreateDeviceAndContextsD3D11Type, CreateSwapChainD3D11Type, LoadGraphicsEngineD3D11
-    enum class EngineD3D11DebugFlags : Uint32
+    enum D3D11_DEBUG_FLAGS : Uint32
     {
+        /// No debug flag
+        D3D11_DEBUG_FLAG_NONE                                = 0x00,
+
+        /// Whether to create Direct3D11 debug device
+        D3D11_DEBUG_FLAG_CREATE_DEBUG_DEVICE                 = 0x01,
+
         /// Before executing draw/dispatch command, verify that
         /// all required shader resources are bound to the device context
-        VerifyCommittedShaderResources = 0x01,
+        D3D11_DEBUG_FLAG_VERIFY_COMMITTED_SHADER_RESOURCES   = 0x02,
 
         /// Verify that all committed cotext resources are relevant,
         /// i.e. they are consistent with the committed resource cache.
-        /// This is very expensive operation and should generally not be 
-        /// necessary.
-        VerifyCommittedResourceRelevance = 0x02
+        /// This is very expensive and should generally not be necessary.
+        D3D11_DEBUG_FLAG_VERIFY_COMMITTED_RESOURCE_RELEVANCE = 0x04
+    };
+    DEFINE_FLAG_ENUM_OPERATORS(D3D11_DEBUG_FLAGS)
+
+    /// Direct3D11/12 feature level
+    enum DIRECT3D_FEATURE_LEVEL : Uint8
+    {
+        /// Feature level 10.0
+        DIRECT3D_FEATURE_LEVEL_10_0,
+
+        /// Feature level 10.1
+        DIRECT3D_FEATURE_LEVEL_10_1,
+
+        /// Feature level 11.0
+        DIRECT3D_FEATURE_LEVEL_11_0,
+
+        /// Feature level 11.1
+        DIRECT3D_FEATURE_LEVEL_11_1,
+
+        /// Feature level 12.0
+        DIRECT3D_FEATURE_LEVEL_12_0,
+
+        /// Feature level 12.1
+        DIRECT3D_FEATURE_LEVEL_12_1
     };
 
     /// Attributes specific to D3D11 engine
@@ -1326,21 +1354,16 @@ namespace Diligent
     {
         static constexpr Uint32 DefaultAdapterId = 0xFFFFFFFF;
         
-        /// Id of the hardware adapter the engine should be initialized on
+        /// Id of the hardware adapter the engine should be initialized on.
         Uint32 AdapterId = DefaultAdapterId;
 
-        /// Debug flags. See Diligent::EngineD3D11DebugFlags for a list of allowed values.
+        /// Minimum required Direct3D feature level.
+        DIRECT3D_FEATURE_LEVEL MinimumFeatureLevel = DIRECT3D_FEATURE_LEVEL_11_0;
+
+        /// Debug flags. See Diligent::D3D11_DEBUG_FLAGS for a list of allowed values.
         ///
         /// \sa CreateDeviceAndContextsD3D11Type, CreateSwapChainD3D11Type, LoadGraphicsEngineD3D11
-        Uint32 DebugFlags;
-
-        EngineD3D11CreateInfo() :
-            DebugFlags(0)
-        {
-#ifdef _DEBUG
-            DebugFlags = static_cast<Uint32>(EngineD3D11DebugFlags::VerifyCommittedShaderResources);
-#endif
-        }
+        D3D11_DEBUG_FLAGS DebugFlags               = D3D11_DEBUG_FLAG_NONE;
     };
 
     /// Attributes specific to D3D12 engine
@@ -1348,8 +1371,11 @@ namespace Diligent
     {
         static constexpr Uint32 DefaultAdapterId = 0xFFFFFFFF;
 
-        /// Id of the hardware adapter the engine should be initialized on
+        /// Id of the hardware adapter the engine should be initialized on.
         Uint32 AdapterId = DefaultAdapterId;
+
+        /// Minimum required Direct3D feature level.
+        DIRECT3D_FEATURE_LEVEL MinimumFeatureLevel = DIRECT3D_FEATURE_LEVEL_11_0;
 
         /// Enable Direct3D12 debug layer.
         bool EnableDebugLayer  = false;

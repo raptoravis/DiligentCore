@@ -50,15 +50,6 @@ enum SHADER_TYPE : Uint32
 };
 DEFINE_FLAG_ENUM_OPERATORS(SHADER_TYPE);
 
-enum SHADER_PROFILE : Uint8
-{
-    SHADER_PROFILE_DEFAULT = 0,
-    SHADER_PROFILE_DX_4_0,
-    SHADER_PROFILE_DX_5_0,
-    SHADER_PROFILE_DX_5_1,
-    SHADER_PROFILE_GL_4_2
-};
-
 /// Describes shader source code language
 enum SHADER_SOURCE_LANGUAGE : Uint32
 {
@@ -77,8 +68,6 @@ struct ShaderDesc : DeviceObjectAttribs
 {
 	/// Shader type. See Diligent::SHADER_TYPE.
     SHADER_TYPE    ShaderType    = SHADER_TYPE_VERTEX;
-
-    SHADER_PROFILE TargetProfile = SHADER_PROFILE_DEFAULT;
 };
 
 
@@ -184,6 +173,42 @@ struct ShaderCreateInfo
 
 	/// Shader source language. See Diligent::SHADER_SOURCE_LANGUAGE.
     SHADER_SOURCE_LANGUAGE SourceLanguage = SHADER_SOURCE_LANGUAGE_DEFAULT;
+
+
+    /// Shader version
+    struct ShaderVersion
+    {
+        /// Major revision
+        Uint8 Major = 0;
+
+        /// Minor revision
+        Uint8 Minor = 0;
+
+        ShaderVersion()noexcept{}
+        ShaderVersion(Uint8 _Major, Uint8 _Minor)noexcept :
+            Major {_Major},
+            Minor {_Minor}
+        {}
+    };
+
+    /// HLSL shader model to use when compiling the shader. When default value 
+    /// is given (0, 0), the engine will attempt to use the highest HLSL shader model
+    /// supported by the device. If the shader is created from the byte code, this value
+    /// has no effect.
+    ///
+    /// \note When HLSL source is converted to GLSL, corresponding GLSL/GLESSL version will be used.
+    ShaderVersion HLSLVersion = ShaderVersion{};
+
+    /// GLSL version to use when creating the shader. When default value 
+    /// is given (0, 0), the engine will attempt to use the highest GLSL version
+    /// supported by the device.
+    ShaderVersion GLSLVersion = ShaderVersion{};
+
+    /// GLES shading language version to use when creating the shader. When default value 
+    /// is given (0, 0), the engine will attempt to use the highest GLESSL version
+    /// supported by the device.
+    ShaderVersion GLESSLVersion = ShaderVersion{};
+
 
     /// Memory address where pointer to the compiler messages data blob will be written
 

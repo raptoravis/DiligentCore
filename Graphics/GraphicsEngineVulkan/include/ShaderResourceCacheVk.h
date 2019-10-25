@@ -52,6 +52,7 @@
 #include <vector>
 #include "DescriptorPoolManager.h"
 #include "SPIRVShaderResources.h"
+#include "BufferVkImpl.h"
 
 namespace Diligent
 {
@@ -167,18 +168,22 @@ public:
         return reinterpret_cast<const DescriptorSet*>(m_pMemory)[Index];
     }
 
-    inline Uint32 GetNumDescriptorSets()const{return m_NumSets; }
+    inline Uint32 GetNumDescriptorSets()const{return m_NumSets;          }
+    inline Uint32 GetNumDynamicBuffers()const{return m_NumDynamicBuffers;}
+
+    Uint16& GetDynamicBuffersCounter(){return m_NumDynamicBuffers;}
 
 #ifdef _DEBUG
     // Only for debug purposes: indicates what types of resources are stored in the cache
     DbgCacheContentType DbgGetContentType()const{return m_DbgContentType;}
     void DbgVerifyResourceInitialization()const;
+    void DbgVerifyDynamicBuffersCounter()const;
 #endif
 
     template<bool VerifyOnly>
     void TransitionResources(DeviceContextVkImpl *pCtxVkImpl);
 
-    Uint32 GetDynamicBufferOffsets(DeviceContextVkImpl *pCtxVkImpl, std::vector<uint32_t>& Offsets)const;
+    __forceinline Uint32 GetDynamicBufferOffsets(Uint32 CtxId, DeviceContextVkImpl* pCtxVkImpl, std::vector<uint32_t>& Offsets)const;
 
 private:
 
@@ -186,11 +191,17 @@ private:
     {
         return reinterpret_cast<Resource*>(reinterpret_cast<DescriptorSet*>(m_pMemory) + m_NumSets);
     }
+    const Resource* GetFirstResourcePtr()const
+    {
+        return reinterpret_cast<const Resource*>(reinterpret_cast<const DescriptorSet*>(m_pMemory) + m_NumSets);
+    }
 
-    IMemoryAllocator*   m_pAllocator     = nullptr; 
-    void*               m_pMemory        = nullptr;
-    Uint32              m_NumSets        = 0;
-    Uint32              m_TotalResources = 0;
+    IMemoryAllocator*   m_pAllocator        = nullptr; 
+    void*               m_pMemory           = nullptr;
+    Uint16              m_NumSets           = 0;
+    // Total number of dynamic buffers bound in the resource cache regardless of the variable type
+    Uint16              m_NumDynamicBuffers = 0;
+    Uint32              m_TotalResources    = 0;
 
 #ifdef _DEBUG
     // Only for debug purposes: indicates what types of resources are stored in the cache
@@ -199,5 +210,65 @@ private:
     std::vector<std::vector<bool>> m_DbgInitializedResources;
 #endif
 };
+
+__forceinline Uint32 ShaderResourceCacheVk::GetDynamicBufferOffsets(Uint32                 CtxId,
+                                                                    DeviceContextVkImpl*   pCtxVkImpl,
+                                                                    std::vector<uint32_t>& Offsets)const
+{
+    // If any of the sets being bound include dynamic uniform or storage buffers, then 
+    // pDynamicOffsets includes one element for each array element in each dynamic descriptor 
+    // type binding in each set. Values are taken from pDynamicOffsets in an order such that 
+    // all entries for set N come before set N+1; within a set, entries are ordered by the binding 
+    // numbers (unclear if this is SPIRV binding or VkDescriptorSetLayoutBinding number) in the 
+    // descriptor set layouts; and within a binding array, elements are in order. (13.2.5)
+
+    // In each descriptor set, all uniform buffers for every shader stage come first,
+    // followed by all storage buffers for every shader stage, followed by all other resources
+    Uint32 OffsetInd = 0;
+    for (Uint32 set=0; set < m_NumSets; ++set)
+    {
+        const auto& DescrSet = GetDescriptorSet(set);
+        Uint32 res = 0;
+        while (res < DescrSet.GetSize())
+        {
+            const auto& Res = DescrSet.GetResource(res);
+            if (Res.Type != SPIRVShaderResourceAttribs::ResourceType::UniformBuffer)
+                break;
+
+            const auto* pBufferVk = Res.pObject.RawPtr<const BufferVkImpl>();
+            auto Offset = pBufferVk != nullptr ? pBufferVk->GetDynamicOffset(CtxId, pCtxVkImpl) : 0;
+            Offsets[OffsetInd++] = Offset;
+
+            ++res;
+        }
+
+        while (res < DescrSet.GetSize())
+        {
+            const auto& Res = DescrSet.GetResource(res);
+            if (Res.Type != SPIRVShaderResourceAttribs::ResourceType::ROStorageBuffer && 
+                Res.Type != SPIRVShaderResourceAttribs::ResourceType::RWStorageBuffer)
+                break;
+
+            const auto* pBufferVkView = Res.pObject.RawPtr<const BufferViewVkImpl>();
+            const auto* pBufferVk = pBufferVkView != nullptr ? pBufferVkView->GetBufferVk() : 0;
+            auto Offset = pBufferVk != nullptr ? pBufferVk->GetDynamicOffset(CtxId, pCtxVkImpl) : 0;
+            Offsets[OffsetInd++] = Offset;
+
+            ++res;
+        }
+
+#ifdef _DEBUG
+        for (; res < DescrSet.GetSize(); ++res)
+        {
+            const auto& Res = DescrSet.GetResource(res);
+            VERIFY(Res.Type != SPIRVShaderResourceAttribs::ResourceType::UniformBuffer   && 
+                   Res.Type != SPIRVShaderResourceAttribs::ResourceType::ROStorageBuffer &&
+                   Res.Type != SPIRVShaderResourceAttribs::ResourceType::RWStorageBuffer, 
+                   "All uniform and storage buffers are expected to go first in the beginning of each descriptor set");
+        }
+#endif
+    }
+    return OffsetInd;
+}
 
 }

@@ -92,9 +92,13 @@ public:
                                    ITextureView*                  pDepthStencil,
                                    RESOURCE_STATE_TRANSITION_MODE StateTransitionMode )override final;
 
-    virtual void Draw( DrawAttribs& DrawAttribs )override final;
+    virtual void Draw               (const DrawAttribs& Attribs)override final;
+    virtual void DrawIndexed        (const DrawIndexedAttribs& Attribs)override final;
+    virtual void DrawIndirect       (const DrawIndirectAttribs& Attribs, IBuffer* pAttribsBuffer)override final;
+    virtual void DrawIndexedIndirect(const DrawIndexedIndirectAttribs& Attribs, IBuffer* pAttribsBuffer)override final;
 
-    virtual void DispatchCompute( const DispatchComputeAttribs& DispatchAttrs )override final;
+    virtual void DispatchCompute(const DispatchComputeAttribs& Attribs)override final;
+    virtual void DispatchComputeIndirect(const DispatchComputeIndirectAttribs& Attribs, IBuffer* pAttribsBuffer)override final;
 
     virtual void ClearDepthStencil(ITextureView*                  pView,
                                    CLEAR_DEPTH_STENCIL_FLAGS      ClearFlags,
@@ -222,24 +226,35 @@ public:
     Int64 GetCurrentFrameNumber()const {return m_ContextFrameNumber; }
 
 private:
-    void CommitD3D12IndexBuffer(VALUE_TYPE IndexType);
+    void CommitD3D12IndexBuffer(GraphicsContext& GraphCtx, VALUE_TYPE IndexType);
     void CommitD3D12VertexBuffers(class GraphicsContext& GraphCtx);
     void CommitRenderTargets(RESOURCE_STATE_TRANSITION_MODE StateTransitionMode);
     void CommitViewports();
     void CommitScissorRects(class GraphicsContext &GraphCtx, bool ScissorEnable);
     void Flush(bool RequestNewCmdCtx);
-    void RequestCommandContext(RenderDeviceD3D12Impl* pDeviceD3D12Impl);
-    inline void TransitionOrVerifyBufferState(CommandContext&                CmdCtx,
-                                              BufferD3D12Impl&               Buffer,
-                                              RESOURCE_STATE_TRANSITION_MODE TransitionMode,
-                                              RESOURCE_STATE                 RequiredState,
-                                              const char*                    OperationName);
-    inline void TransitionOrVerifyTextureState(CommandContext&                CmdCtx,
-                                               TextureD3D12Impl&              Texture,
-                                               RESOURCE_STATE_TRANSITION_MODE TransitionMode,
-                                               RESOURCE_STATE                 RequiredState,
-                                               const char*                    OperationName);
+    __forceinline void RequestCommandContext(RenderDeviceD3D12Impl* pDeviceD3D12Impl);
+    __forceinline void TransitionOrVerifyBufferState(CommandContext&                CmdCtx,
+                                                     BufferD3D12Impl&               Buffer,
+                                                     RESOURCE_STATE_TRANSITION_MODE TransitionMode,
+                                                     RESOURCE_STATE                 RequiredState,
+                                                     const char*                    OperationName);
+    __forceinline void TransitionOrVerifyTextureState(CommandContext&                CmdCtx,
+                                                      TextureD3D12Impl&              Texture,
+                                                      RESOURCE_STATE_TRANSITION_MODE TransitionMode,
+                                                      RESOURCE_STATE                 RequiredState,
+                                                      const char*                    OperationName);
 
+    __forceinline void PrepareForDraw(GraphicsContext& GraphCtx, DRAW_FLAGS Flags);
+
+    __forceinline void PrepareForIndexedDraw(GraphicsContext& GraphCtx, DRAW_FLAGS Flags, VALUE_TYPE IndexType);
+
+    __forceinline void PrepareForDispatchCompute(ComputeContext& GraphCtx);
+
+    __forceinline void PrepareDrawIndirectBuffer(GraphicsContext&               GraphCtx,
+                                                 IBuffer*                       pAttribsBuffer,
+                                                 RESOURCE_STATE_TRANSITION_MODE BufferStateTransitionMode,
+                                                 ID3D12Resource*&               pd3d12ArgsBuff,
+                                                 size_t&                        BuffDataStartByteOffset);
 
     struct TextureUploadSpace
     {
@@ -273,11 +288,15 @@ private:
         VALUE_TYPE              CommittedIBFormat                  = VT_UNDEFINED;
         Uint32                  CommittedD3D12IndexDataStartOffset = 0;
 
-        // Flag indicating if currently committed D3D12 vertex buffers are up to date
+        // Indicates if currently committed D3D12 vertex buffers are up to date
         bool bCommittedD3D12VBsUpToDate = false;
 
-        // Fl indicating if currently committed D3D11 index buffer is up to date
+        // Indicates if currently committed D3D11 index buffer is up to date
         bool bCommittedD3D12IBUpToDate  = false;
+
+        // Indicates if root views have been committed since the time SRB
+        // has been committed.
+        bool bRootViewsCommitted        = false;
 
         class ShaderResourceCacheD3D12* pCommittedResourceCache = nullptr;
     }m_State;

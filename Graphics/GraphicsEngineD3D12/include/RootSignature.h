@@ -28,6 +28,7 @@
 #include <array>
 #include "ShaderD3DBase.h"
 #include "ShaderResourceLayoutD3D12.h"
+#include "BufferD3D12Impl.h"
 
 namespace Diligent
 {
@@ -326,10 +327,16 @@ public:
     void TransitionResources(ShaderResourceCacheD3D12&  ResourceCache, 
                              class CommandContext&      Ctx)const;
 
-    void CommitRootViews(ShaderResourceCacheD3D12&     ResourceCache, 
-                         class CommandContext&         Ctx, 
-                         bool                          IsCompute,
-                         class DeviceContextD3D12Impl* pCtx)const;
+    __forceinline void CommitRootViews(ShaderResourceCacheD3D12&     ResourceCache, 
+                                       class CommandContext&         CmdCtx, 
+                                       bool                          IsCompute,
+                                       Uint32                        DeviceCtxId,
+                                       class DeviceContextD3D12Impl* pDeviceCtx,
+                                       bool                          CommitViews,
+                                       bool                          ProcessDynamicBuffers,
+                                       bool                          ProcessNonDynamicBuffers,
+                                       bool                          TransitionStates,
+                                       bool                          ValidateStates)const;
 
     Uint32 GetTotalSrvCbvUavSlots(SHADER_RESOURCE_VARIABLE_TYPE VarType)const
     {
@@ -356,6 +363,11 @@ public:
 private:
 #ifdef _DEBUG
     void dbgVerifyRootParameters()const;
+#endif
+
+#ifdef DEVELOPMENT
+    static void DvpVerifyResourceState(const ShaderResourceCacheD3D12::Resource& Res,
+                                       D3D12_DESCRIPTOR_RANGE_TYPE               RangeType);
 #endif
     
     std::vector<Uint32, STDAllocatorRawMem<Uint32> > GetCacheTableSizes()const;
@@ -487,5 +499,77 @@ private:
                                              bool                          IsCompute,
                                              bool                          ValidateStates)const;
 };
+
+void RootSignature::CommitRootViews(ShaderResourceCacheD3D12& ResourceCache, 
+                                    CommandContext&           CmdCtx, 
+                                    bool                      IsCompute,
+                                    Uint32                    DeviceCtxId,
+                                    DeviceContextD3D12Impl*   pDeviceCtx,
+                                    bool                      CommitViews,
+                                    bool                      ProcessDynamicBuffers,
+                                    bool                      ProcessNonDynamicBuffers,
+                                    bool                      TransitionStates,
+                                    bool                      ValidateStates)const
+{
+    for (Uint32 rv = 0; rv < m_RootParams.GetNumRootViews(); ++rv)
+    {
+        auto& RootView = m_RootParams.GetRootView(rv);
+        auto RootInd = RootView.GetRootIndex();
+       
+        SHADER_TYPE dbgShaderType = SHADER_TYPE_UNKNOWN;
+#ifdef _DEBUG
+        {
+            auto& Param = static_cast<const D3D12_ROOT_PARAMETER&>( RootView );
+            VERIFY_EXPR(Param.ParameterType == D3D12_ROOT_PARAMETER_TYPE_CBV);
+            dbgShaderType = ShaderTypeFromShaderVisibility(Param.ShaderVisibility);
+        }
+#endif
+
+        auto& Res = ResourceCache.GetRootTable(RootInd).GetResource(0, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, dbgShaderType);
+        if (auto* pBuffToTransition = Res.pObject.RawPtr<BufferD3D12Impl>())
+        {
+            bool IsDynamic = pBuffToTransition->GetDesc().Usage == USAGE_DYNAMIC;
+            if (IsDynamic && ProcessDynamicBuffers || !IsDynamic && ProcessNonDynamicBuffers)
+            {
+                if (IsDynamic)
+                {
+#ifdef _DEBUG
+                    if (pBuffToTransition->IsInKnownState())
+                    {
+                        VERIFY(pBuffToTransition->CheckState(RESOURCE_STATE_CONSTANT_BUFFER),
+                               "Dynamic buffers must always have RESOURCE_STATE_CONSTANT_BUFFER state flag set");
+                    }
+#endif
+                }
+                else
+                {
+                    if (TransitionStates)
+                    {
+                        if (pBuffToTransition->IsInKnownState() && !pBuffToTransition->CheckState(RESOURCE_STATE_CONSTANT_BUFFER))
+                        {
+                            CmdCtx.TransitionResource(pBuffToTransition, RESOURCE_STATE_CONSTANT_BUFFER);
+                        }
+                    }
+#ifdef DEVELOPMENT
+                    else if (ValidateStates)
+                    {
+
+                        DvpVerifyResourceState(Res, D3D12_DESCRIPTOR_RANGE_TYPE_CBV);
+                    }
+#endif
+                }
+
+                if (CommitViews)
+                {
+                    D3D12_GPU_VIRTUAL_ADDRESS CBVAddress = pBuffToTransition->GetGPUAddress(DeviceCtxId, pDeviceCtx);
+                    if(IsCompute)
+                        CmdCtx.GetCommandList()->SetComputeRootConstantBufferView(RootInd, CBVAddress);
+                    else
+                        CmdCtx.GetCommandList()->SetGraphicsRootConstantBufferView(RootInd, CBVAddress);
+                }
+            }
+        }
+    }
+}
 
 }
