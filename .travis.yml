@@ -9,7 +9,7 @@ notifications:
 
 env:
   global:
-    - CMAKE_VERSION=3.13.2
+    - CMAKE_VERSION=3.15.4
 
 before_install:
   - |
@@ -106,7 +106,7 @@ script:
       else
         cmake .. -DCMAKE_INSTALL_PREFIX=install -G "Xcode"
       fi
-      cmake --build . --target install --config ${CONFIG}
+      cmake --build . --target install --config ${CONFIG} | xcpretty
     fi
 
 after_success:
