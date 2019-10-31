@@ -153,7 +153,7 @@ namespace Diligent
 
     // http://diligentgraphics.com/diligent-engine/architecture/d3d11/committing-shader-resources-to-the-gpu-pipeline/
     template<bool TransitionResources, bool CommitResources>
-    void DeviceContextD3D11Impl::TransitionAndCommitShaderResources(IPipelineState* pPSO, IShaderResourceBinding* pShaderResourceBinding, bool VerifyStates)
+    void DeviceContextD3D11Impl::TransitionAndCommitShaderResources(IPipelineState* pPSO, IShaderResourceBinding* pShaderResourceBinding, bool VerifyStates, bool bCheckSRVUAV)
     {
         VERIFY_EXPR(pPSO != nullptr);
         static_assert(TransitionResources || CommitResources, "At least one of TransitionResources or CommitResources flags is expected to be true");
@@ -543,7 +543,7 @@ namespace Diligent
                         m_NumCommittedSRVs[ShaderTypeInd] = std::max(m_NumCommittedSRVs[ShaderTypeInd], static_cast<Uint8>(NumSRVs));
                     }
 #ifdef DEVELOPMENT
-                    if (m_DebugFlags & D3D11_DEBUG_FLAG_VERIFY_COMMITTED_RESOURCE_RELEVANCE)
+                    if (m_DebugFlags & D3D11_DEBUG_FLAG_VERIFY_COMMITTED_RESOURCE_RELEVANCE && bCheckSRVUAV)
                     {
                         dbgVerifyCommittedSRVs(pShaderD3D11->GetDesc().ShaderType);
                     }
@@ -594,7 +594,7 @@ namespace Diligent
 
 
 #ifdef DEVELOPMENT
-            if (CommitResources && (m_DebugFlags & D3D11_DEBUG_FLAG_VERIFY_COMMITTED_SHADER_RESOURCES) != 0)
+            if (CommitResources && (m_DebugFlags & D3D11_DEBUG_FLAG_VERIFY_COMMITTED_SHADER_RESOURCES) != 0 && bCheckSRVUAV)
             {
                 // Use full resource layout to verify that all required resources are committed
                 pShaderD3D11->GetD3D11Resources()->dvpVerifyCommittedResources(
@@ -614,18 +614,18 @@ namespace Diligent
     {
         DEV_CHECK_ERR(pPipelineState != nullptr, "Pipeline state must not be null");
         DEV_CHECK_ERR(pShaderResourceBinding != nullptr, "Shader resource binding must not be null");
-        TransitionAndCommitShaderResources<true, false>(pPipelineState, pShaderResourceBinding, false);
+        TransitionAndCommitShaderResources<true, false>(pPipelineState, pShaderResourceBinding, false, true);
     }
 
-    void DeviceContextD3D11Impl::CommitShaderResources(IShaderResourceBinding* pShaderResourceBinding, RESOURCE_STATE_TRANSITION_MODE StateTransitionMode)
+    void DeviceContextD3D11Impl::CommitShaderResources(IShaderResourceBinding* pShaderResourceBinding, RESOURCE_STATE_TRANSITION_MODE StateTransitionMode, bool bCheckUAVSRV)
     {
         if (!DeviceContextBase::CommitShaderResources(pShaderResourceBinding, StateTransitionMode, 0 /*Dummy*/))
             return;
 
         if (StateTransitionMode == RESOURCE_STATE_TRANSITION_MODE_TRANSITION)
-            TransitionAndCommitShaderResources<true, true>(m_pPipelineState, pShaderResourceBinding, false);
+            TransitionAndCommitShaderResources<true, true>(m_pPipelineState, pShaderResourceBinding, false, bCheckUAVSRV);
         else
-            TransitionAndCommitShaderResources<false, true>(m_pPipelineState, pShaderResourceBinding, StateTransitionMode == RESOURCE_STATE_TRANSITION_MODE_VERIFY);
+            TransitionAndCommitShaderResources<false, true>(m_pPipelineState, pShaderResourceBinding, StateTransitionMode == RESOURCE_STATE_TRANSITION_MODE_VERIFY, bCheckUAVSRV);
     }
 
     void DeviceContextD3D11Impl::SetStencilRef(Uint32 StencilRef)
