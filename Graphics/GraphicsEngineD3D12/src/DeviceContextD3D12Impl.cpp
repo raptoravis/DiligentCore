@@ -247,7 +247,7 @@ namespace Diligent
         pPipelineStateD3D12->CommitAndTransitionShaderResources(this, Ctx, Attribs);
     }
 
-    void DeviceContextD3D12Impl::CommitShaderResources(IShaderResourceBinding* pShaderResourceBinding, RESOURCE_STATE_TRANSITION_MODE StateTransitionMode)
+    void DeviceContextD3D12Impl::CommitShaderResources(IShaderResourceBinding* pShaderResourceBinding, RESOURCE_STATE_TRANSITION_MODE StateTransitionMode, bool bCheckUAVSRV)
     {
         if (!DeviceContextBase::CommitShaderResources(pShaderResourceBinding, StateTransitionMode, 0 /*Dummy*/))
             return;

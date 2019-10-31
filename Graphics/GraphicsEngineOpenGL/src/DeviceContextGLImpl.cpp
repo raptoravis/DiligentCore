@@ -143,7 +143,7 @@ namespace Diligent
 
     }
 
-    void DeviceContextGLImpl::CommitShaderResources(IShaderResourceBinding* pShaderResourceBinding, RESOURCE_STATE_TRANSITION_MODE StateTransitionMode)
+    void DeviceContextGLImpl::CommitShaderResources(IShaderResourceBinding* pShaderResourceBinding, RESOURCE_STATE_TRANSITION_MODE StateTransitionMode, bool bCheckUAVSRV)
     {
         if (!DeviceContextBase::CommitShaderResources(pShaderResourceBinding, StateTransitionMode, 0))
             return;
