@@ -57,6 +57,7 @@ namespace Diligent
         m_DebugFlags         {EngineAttribs.DebugFlags   },
         m_CmdListAllocator   {GetRawAllocator(), sizeof(CommandListD3D11Impl), 64}
     {
+		m_nvapi.init();
     }
 
     IMPLEMENT_QUERY_INTERFACE( DeviceContextD3D11Impl, IID_DeviceContextD3D11, TDeviceContextBase )
@@ -856,6 +857,32 @@ namespace Diligent
         ID3D11Buffer* pd3d11ArgsBuff = pIndirectDrawAttribsD3D11->m_pd3d11Buffer;
         m_pd3d11DeviceContext->DrawIndexedInstancedIndirect( pd3d11ArgsBuff, Attribs.IndirectDrawArgsOffset );
     }
+
+	void DeviceContextD3D11Impl::MultiDrawInstancedIndirect(Uint32 _numDrawIndirect, IBuffer* pIndirectBuffer, Uint32 _offset, Uint32 _stride)
+	{
+		auto* pIndirectBufferImpl = ValidatedCast<BufferD3D11Impl>(pIndirectBuffer);
+		ID3D11Buffer* pIndirectBufferD3D11 = pIndirectBufferImpl->m_pd3d11Buffer;
+
+		if (m_nvapi.nvApiD3D11MultiDrawInstancedIndirect) {
+			m_nvapi.nvApiD3D11MultiDrawInstancedIndirect(m_pd3d11DeviceContext, _numDrawIndirect, pIndirectBufferD3D11, _offset, _stride);
+		}
+		else {
+			LOG_ERROR("nvapi not initialized");
+		}
+	}
+
+	void DeviceContextD3D11Impl::MultiDrawIndexedInstancedIndirect(Uint32 _numDrawIndirect, IBuffer* pIndirectBuffer, Uint32 _offset, Uint32 _stride)
+	{
+		auto* pIndirectBufferImpl = ValidatedCast<BufferD3D11Impl>(pIndirectBuffer);
+		ID3D11Buffer* pIndirectBufferD3D11 = pIndirectBufferImpl->m_pd3d11Buffer;
+
+		if (m_nvapi.nvApiD3D11MultiDrawIndexedInstancedIndirect) {
+			m_nvapi.nvApiD3D11MultiDrawIndexedInstancedIndirect(m_pd3d11DeviceContext, _numDrawIndirect, pIndirectBufferD3D11, _offset, _stride);
+		}
+		else {
+			LOG_ERROR("nvapi not initialized");
+		}
+	}
 
     void DeviceContextD3D11Impl::DispatchCompute(const DispatchComputeAttribs& Attribs)
     {

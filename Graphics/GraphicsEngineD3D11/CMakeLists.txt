@@ -28,6 +28,7 @@ set(INCLUDE
     include/Texture3D_D3D11.h
     include/TextureBaseD3D11.h
     include/TextureViewD3D11Impl.h
+	include/nvapi.h
 )
 
 set(INTERFACE 
@@ -70,6 +71,7 @@ set(SRC
     src/Texture3D_D3D11.cpp
     src/TextureBaseD3D11.cpp
     src/TextureViewD3D11Impl.cpp
+	src/nvapi.cpp
 )
 
 add_library(Diligent-GraphicsEngineD3D11Interface INTERFACE)

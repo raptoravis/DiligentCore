@@ -33,6 +33,8 @@
 #include "TextureBaseD3D11.h"
 #include "PipelineStateD3D11Impl.h"
 
+#include "nvapi.h"
+
 #ifdef _DEBUG
 #   define VERIFY_CONTEXT_BINDINGS
 #endif
@@ -98,6 +100,9 @@ public:
     virtual void DrawIndexed        (const DrawIndexedAttribs& Attribs)override final;
     virtual void DrawIndirect       (const DrawIndirectAttribs& Attribs, IBuffer* pAttribsBuffer)override final;
     virtual void DrawIndexedIndirect(const DrawIndexedIndirectAttribs& Attribs, IBuffer* pAttribsBuffer)override final;
+
+	virtual void MultiDrawIndexedInstancedIndirect(Uint32 _numDrawIndirect, IBuffer* pIndirectBuffer, Uint32 _offset, Uint32 _stride)override final;
+	virtual void MultiDrawInstancedIndirect(Uint32 _numDrawIndirect, IBuffer* pIndirectBuffer, Uint32 _offset, Uint32 _stride)override final;
 
     virtual void DispatchCompute(const DispatchComputeAttribs& Attribs)override final;
     virtual void DispatchComputeIndirect(const DispatchComputeIndirectAttribs& Attribs, IBuffer* pAttribsBuffer)override final;
@@ -313,6 +318,8 @@ private:
     const Uint32 m_DebugFlags;
 
     FixedBlockMemoryAllocator m_CmdListAllocator;
+
+	DiligentNv::NvApi m_nvapi;
 
 #ifdef VERIFY_CONTEXT_BINDINGS
 

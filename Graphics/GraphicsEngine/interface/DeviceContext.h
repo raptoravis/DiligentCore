@@ -839,6 +839,8 @@ public:
     ///           explicitly manage the states using IDeviceContext::TransitionResourceStates() method.
     virtual void DrawIndexedIndirect(const DrawIndexedIndirectAttribs& Attribs, IBuffer* pAttribsBuffer) = 0;
 
+	virtual void MultiDrawIndexedInstancedIndirect(Uint32 _numDrawIndirect, IBuffer* pIndirectBuffer, Uint32 _offset, Uint32 _stride) {};
+	virtual void MultiDrawInstancedIndirect(Uint32 _numDrawIndirect, IBuffer* pIndirectBuffer, Uint32 _offset, Uint32 _stride) {};
 
     /// Executes a dispatch compute command.
     
