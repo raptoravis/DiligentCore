@@ -469,7 +469,7 @@ namespace Diligent
                     {
                         if (auto* pTexture = ValidatedCast<TextureBaseD3D11>(SRVRes.pTexture))
                         {
-                            if (pTexture->IsInKnownState() && !pTexture->CheckState(RESOURCE_STATE_SHADER_RESOURCE))
+                            if (pTexture->IsInKnownState() && !pTexture->CheckState(RESOURCE_STATE_SHADER_RESOURCE) && bCheckSRVUAV)
                             {
                                 if (pTexture->CheckState(RESOURCE_STATE_UNORDERED_ACCESS))
                                 {
