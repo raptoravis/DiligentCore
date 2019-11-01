@@ -860,6 +860,8 @@ namespace Diligent
 
 	void DeviceContextD3D11Impl::MultiDrawInstancedIndirect(Uint32 _numDrawIndirect, IBuffer* pIndirectBuffer, Uint32 _offset, Uint32 _stride)
 	{
+		PrepareForIndexedDraw(DRAW_FLAG_VERIFY_STATES, VALUE_TYPE::VT_INT32);
+
 		auto* pIndirectBufferImpl = ValidatedCast<BufferD3D11Impl>(pIndirectBuffer);
 		ID3D11Buffer* pIndirectBufferD3D11 = pIndirectBufferImpl->m_pd3d11Buffer;
 
@@ -873,6 +875,8 @@ namespace Diligent
 
 	void DeviceContextD3D11Impl::MultiDrawIndexedInstancedIndirect(Uint32 _numDrawIndirect, IBuffer* pIndirectBuffer, Uint32 _offset, Uint32 _stride)
 	{
+		PrepareForIndexedDraw(DRAW_FLAG_VERIFY_STATES, VALUE_TYPE::VT_UINT32);
+
 		auto* pIndirectBufferImpl = ValidatedCast<BufferD3D11Impl>(pIndirectBuffer);
 		ID3D11Buffer* pIndirectBufferD3D11 = pIndirectBufferImpl->m_pd3d11Buffer;
 
